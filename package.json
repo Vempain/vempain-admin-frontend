@@ -1,0 +1,58 @@
+{
+  "name" : "vempain-admin-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@ant-design/icons" : "^5.3.5",
+    "@testing-library/jest-dom" : "^6.2.0",
+    "@testing-library/react" : "^14.2.1",
+    "@testing-library/user-event" : "^14.5.2",
+    "@types/dompurify" : "^3.0.5",
+    "@types/jest" : "^29.5.12",
+    "@types/node" : "^20.11.28",
+    "@types/react" : "^18.2.66",
+    "@types/react-dom" : "^18.2.18",
+    "@types/react-highlight-words" : "^0.16.7",
+    "antd" : "^5.15.3",
+    "axios" : "^1.6.8",
+    "dompurify" : "^3.0.8",
+    "env-cmd": "^10.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-highlight-words" : "^0.20.0",
+    "react-router-dom" : "^6.22.3",
+    "react-scripts": "5.0.1",
+    "typescript" : "^4.9.5",
+    "web-vitals" : "^3.5.1"
+  },
+  "scripts": {
+    "start" : "env-cmd -f .env.local react-scripts start",
+    "build:test" : "react-scripts build",
+    "build:stage" : "env-cmd -f .env.stage react-scripts build",
+    "build:production" : "env-cmd -f .env.prod react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies" : {
+    "@babel/plugin-proposal-private-property-in-object" : "^7.21.11",
+    "@types/dompurify" : "^3.0.5"
+  }
+}

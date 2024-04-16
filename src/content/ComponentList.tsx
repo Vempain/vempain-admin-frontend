@@ -1,0 +1,103 @@
+import { useEffect, useState } from "react";
+import { ColumnsType } from "antd/lib/table";
+import { Button, Space, Spin, Table } from "antd";
+import { PlusCircleFilled } from "@ant-design/icons";
+import { Link } from "react-router-dom";
+import { useSession } from "../session";
+import { PrivilegeEnum } from "../models";
+import { ComponentVO } from "../models/Responses";
+import { aclTool } from "../tools";
+import { componentAPI } from "../services";
+
+export function ComponentList() {
+    const [loading, setLoading] = useState<boolean>(false);
+    const [componentList, setComponentList] = useState<ComponentVO[]>([]);
+    const {userSession} = useSession();
+
+    const columns: ColumnsType<ComponentVO> = [
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            sorter: (a, b) => a.id - b.id
+        },
+        {
+            title: 'Component Name',
+            dataIndex: 'comp_name',
+            key: 'comp_name',
+            sorter: (a, b) => a.comp_name.localeCompare(b.comp_name)
+        },
+        {
+            title: 'Locked',
+            dataIndex: 'locked',
+            key: 'locked',
+            sorter: (a, b) => Number(b.locked) - Number(a.locked)
+        },
+        {
+            title: 'Creator',
+            dataIndex: 'creator',
+            key: 'creator',
+            sorter: (a, b) => a.creator - b.creator
+        },
+        {
+            title: 'Created',
+            dataIndex: 'created',
+            key: 'created',
+            sorter: (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
+        },
+        {
+            title: 'Modifier',
+            dataIndex: 'modifier',
+            key: 'modifier',
+            sorter: (a, b) => a.modifier - b.modifier
+        },
+        {
+            title: 'Modified',
+            dataIndex: 'modified',
+            key: 'modified',
+            sorter: (a, b) => new Date(a.modified).getTime() - new Date(b.modified).getTime()
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (text: any, record: ComponentVO) => (
+                    <Space>
+                        <Button type="primary" href={`/components/${record.id}/edit`}>Edit</Button>
+                        {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&
+                                <Button type={'primary'} danger href={`/components/${record.id}/delete`}>Delete</Button>}
+                    </Space>
+
+            ),
+        },
+    ];
+
+    useEffect(() => {
+        setLoading(true);
+        componentAPI.findAll()
+                .then((response) => {
+                    setComponentList(response);
+                    setLoading(false);
+                });
+    }, []);
+
+    return (
+            <div className={'darkBody'} key={'componentListDiv'}>
+                <Spin tip={'Loading'} spinning={loading} key={'componentListSpinner'}>
+                    <h1 key={'componentListHeader'}>Component List <Link to={'/components/0/edit'}><PlusCircleFilled/></Link></h1>
+
+                    <Table
+                            dataSource={componentList.map((item, index) => ({...item, key: `row_${index}`}))}
+                            columns={columns}
+                            pagination={{
+                                defaultPageSize: 5,
+                                hideOnSinglePage: true,
+                                showSizeChanger: true,
+                                showQuickJumper: true,
+                                total: componentList.length,
+                                pageSizeOptions: ['5', '10', '20', '30', '50', '100']
+                            }}
+                            key={'componentListTable'}/>
+                </Spin>
+            </div>
+    );
+}
