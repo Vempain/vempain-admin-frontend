@@ -70,7 +70,7 @@ function App() {
                         </div>
                     </Content>
                     <Footer style={{textAlign: "center"}}
-                            dangerouslySetInnerHTML={{__html: process.env.REACT_APP_VEMPAIN_COPYRIGHT_FOOTER + "<br/>" + process.env.REACT_APP_POWERED_BY_VEMPAIN}}
+                            dangerouslySetInnerHTML={{__html: import.meta.env.VITE_APP_VEMPAIN_COPYRIGHT_FOOTER + "<br/>" + import.meta.env.VITE_APP_POWERED_BY_VEMPAIN}}
                     />
                 </Layout>
             </ConfigProvider>

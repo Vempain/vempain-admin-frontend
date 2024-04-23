@@ -6,7 +6,7 @@ export abstract class AbstractAPI<REQUEST, RESPONSE> {
 
     constructor(member: string) {
         this.axiosInstance = Axios.create({
-            baseURL: `${process.env.REACT_APP_API_URL}` + member
+            baseURL: `${import.meta.env.VITE_APP_API_URL}` + member
         });
     }
 
