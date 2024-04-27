@@ -54,6 +54,7 @@ export function UnitEditor() {
                 created: new Date(),
                 modifier: 0,
                 modified: new Date(),
+                locked: false
             });
             setLoading(false);
         }
