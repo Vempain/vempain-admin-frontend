@@ -5,6 +5,7 @@ yarn.lock
 package-lock.json
 node_modules
 build
+coverage
 
 .env.local
 .env.stage
