@@ -1,0 +1,24 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+concurrency: build
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up NodeJS
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: '20'
+      - name: Test
+        run: |
+          yarn install
+          yarn build
+          yarn test --passWithNoTests --watchAll=false
