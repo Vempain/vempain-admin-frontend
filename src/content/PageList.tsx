@@ -6,6 +6,7 @@ import { PlusCircleFilled } from "@ant-design/icons";
 import { QueryDetailEnum } from "../models";
 import { PageVO } from "../models/Responses";
 import { pageAPI } from "../services";
+import dayjs from "dayjs";
 
 // Define an hash containing the spin messages
 const spinMessages: Record<string, string> = {
@@ -78,6 +79,9 @@ export function PageList() {
             dataIndex: 'created',
             key: 'created',
             sorter: (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime(),
+            render: (_text: string, record: PageVO) => {
+                return (<>{dayjs(record.created).format("YYYY.MM.DD HH:mm")}</>);
+            }
         },
         {
             title: 'Modifier',
@@ -90,6 +94,13 @@ export function PageList() {
             dataIndex: 'modified',
             key: 'modified',
             sorter: (a, b) => new Date(a.modified).getTime() - new Date(b.modified).getTime(),
+            render: (_text: string, record: PageVO) => {
+                if (record.modified === null) {
+                    return (<>-</>);
+                }
+
+                return (<>{dayjs(record.modified).format("YYYY.MM.DD HH:mm")}</>);
+            }
         },
         {
             title: 'Published',
@@ -110,11 +121,18 @@ export function PageList() {
 
                 return (new Date(a.published).getTime() - new Date(b.published).getTime());
             },
+            render: (_text: string, record: PageVO) => {
+                if (record.published === null) {
+                    return (<>-</>);
+                }
+
+                return (<>{dayjs(record.published).format("YYYY.MM.DD HH:mm")}</>);
+            }
         },
         {
             title: 'Action',
             key: 'action',
-            render: (text: any, record: PageVO) => (
+            render: (_text: any, record: PageVO) => (
                     <Space>
                         <Button type="primary" href={`/pages/${record.id}/edit`}>Edit</Button>
                         <Button type={"primary"} danger href={`/pages/${record.id}/delete`}>Delete</Button>
