@@ -12,7 +12,7 @@ export function CommonFileCard({commonFile}: CommonFileCardProps) {
     // Generate Collapse items dynamically
     const metadataProps = Object.keys(metaData).map(key => ({
         label: key,
-        children: typeof metaData[key] === 'string' ? (
+        items: typeof metaData[key] === 'string' ? (
                 // Render directly if value is a string
                 <Input value={metaData[key]}/>
         ) : (

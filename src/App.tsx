@@ -19,7 +19,7 @@ import {
 } from "./content";
 import { UnitEditor, UnitList, UserEditor, UserList } from "./user";
 import { LayoutDelete } from "./content/LayoutDelete";
-import { AudioList, DocumentList, FileImport, GalleryDelete, GalleryEdit, GalleryList, GalleryPublish, ImageList, VideoList } from "./file";
+import { AudioList, DocumentList, FileImport, GalleryDelete, GalleryEdit, GalleryList, GalleryPublish, GalleryRefresh, ImageList, VideoList } from "./file";
 
 const {Content, Footer} = Layout;
 
@@ -58,6 +58,7 @@ function App() {
                                 <Route path={'/galleries/:paramId/delete'} element={<GalleryDelete/>}/>
                                 <Route path={'/galleries/:paramId/edit'} element={<GalleryEdit/>}/>
                                 <Route path={'/galleries/:paramId/publish'} element={<GalleryPublish/>}/>
+                                <Route path={'/galleries/:paramId/refresh'} element={<GalleryRefresh/>}/>
                                 <Route path={'/images'} element={<ImageList/>}/>
                                 <Route path={'/import'} element={<FileImport/>}/>
                                 <Route path={'/videos'} element={<VideoList/>}/>
