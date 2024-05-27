@@ -227,7 +227,10 @@ export function FileImport() {
                                                 <Input placeholder="Gallery short name" style={{width: 800}}/>
                                             </Form.Item>
                                             <Form.Item name="gallery_description" label="Gallery Description">
-                                                <TextArea placeholder="Gallery description" style={{width: 800}}/>
+                                                <TextArea placeholder="Gallery description"
+                                                          style={{width: 800}}
+                                                          autoSize={true}
+                                                />
                                             </Form.Item>
                                         </>
                                 )}
@@ -242,7 +245,10 @@ export function FileImport() {
                                                 <Input placeholder="Page path" style={{width: 800}}/>
                                             </Form.Item>
                                             <Form.Item name="page_body" label="Page body">
-                                                <TextArea placeholder="Page body" style={{width: 800}}/>
+                                                <TextArea placeholder="Page body"
+                                                          style={{width: 800}}
+                                                          autoSize={true}
+                                                />
                                             </Form.Item>
                                             <Form.Item
                                                     name="page_form_id"

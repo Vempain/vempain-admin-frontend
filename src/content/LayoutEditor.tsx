@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Button, Divider, Form, Input, Spin, Switch } from "antd";
+import { Button, Form, Input, Spin, Switch } from "antd";
 import { useParams } from "react-router-dom";
 import { AclEdit } from "./AclEdit";
-import { SubmitResultHandler } from "../main";
+import { MetadataForm, SubmitResultHandler } from "../main";
 import { AclVO, LayoutVO } from "../models/Responses";
 import { ActionResult, SubmitResult } from "../models";
 import { layoutAPI } from "../services";
@@ -138,21 +138,8 @@ export function LayoutEditor() {
                         >
                             <AclEdit acls={acls} onChange={handleAclsChange} parentForm={layoutForm}/>
                         </Form.Item>
-                        <Form.Item wrapperCol={{offset: 8, span: 16,}}><Divider orientation={'left'}>Metadata</Divider></Form.Item>
-                        <Form.Item name={'creator'} label={'Creator'}>
-                            <Input disabled={true}/>
-                        </Form.Item>
-
-                        <Form.Item name={'created'} label={'Created'}>
-                            <Input disabled={true}/>
-                        </Form.Item>
-
-                        <Form.Item name={'modifier'} label={'Modifier'}>
-                            <Input disabled={true}/>
-                        </Form.Item>
-
-                        <Form.Item name={'modified'} label={'Modified'}>
-                            <Input disabled={true}/>
+                        <Form.Item label={" "} colon={false} key={"page-metadata"}>
+                            <MetadataForm metadata={{creator: layout.creator, created: layout.created, modifier: layout.modifier, modified: layout.modified}}/>
                         </Form.Item>
                         <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: 'center'}}>
                             <Button type={'primary'} htmlType={'submit'}>Save</Button>

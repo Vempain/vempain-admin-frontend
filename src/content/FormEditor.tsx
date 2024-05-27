@@ -1,8 +1,8 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { Button, Divider, Form, Input, Select, Space, Spin, Switch } from "antd";
+import { Button, Form, Input, Select, Space, Spin, Switch } from "antd";
 import { MinusCircleFilled, PlusOutlined } from "@ant-design/icons";
-import { SubmitResultHandler } from "../main";
+import { MetadataForm, SubmitResultHandler } from "../main";
 import { AclEdit } from "./AclEdit";
 import { AclVO, ComponentVO, FormVO, LayoutVO } from "../models/Responses";
 import { ActionResult, SubmitResult } from "../models";
@@ -228,21 +228,8 @@ export function FormEditor() {
                         >
                             <AclEdit acls={acls} onChange={handleAclsChange} parentForm={formForm}/>
                         </Form.Item>
-                        <Form.Item wrapperCol={{offset: 8, span: 16,}}><Divider orientation={'left'}>Metadata</Divider></Form.Item>
-                        <Form.Item name={'creator'} label={'Creator'}>
-                            <Input disabled={true}/>
-                        </Form.Item>
-
-                        <Form.Item name={'created'} label={'Created'}>
-                            <Input disabled={true}/>
-                        </Form.Item>
-
-                        <Form.Item name={'modifier'} label={'Modifier'}>
-                            <Input disabled={true}/>
-                        </Form.Item>
-
-                        <Form.Item name={'modified'} label={'Modified'}>
-                            <Input disabled={true}/>
+                        <Form.Item label={" "} colon={false} key={"page-metadata"}>
+                            <MetadataForm metadata={{creator: form.creator, created: form.created, modifier: form.modifier, modified: form.modified}}/>
                         </Form.Item>
                         <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: 'center'}}>
                             <Button type={'primary'} htmlType={'submit'}>Save</Button>

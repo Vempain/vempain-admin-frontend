@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { Button, Col, Divider, Form, Input, Row, Select, Spin, Switch } from "antd";
+import { Button, Col, Form, Input, Row, Select, Spin, Switch } from "antd";
 import { AclEdit } from "./AclEdit";
 import TextArea from "antd/es/input/TextArea";
-import { SubmitResultHandler } from "../main";
+import { MetadataForm, SubmitResultHandler } from "../main";
 import { AclVO, FormVO, PageVO } from "../models/Responses";
 import { ActionResult, QueryDetailEnum, SubmitResult } from "../models";
 import { formAPI, pageAPI } from "../services";
@@ -276,7 +276,7 @@ export function PageEditor() {
                             <Input/>
                         </Form.Item>
                         <Form.Item name={"body"} label={"Body"}>
-                            <TextArea/>
+                            <TextArea autoSize={true}/>
                         </Form.Item>
                         <Form.Item name={"path"} label={"Path"}>
                             <Input/>
@@ -290,24 +290,8 @@ export function PageEditor() {
                         >
                             <AclEdit acls={acls} onChange={handleAclsChange} parentForm={pageForm}/>
                         </Form.Item>
-                        <Form.Item wrapperCol={{offset: 8, span: 16,}}><Divider orientation={"left"}>Metadata</Divider></Form.Item>
-                        <Form.Item name={"creator"} label={"Creator"}>
-                            <Input disabled={true}/>
-                        </Form.Item>
-
-                        <Form.Item name={"created"} label={"Created"}>
-                            <Input disabled={true}/>
-                        </Form.Item>
-
-                        <Form.Item name={"modifier"} label={"Modifier"}>
-                            <Input disabled={true}/>
-                        </Form.Item>
-
-                        <Form.Item name={"modified"} label={"Modified"}>
-                            <Input disabled={true}/>
-                        </Form.Item>
-                        <Form.Item name={"published"} label={"Published"}>
-                            <Input disabled={true}/>
+                        <Form.Item label={" "} colon={false} key={"page-metadata"}>
+                            <MetadataForm metadata={{creator: page.creator, created: page.created, modifier: page.modifier, modified: page.modified}}/>
                         </Form.Item>
                         <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: "center"}}>
                             <Button type={"primary"} htmlType={"submit"}>Save page</Button>

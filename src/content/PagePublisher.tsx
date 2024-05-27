@@ -74,7 +74,11 @@ export function PagePublisher() {
                 <Spin spinning={loading} tip={"Uploading page and files..."}>
                     {page !== null && page.body !== undefined && <div>
                         <Space direction={"vertical"} size={"large"}>
-                            <TextArea key={"pageBody"} value={page.body} style={{width: 800, height: "100%"}}/>
+                            <TextArea key={"pageBody"}
+                                      value={page.body}
+                                      style={{width: 800, height: "100%"}}
+                                      autoSize={true}
+                            />
                             <Button key={"publishButton"} type={"primary"} onClick={publishPage}>Publish page</Button>
                         </Space>
                     </div>}

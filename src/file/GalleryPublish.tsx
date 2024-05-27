@@ -92,6 +92,7 @@ export function GalleryPublish() {
                                       value={gallery.description}
                                       style={{width: 800, height: '100%'}}
                                       disabled={true}
+                                      autoSize={true}
                             />
                             <Button key={'publishButton-top'} type={'primary'} onClick={publishGallery}>Publish gallery</Button>
                             {
