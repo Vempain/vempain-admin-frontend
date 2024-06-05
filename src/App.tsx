@@ -2,7 +2,7 @@ import React from "react";
 import { ConfigProvider, Layout, theme } from "antd";
 import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
-import { Home, Login, Logout, TopBar } from "./main";
+import { BottomFooter, Home, Login, Logout, TopBar } from "./main";
 import {
     ComponentDelete,
     ComponentEditor,
@@ -69,10 +69,8 @@ function App() {
                                 <Route path={'/users/:paramId/edit'} element={<UserEditor/>}/>
                             </Routes>
                         </div>
+                        <BottomFooter/>
                     </Content>
-                    <Footer style={{textAlign: "center"}}
-                            dangerouslySetInnerHTML={{__html: import.meta.env.VITE_APP_VEMPAIN_COPYRIGHT_FOOTER + "<br/>" + import.meta.env.VITE_APP_POWERED_BY_VEMPAIN}}
-                    />
                 </Layout>
             </ConfigProvider>
     );

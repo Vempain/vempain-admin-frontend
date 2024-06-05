@@ -29,6 +29,8 @@
     "web-vitals": "^3.5.1"
   },
   "scripts": {
+    "prebuild": "node generateBuildInfo.js",
+    "prestart": "node generateBuildInfo.js",
     "start": "env-cmd -f .env.local vite",
     "build": "tsc && env-cmd -f .env.prod vite build",
     "test": "jest",

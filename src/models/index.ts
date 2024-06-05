@@ -1,3 +1,4 @@
+export type {BuildInfo} from './BuildInfo';
 export type {LoginVO} from './LoginVO';
 export type {LoginStatus} from './LoginStatus';
 export type {Pageable} from "./Pageable";
