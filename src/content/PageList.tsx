@@ -21,78 +21,78 @@ export function PageList() {
 
     const columns: ColumnsType<PageVO> = [
         {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
+            title: "ID",
+            dataIndex: "id",
+            key: "id",
             sorter: (a, b) => a.id - b.id
         },
         {
-            title: 'Parent ID',
-            dataIndex: 'parent_id',
-            key: 'parent_id',
+            title: "Parent ID",
+            dataIndex: "parent_id",
+            key: "parent_id",
             sorter: (a, b) => a.parent_id - b.parent_id
         },
         {
-            title: 'Form ID',
-            dataIndex: 'form_id',
-            key: 'form_id',
+            title: "Form ID",
+            dataIndex: "form_id",
+            key: "form_id",
             sorter: (a, b) => a.form_id - b.form_id
         },
         {
-            title: 'Path',
-            dataIndex: 'path',
-            key: 'path',
+            title: "Path",
+            dataIndex: "path",
+            key: "path",
             sorter: (a, b) => a.path.localeCompare(b.path)
         },
         {
-            title: 'Secure',
-            dataIndex: 'secure',
-            key: 'secure',
+            title: "Secure",
+            dataIndex: "secure",
+            key: "secure",
             sorter: (a, b) => Number(b.secure) - Number(a.secure)
         },
         {
-            title: 'Index List',
-            dataIndex: 'index_list',
-            key: 'index_list',
+            title: "Index List",
+            dataIndex: "index_list",
+            key: "index_list",
             sorter: (a, b) => Number(b.index_list) - Number(a.index_list)
         },
         {
-            title: 'Title',
-            dataIndex: 'title',
-            key: 'title',
+            title: "Title",
+            dataIndex: "title",
+            key: "title",
             sorter: (a, b) => a.title.localeCompare(b.title)
         },
         {
-            title: 'Locked',
-            dataIndex: 'locked',
-            key: 'locked',
+            title: "Locked",
+            dataIndex: "locked",
+            key: "locked",
             sorter: (a, b) => Number(b.locked) - Number(a.locked)
         },
         {
-            title: 'Creator',
-            dataIndex: 'creator',
-            key: 'creator',
+            title: "Creator",
+            dataIndex: "creator",
+            key: "creator",
             sorter: (a, b) => a.creator - b.creator
         },
         {
-            title: 'Created',
-            dataIndex: 'created',
-            key: 'created',
+            title: "Created",
+            dataIndex: "created",
+            key: "created",
             sorter: (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime(),
             render: (_text: string, record: PageVO) => {
                 return (<>{dayjs(record.created).format("YYYY.MM.DD HH:mm")}</>);
             }
         },
         {
-            title: 'Modifier',
-            dataIndex: 'modifier',
-            key: 'modifier',
+            title: "Modifier",
+            dataIndex: "modifier",
+            key: "modifier",
             sorter: (a, b) => a.modifier - b.modifier,
         },
         {
-            title: 'Modified',
-            dataIndex: 'modified',
-            key: 'modified',
+            title: "Modified",
+            dataIndex: "modified",
+            key: "modified",
             sorter: (a, b) => new Date(a.modified).getTime() - new Date(b.modified).getTime(),
             render: (_text: string, record: PageVO) => {
                 if (record.modified === null) {
@@ -103,9 +103,9 @@ export function PageList() {
             }
         },
         {
-            title: 'Published',
-            dataIndex: 'published',
-            key: 'published',
+            title: "Published",
+            dataIndex: "published",
+            key: "published",
             sorter: (a, b) => {
                 if (a.published === null && b.published === null) {
                     return 0;
@@ -130,8 +130,8 @@ export function PageList() {
             }
         },
         {
-            title: 'Action',
-            key: 'action',
+            title: "Action",
+            key: "action",
             render: (_text: any, record: PageVO) => (
                     <Space>
                         <Button type="primary" href={`/pages/${record.id}/edit`}>Edit</Button>
@@ -182,23 +182,24 @@ export function PageList() {
     }
 
     return (
-            <div className={'darkBody'} key={'pageListDiv'}>
+            <div className={"darkBody"} key={"pageListDiv"}>
                 <Spin tip={spinMessage} spinning={loading} key={"pageListSpinner"}>
-                    <Space direction={'vertical'} size={'large'} key={'pageListSpace'}>
-                        <h1 key={'pageListHeader'}>Page List <Link to={'/pages/0/edit'}><PlusCircleFilled/></Link></h1>
-                        <Button type={'primary'} onClick={publishAll}>Publish all pages</Button>
+                    <Space direction={"vertical"} size={"large"} key={"pageListSpace"}>
+                        <h1 key={"pageListHeader"}>Page List <Link to={"/pages/0/edit"}><PlusCircleFilled/></Link></h1>
+                        <Button type={"primary"} onClick={publishAll}>Publish all pages</Button>
                         <Table
                                 dataSource={pageList.map((item, index) => ({...item, key: `row_${index}`}))}
                                 columns={columns}
                                 pagination={{
-                                    defaultPageSize: 5,
+                                    position: ["topRight", "bottomRight"],
+                                    defaultPageSize: 15,
                                     hideOnSinglePage: true,
                                     showSizeChanger: true,
                                     showQuickJumper: true,
                                     total: pageList.length,
-                                    pageSizeOptions: ['5', '10', '20', '30', '50', '100']
+                                    pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
                                 }}
-                                key={'pageListTable'}/>
+                                key={"pageListTable"}/>
                     </Space>
                 </Spin>
             </div>

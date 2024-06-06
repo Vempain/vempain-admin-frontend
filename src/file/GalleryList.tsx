@@ -164,12 +164,13 @@ export function GalleryList() {
                                 columns={columns}
                                 key={"galleryListTable"}
                                 pagination={{
-                                    defaultPageSize: 5,
+                                    position: ["topRight", "bottomRight"],
+                                    defaultPageSize: 15,
                                     hideOnSinglePage: true,
                                     showSizeChanger: true,
                                     showQuickJumper: true,
                                     total: galleryList.length,
-                                    pageSizeOptions: ["5", "10", "20", "30", "50", "100"]
+                                    pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
                                 }}
                         />
                     </Space>

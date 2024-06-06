@@ -18,11 +18,12 @@ export function GenericFileList<T extends AbstractFileVO>({valueObjectColumns, a
     const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>({
         current: 1,
         pageSize: 10,
-        defaultPageSize: 10,
+        position: ["topRight", "bottomRight"],
+        defaultPageSize: 15,
         total: 0,
-        pageSizeOptions: ['5', '10', '20', '30', '50', '100'],
         showSizeChanger: true,
         hideOnSinglePage: false,
+        pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
     });
 
     const [tableParams, setTableParams] = useState<SortableTableParams>({

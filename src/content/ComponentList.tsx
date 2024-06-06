@@ -89,12 +89,13 @@ export function ComponentList() {
                             dataSource={componentList.map((item, index) => ({...item, key: `row_${index}`}))}
                             columns={columns}
                             pagination={{
-                                defaultPageSize: 5,
+                                position: ["topRight", "bottomRight"],
+                                defaultPageSize: 15,
                                 hideOnSinglePage: true,
                                 showSizeChanger: true,
                                 showQuickJumper: true,
                                 total: componentList.length,
-                                pageSizeOptions: ['5', '10', '20', '30', '50', '100']
+                                pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
                             }}
                             key={'componentListTable'}/>
                 </Spin>
