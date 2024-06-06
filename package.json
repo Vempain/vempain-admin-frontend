@@ -12,7 +12,7 @@
     "@types/node": "^20.11.28",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.18",
-    "@types/react-highlight-words": "^0.16.7",
+    "@types/react-highlight-words": "^0.20.0",
     "@vitejs/plugin-react": "^4.2.1",
     "antd": "^5.15.3",
     "axios": "^1.6.8",
