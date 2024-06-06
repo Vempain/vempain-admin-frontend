@@ -75,17 +75,19 @@ export function FileImport() {
                     let listOfRootDirs: TreeNode[] = [];
                     // Loop through the list received in the response
                     for (let i = 0; i < response[0].length; i++) {
-                        listOfRootDirs.push(generateTreeData("", response[0][i]));
+                        // We only add the root directories to the list which contain children
+                        if (response[0][i].children !== null && response[0][i].children.length > 0) {
+                            listOfRootDirs.push(generateTreeData("", response[0][i]));
+                        }
                     }
 
                     setDirectoryTree(listOfRootDirs);
+
                     let tmpFormList: { label: string, value: number }[] = [];
 
                     for (let i = 0; i < response[1].length; i++) {
                         tmpFormList.push({label: response[1][i].name, value: response[1][i].id});
                     }
-
-                    console.log("Form list:", tmpFormList);
 
                     setFormList(tmpFormList);
                 })
@@ -152,7 +154,7 @@ export function FileImport() {
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={"/import"} failTo={"/import"}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/"} failTo={"/"}/>);
     }
 
     return (

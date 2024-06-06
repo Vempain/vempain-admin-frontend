@@ -206,11 +206,11 @@ export function PageEditor() {
     }
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={loadResults} successTo={"/forms"} failTo={"/forms"}/>);
+        return (<SubmitResultHandler submitResult={loadResults} successTo={"/pages"} failTo={"/pages"}/>);
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={"/pages"} failTo={"/pages"}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/pages/" + paramId + "/edit"} failTo={"/pages/" + paramId + "/edit"}/>);
     }
 
     return (
