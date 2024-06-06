@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
-import { Button, Space, Spin, Table } from "antd";
+import { Button, Space, Spin, Table, TablePaginationConfig } from "antd";
 import { ColumnsType } from "antd/lib/table";
 import { Link } from "react-router-dom";
 import { PlusCircleFilled } from "@ant-design/icons";
 import { useSession } from "../session";
 import { PrivilegeEnum } from "../models";
 import { LayoutVO } from "../models/Responses";
-import { aclTool } from "../tools";
+import { aclTool, getPaginationConfig } from "../tools";
 import { layoutAPI } from "../services";
 
 export function LayoutList() {
     const [loading, setLoading] = useState<boolean>(false);
     const [layoutList, setLayoutList] = useState<LayoutVO[]>([]);
     const {userSession} = useSession();
+    const [pagination, setPagination] = useState<TablePaginationConfig>({});
 
     const columns: ColumnsType<LayoutVO> = [
         {
@@ -56,7 +57,7 @@ export function LayoutList() {
         {
             title: 'Action',
             key: 'action',
-            render: (text: any, record: any) => (
+            render: (_text: any, record: any) => (
                     <Space>
                         <Button type={'primary'} href={`/layouts/${record.id}/edit`}>Edit</Button>
                         {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&
@@ -71,6 +72,12 @@ export function LayoutList() {
         layoutAPI.findAll()
                 .then((response) => {
                     setLayoutList(response);
+                    setPagination(getPaginationConfig(response.length));
+                })
+                .catch((error) => {
+                    console.error(error);
+                })
+                .finally(() => {
                     setLoading(false);
                 });
     }, []);
@@ -80,19 +87,11 @@ export function LayoutList() {
                 <Spin tip={'Loading'} spinning={loading} key={'layoutListSpinner'}>
                     <h1 key={'layoutListHeader'}>Layout List <Link to={'/layouts/0/edit'}><PlusCircleFilled/></Link></h1>
 
-                    <Table
+                    {layoutList.length > 0 && <Table
                             dataSource={layoutList.map((item, index) => ({...item, key: `row_${index}`}))}
                             columns={columns}
-                            pagination={{
-                                position: ["topRight", "bottomRight"],
-                                defaultPageSize: 15,
-                                hideOnSinglePage: true,
-                                showSizeChanger: true,
-                                showQuickJumper: true,
-                                total: layoutList.length,
-                                pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
-                            }}
-                            key={'layoutListTable'}/>
+                            pagination={pagination}
+                            key={"layoutListTable"}/>}
                 </Spin>
             </div>
     );

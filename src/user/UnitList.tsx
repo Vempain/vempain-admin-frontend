@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { Button, Spin, Table } from "antd";
+import { Button, Spin, Table, TablePaginationConfig } from "antd";
 import { ColumnsType } from "antd/lib/table";
 import { Link } from "react-router-dom";
 import { PlusCircleFilled } from "@ant-design/icons";
 import { UnitVO } from "../models/Responses";
 import { unitAPI } from "../services";
+import { getPaginationConfig } from "../tools";
 
 export function UnitList() {
     const [loading, setLoading] = useState<boolean>(false);
     const [unitList, setUnitList] = useState<UnitVO[]>([]);
+    const [pagination, setPagination] = useState<TablePaginationConfig>({});
 
     const columns: ColumnsType<UnitVO> = [
         {
@@ -56,7 +58,7 @@ export function UnitList() {
         {
             title: 'Action',
             key: 'action',
-            render: (text: any, record: UnitVO) => (
+            render: (_text: any, record: UnitVO) => (
                     <Button type="primary" href={`/units/${record.id}/edit`}>Edit</Button>
             ),
         },
@@ -67,6 +69,12 @@ export function UnitList() {
         unitAPI.findAll()
                 .then((response) => {
                     setUnitList(response);
+                    setPagination(getPaginationConfig(response.length));
+                })
+                .catch((error) => {
+                    console.error(error);
+                })
+                .finally(() => {
                     setLoading(false);
                 });
     }, []);
@@ -76,19 +84,11 @@ export function UnitList() {
                 <Spin tip={'Loading'} spinning={loading} key={'unitListSpinner'}>
                     <h1 key={'unitListHeader'}>Unit List <Link to={'/units/0/edit'}><PlusCircleFilled/></Link></h1>
 
-                    <Table
+                    {unitList.length > 0 && <Table
                             dataSource={unitList.map((item, index) => ({...item, key: `row_${index}`}))}
                             columns={columns}
-                            pagination={{
-                                position: ["topRight", "bottomRight"],
-                                defaultPageSize: 15,
-                                hideOnSinglePage: true,
-                                showSizeChanger: true,
-                                showQuickJumper: true,
-                                total: unitList.length,
-                                pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
-                            }}
-                            key={'unitListTable'}/>
+                            pagination={pagination}
+                            key={"unitListTable"}/>}
                 </Spin>
             </div>
     );

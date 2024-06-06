@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import { ColumnsType } from "antd/lib/table";
-import { Button, Space, Spin, Table } from "antd";
+import { Button, Space, Spin, Table, TablePaginationConfig } from "antd";
 import { PlusCircleFilled } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useSession } from "../session";
 import { PrivilegeEnum } from "../models";
 import { ComponentVO } from "../models/Responses";
-import { aclTool } from "../tools";
+import { aclTool, getPaginationConfig } from "../tools";
 import { componentAPI } from "../services";
 
 export function ComponentList() {
     const [loading, setLoading] = useState<boolean>(false);
     const [componentList, setComponentList] = useState<ComponentVO[]>([]);
     const {userSession} = useSession();
+    const [pagination, setPagination] = useState<TablePaginationConfig>({});
 
     const columns: ColumnsType<ComponentVO> = [
         {
@@ -60,7 +61,7 @@ export function ComponentList() {
         {
             title: 'Action',
             key: 'action',
-            render: (text: any, record: ComponentVO) => (
+            render: (_text: any, record: ComponentVO) => (
                     <Space>
                         <Button type="primary" href={`/components/${record.id}/edit`}>Edit</Button>
                         {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&
@@ -76,6 +77,12 @@ export function ComponentList() {
         componentAPI.findAll()
                 .then((response) => {
                     setComponentList(response);
+                    setPagination(getPaginationConfig(response.length));
+                })
+                .catch((error) => {
+                    console.error(error);
+                })
+                .finally(() => {
                     setLoading(false);
                 });
     }, []);
@@ -85,19 +92,11 @@ export function ComponentList() {
                 <Spin tip={'Loading'} spinning={loading} key={'componentListSpinner'}>
                     <h1 key={'componentListHeader'}>Component List <Link to={'/components/0/edit'}><PlusCircleFilled/></Link></h1>
 
-                    <Table
+                    {componentList.length > 0 && <Table
                             dataSource={componentList.map((item, index) => ({...item, key: `row_${index}`}))}
                             columns={columns}
-                            pagination={{
-                                position: ["topRight", "bottomRight"],
-                                defaultPageSize: 15,
-                                hideOnSinglePage: true,
-                                showSizeChanger: true,
-                                showQuickJumper: true,
-                                total: componentList.length,
-                                pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
-                            }}
-                            key={'componentListTable'}/>
+                            pagination={pagination}
+                            key={"componentListTable"}/>}
                 </Spin>
             </div>
     );

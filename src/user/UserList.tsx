@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { Button, Spin, Table } from "antd";
+import { Button, Spin, Table, TablePaginationConfig } from "antd";
 import { ColumnsType } from "antd/lib/table";
 import { Link } from "react-router-dom";
 import { PlusCircleFilled } from "@ant-design/icons";
 import { UserVO } from "../models/Responses";
 import { userAPI } from "../services";
+import { getPaginationConfig } from "../tools";
 
 export function UserList() {
     const [loading, setLoading] = useState<boolean>(false);
     const [userList, setUserList] = useState<UserVO[]>([]);
-
+    const [pagination, setPagination] = useState<TablePaginationConfig>({});
 
     const columns: ColumnsType<UserVO> = [
         {
@@ -99,7 +100,7 @@ export function UserList() {
         {
             title: 'Action',
             key: 'action',
-            render: (text: any, record: UserVO) => (
+            render: (_text: any, record: UserVO) => (
                     <Button type="primary" href={`/users/${record.id}/edit`}>Edit</Button>
             ),
         },
@@ -110,6 +111,12 @@ export function UserList() {
         userAPI.findAll()
                 .then((response) => {
                     setUserList(response);
+                    setPagination(getPaginationConfig(response.length));
+                })
+                .catch((error) => {
+                    console.error(error);
+                })
+                .finally(() => {
                     setLoading(false);
                 });
     }, []);
@@ -119,19 +126,11 @@ export function UserList() {
                 <Spin tip={'Loading'} spinning={loading} key={'userListSpinner'}>
                     <h1 key={'userListHeader'}>User List <Link to={'/users/0/edit'}><PlusCircleFilled/></Link></h1>
 
-                    <Table
+                    {userList.length > 0 && <Table
                             dataSource={userList.map((item, index) => ({...item, key: `row_${index}`}))}
                             columns={columns}
-                            pagination={{
-                                position: ["topRight", "bottomRight"],
-                                defaultPageSize: 15,
-                                hideOnSinglePage: true,
-                                showSizeChanger: true,
-                                showQuickJumper: true,
-                                total: userList.length,
-                                pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
-                            }}
-                            key={'userListTable'}/>
+                            pagination={pagination}
+                            key={"userListTable"}/>}
                 </Spin>
             </div>
     );

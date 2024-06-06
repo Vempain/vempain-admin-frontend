@@ -3,8 +3,8 @@ import { useSession } from "../session";
 import { GalleryVO } from "../models/Responses/Files";
 import { fileSystemAPI, galleryAPI } from "../services/Files";
 import { ColumnsType } from "antd/lib/table";
-import { Button, Space, Spin, Table } from "antd";
-import { aclTool } from "../tools";
+import { Button, Space, Spin, Table, TablePaginationConfig } from "antd";
+import { aclTool, getPaginationConfig } from "../tools";
 import { ActionResult, PrivilegeEnum, QueryDetailEnum, SubmitResult } from "../models";
 import { Link } from "react-router-dom";
 import { PlusCircleFilled } from "@ant-design/icons";
@@ -15,6 +15,7 @@ export function GalleryList() {
     const [galleryList, setGalleryList] = useState<GalleryVO[]>([]);
     const {userSession} = useSession();
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
+    const [pagination, setPagination] = useState<TablePaginationConfig>({});
 
     const columns: ColumnsType<GalleryVO> = [
         {
@@ -47,7 +48,7 @@ export function GalleryList() {
         {
             title: "Action",
             key: "action",
-            render: (text: any, record: GalleryVO) => (
+            render: (_text: any, record: GalleryVO) => (
                     <Space key={record.id + "-button-space"}>
                         <Button type="primary"
                                 key={record.id + "-edit-button"}
@@ -81,10 +82,10 @@ export function GalleryList() {
         galleryAPI.findAll({details: QueryDetailEnum.MINIMAL})
                 .then((response) => {
                     setGalleryList(response);
+                    setPagination(getPaginationConfig(response.length));
                 })
                 .catch((error) => {
                     console.error(error);
-
                 })
                 .finally(() => {
                     setLoading(false);
@@ -159,20 +160,11 @@ export function GalleryList() {
                             <Button type={"primary"} onClick={publishAll}>Publish all galleries</Button>
                             <Button type={"primary"} onClick={refreshhAll} style={{background: "fuchsia"}}>Refresh all gallery files</Button>
                         </Space>
-                        <Table
+                        {galleryList.length > 0 && <Table
                                 dataSource={galleryList}
                                 columns={columns}
-                                key={"galleryListTable"}
-                                pagination={{
-                                    position: ["topRight", "bottomRight"],
-                                    defaultPageSize: 15,
-                                    hideOnSinglePage: true,
-                                    showSizeChanger: true,
-                                    showQuickJumper: true,
-                                    total: galleryList.length,
-                                    pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
-                                }}
-                        />
+                                pagination={pagination}
+                                key={"galleryListTable"}/>}
                     </Space>
                 </Spin>
             </div>

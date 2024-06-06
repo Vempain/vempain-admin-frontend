@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Space, Spin, Table } from "antd";
+import { Button, Space, Spin, Table, TablePaginationConfig } from "antd";
 import { ColumnsType } from "antd/lib/table";
 import { Link } from "react-router-dom";
 import { PlusCircleFilled } from "@ant-design/icons";
@@ -7,6 +7,7 @@ import { QueryDetailEnum } from "../models";
 import { PageVO } from "../models/Responses";
 import { pageAPI } from "../services";
 import dayjs from "dayjs";
+import { getPaginationConfig } from "../tools";
 
 // Define an hash containing the spin messages
 const spinMessages: Record<string, string> = {
@@ -18,6 +19,7 @@ export function PageList() {
     const [loading, setLoading] = useState<boolean>(false);
     const [pageList, setPageList] = useState<PageVO[]>([]);
     const [spinMessage, setSpinMessage] = useState<string>(spinMessages.loading);
+    const [pagination, setPagination] = useState<TablePaginationConfig>({});
 
     const columns: ColumnsType<PageVO> = [
         {
@@ -149,6 +151,12 @@ export function PageList() {
         pageAPI.findAll({details: QueryDetailEnum.UNPOPULATED})
                 .then((response) => {
                     setPageList(response);
+                    setPagination(getPaginationConfig(response.length));
+                })
+                .catch((error) => {
+                    console.error(error);
+                })
+                .finally(() => {
                     setLoading(false);
                 });
     }, []);
@@ -187,19 +195,11 @@ export function PageList() {
                     <Space direction={"vertical"} size={"large"} key={"pageListSpace"}>
                         <h1 key={"pageListHeader"}>Page List <Link to={"/pages/0/edit"}><PlusCircleFilled/></Link></h1>
                         <Button type={"primary"} onClick={publishAll}>Publish all pages</Button>
-                        <Table
+                        {pageList.length > 0 && <Table
                                 dataSource={pageList.map((item, index) => ({...item, key: `row_${index}`}))}
                                 columns={columns}
-                                pagination={{
-                                    position: ["topRight", "bottomRight"],
-                                    defaultPageSize: 15,
-                                    hideOnSinglePage: true,
-                                    showSizeChanger: true,
-                                    showQuickJumper: true,
-                                    total: pageList.length,
-                                    pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
-                                }}
-                                key={"pageListTable"}/>
+                                pagination={pagination}
+                                key={"pageListTable"}/>}
                     </Space>
                 </Spin>
             </div>

@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
-import { Button, Space, Spin, Table } from "antd";
+import { Button, Space, Spin, Table, TablePaginationConfig } from "antd";
 import { ColumnsType } from "antd/lib/table";
 import { Link } from "react-router-dom";
 import { PlusCircleFilled } from "@ant-design/icons";
 import { useSession } from "../session";
 import { PrivilegeEnum, QueryDetailEnum } from "../models";
 import { ComponentVO, FormVO } from "../models/Responses";
-import { aclTool } from "../tools";
+import { aclTool, getPaginationConfig } from "../tools";
 import { formAPI } from "../services";
 
 export function FormList() {
     const [loading, setLoading] = useState<boolean>(false);
     const [formList, setFormList] = useState<FormVO[]>([]);
     const {userSession} = useSession();
+    const [pagination, setPagination] = useState<TablePaginationConfig>({});
 
     const columns: ColumnsType<FormVO> = [
         {
@@ -79,7 +80,7 @@ export function FormList() {
         {
             title: 'Action',
             key: 'action',
-            render: (text: any, record: FormVO) => (
+            render: (_text: any, record: FormVO) => (
                     <Space>
                         <Button type="primary" href={`/forms/${record.id}/edit`}>Edit</Button>
                         {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&
@@ -94,6 +95,12 @@ export function FormList() {
         formAPI.findAll({details: QueryDetailEnum.FULL})
                 .then((response) => {
                     setFormList(response);
+                    setPagination(getPaginationConfig(response.length));
+                })
+                .catch((error) => {
+                    console.error(error);
+                })
+                .finally(() => {
                     setLoading(false);
                 });
     }, []);
@@ -103,19 +110,11 @@ export function FormList() {
                 <Spin tip={'Loading'} spinning={loading} key={'formListSpinner'}>
                     <h1 key={'formListHeader'}>Form List <Link to={'/forms/0/edit'}><PlusCircleFilled/></Link></h1>
 
-                    <Table
+                    {formList.length > 0 && <Table
                             dataSource={formList.map((item, index) => ({...item, key: `row_${index}`}))}
                             columns={columns}
-                            pagination={{
-                                position: ["topRight", "bottomRight"],
-                                defaultPageSize: 15,
-                                hideOnSinglePage: true,
-                                showSizeChanger: true,
-                                showQuickJumper: true,
-                                total: formList.length,
-                                pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
-                            }}
-                            key={'formListTable'}/>
+                            pagination={pagination}
+                            key={"formListTable"}/>}
                 </Spin>
             </div>
     );
