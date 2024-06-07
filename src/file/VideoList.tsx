@@ -8,28 +8,28 @@ export function VideoList() {
     const videoFileColumns: ColumnsType<VideoFileVO> = [
         {
             title: "Creator",
-            dataIndex: 'common.creator',
-            key: 'creator',
+            dataIndex: "common.creator",
+            key: "creator",
             sorter: true,
-            sortDirections: ['descend', 'ascend'],
+            sortDirections: ["descend", "ascend"],
             render: (_, record) => {
                 return (<>{record.common.creator}</>);
             }
         },
         {
             title: "Created",
-            dataIndex: 'common.created',
-            key: 'created',
+            dataIndex: "common.created",
+            key: "created",
             sorter: true,
-            sortDirections: ['descend', 'ascend'],
+            sortDirections: ["descend", "ascend"],
             render: (_, record) => {
                 return (<>{formatDateTimeWithMs(record.common.created)}</>);
             }
         },
         {
             title: "Source file",
-            dataIndex: 'common.converted_file',
-            key: 'app_file',
+            dataIndex: "common.converted_file",
+            key: "app_file",
             render: (_, record) => {
                 return (<>{record.common.converted_file}</>);
             }

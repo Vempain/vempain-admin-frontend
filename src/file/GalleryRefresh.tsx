@@ -88,14 +88,14 @@ export function GalleryRefresh() {
                         <Space direction={"vertical"} size={"large"}>
                             <h4>Refreshing '{gallery.short_name}' gallery files</h4>
 
-                            <Button key={'refreshFilesButton-top'} type={'primary'} onClick={refreshGalleryFiles}>Refresh gallery files</Button>
+                            <Button key={"refreshFilesButton-top"} type={"primary"} onClick={refreshGalleryFiles}>Refresh gallery files</Button>
                             {
                                     gallery.common_files.length > 0 &&
                                     gallery.common_files.map(commonFile => {
-                                        return (<CommonFileCard key={"commonFileCard-" + commonFile.id} commonFile={commonFile}/>)
+                                        return (<CommonFileCard key={"commonFileCard-" + commonFile.id} commonFile={commonFile}/>);
                                     })
                             }
-                            <Button key={'refreshFilesButton-bottom'} type={'primary'} onClick={refreshGalleryFiles}>Refresh gallery files</Button>
+                            <Button key={"refreshFilesButton-bottom"} type={"primary"} onClick={refreshGalleryFiles}>Refresh gallery files</Button>
                         </Space>
                     </div>}
                 </Spin>

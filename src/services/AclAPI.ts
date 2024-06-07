@@ -2,19 +2,6 @@ import {AbstractAPI} from "./AbstractAPI";
 import {AclVO} from "../models/Responses";
 
 class AclAPI extends AbstractAPI<AclVO, AclVO> {
-    public async findAllById(id: number): Promise<AclVO[]> {
-        this.setAuthorizationHeader();
-        const response = await this.axiosInstance.get<AclVO[]>("/" + id);
-
-        return AclAPI.convertNullUserUnit(response.data);
-    }
-
-    public async findAll(): Promise<AclVO[]> {
-        let aclList = await super.findAll();
-        aclList = AclAPI.convertNullUserUnit(aclList);
-        return aclList;
-    }
-
     private static convertNullUserUnit(aclList: AclVO[]): AclVO[] {
         for (let i = 0; i < aclList.length; i++) {
             if (aclList[i].unit === null) {
@@ -26,6 +13,19 @@ class AclAPI extends AbstractAPI<AclVO, AclVO> {
             }
         }
 
+        return aclList;
+    }
+
+    public async findAllById(id: number): Promise<AclVO[]> {
+        this.setAuthorizationHeader();
+        const response = await this.axiosInstance.get<AclVO[]>("/" + id);
+
+        return AclAPI.convertNullUserUnit(response.data);
+    }
+
+    public async findAll(): Promise<AclVO[]> {
+        let aclList = await super.findAll();
+        aclList = AclAPI.convertNullUserUnit(aclList);
         return aclList;
     }
 }

@@ -17,51 +17,51 @@ export function LayoutList() {
 
     const columns: ColumnsType<LayoutVO> = [
         {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
-            defaultSortOrder: 'descend',
+            title: "ID",
+            dataIndex: "id",
+            key: "id",
+            defaultSortOrder: "descend",
             sorter: (a, b) => a.id - b.id
         },
         {
-            title: 'Layout Name',
-            dataIndex: 'layout_name',
-            key: 'layout_name',
-            defaultSortOrder: 'descend',
+            title: "Layout Name",
+            dataIndex: "layout_name",
+            key: "layout_name",
+            defaultSortOrder: "descend",
             sorter: (a, b) => a.layout_name.localeCompare(b.layout_name),
         },
         {
-            title: 'Creator',
-            dataIndex: 'creator',
-            key: 'creator',
+            title: "Creator",
+            dataIndex: "creator",
+            key: "creator",
             sorter: (a, b) => a.creator - b.creator,
         },
         {
-            title: 'Created',
-            dataIndex: 'created',
-            key: 'created',
+            title: "Created",
+            dataIndex: "created",
+            key: "created",
             sorter: (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
         },
         {
-            title: 'Modifier',
-            dataIndex: 'modifier',
-            key: 'modifier',
+            title: "Modifier",
+            dataIndex: "modifier",
+            key: "modifier",
             sorter: (a, b) => a.modifier - b.modifier,
         },
         {
-            title: 'Modified',
-            dataIndex: 'modified',
-            key: 'modified',
+            title: "Modified",
+            dataIndex: "modified",
+            key: "modified",
             sorter: (a, b) => new Date(a.modified).getTime() - new Date(b.modified).getTime()
         },
         {
-            title: 'Action',
-            key: 'action',
+            title: "Action",
+            key: "action",
             render: (_text: any, record: any) => (
                     <Space>
-                        <Button type={'primary'} href={`/layouts/${record.id}/edit`}>Edit</Button>
+                        <Button type={"primary"} href={`/layouts/${record.id}/edit`}>Edit</Button>
                         {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&
-                                <Button type={'primary'} danger href={`/layouts/${record.id}/delete`}>Delete</Button>}
+                                <Button type={"primary"} danger href={`/layouts/${record.id}/delete`}>Delete</Button>}
                     </Space>
             )
         }
@@ -83,9 +83,9 @@ export function LayoutList() {
     }, []);
 
     return (
-            <div className={'darkBody'} key={'layoutListDiv'}>
-                <Spin tip={'Loading'} spinning={loading} key={'layoutListSpinner'}>
-                    <h1 key={'layoutListHeader'}>Layout List <Link to={'/layouts/0/edit'}><PlusCircleFilled/></Link></h1>
+            <div className={"darkBody"} key={"layoutListDiv"}>
+                <Spin tip={"Loading"} spinning={loading} key={"layoutListSpinner"}>
+                    <h1 key={"layoutListHeader"}>Layout List <Link to={"/layouts/0/edit"}><PlusCircleFilled/></Link></h1>
 
                     {layoutList.length > 0 && <Table
                             dataSource={layoutList.map((item, index) => ({...item, key: `row_${index}`}))}

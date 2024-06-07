@@ -14,36 +14,36 @@ export function GalleryDelete() {
     const [galleryId, setGalleryId] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
     const [gallery, setGallery] = useState<GalleryVO | null>(null);
-    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
-    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
+    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
+    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     // For the list of images
     const [commonFileList, setCommonFileList] = useState<CommonFileVO[]>([]);
     const commonFileColumns: ColumnsType<CommonFileVO> = [
         {
             title: "Creator",
-            dataIndex: 'common.creator',
-            key: 'creator',
+            dataIndex: "common.creator",
+            key: "creator",
             sorter: true,
-            sortDirections: ['descend', 'ascend'],
+            sortDirections: ["descend", "ascend"],
             render: (_, record) => {
                 return (<>{record.creator}</>);
             }
         },
         {
             title: "Created",
-            dataIndex: 'common.created',
-            key: 'created',
+            dataIndex: "common.created",
+            key: "created",
             sorter: true,
-            sortDirections: ['descend', 'ascend'],
+            sortDirections: ["descend", "ascend"],
             render: (_, record) => {
                 return (<>{formatDateTimeWithMs(record.created)}</>);
             }
         },
         {
             title: "Source file",
-            dataIndex: 'common.converted_file',
-            key: 'app_file',
+            dataIndex: "common.converted_file",
+            key: "app_file",
             render: (_, record) => {
                 return (<>{record.converted_file}</>);
             }
@@ -58,7 +58,7 @@ export function GalleryDelete() {
         if (tmpGalleryId < 0) {
             setLoadResults({
                 status: ActionResult.FAIL,
-                message: 'Called with invalid parameter'
+                message: "Called with invalid parameter"
             });
             return;
         }
@@ -74,7 +74,7 @@ export function GalleryDelete() {
                     })
                     .catch((error) => {
                         console.error("Error fetching gallery details:", error);
-                        setLoadResults({status: ActionResult.FAIL, message: 'Failed to fetch the gallery details, try again later'});
+                        setLoadResults({status: ActionResult.FAIL, message: "Failed to fetch the gallery details, try again later"});
                     })
                     .finally(() => {
                         setLoading(false);
@@ -86,25 +86,25 @@ export function GalleryDelete() {
         if (gallery !== null) {
             galleryAPI.delete(galleryId)
                     .then(() => {
-                        setSubmitResults({status: ActionResult.OK, message: 'Gallery deleted successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "Gallery deleted successfully"});
                     })
                     .catch((error) => {
                         console.error("Error deleting gallery:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to delete the gallery, try again later'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to delete the gallery, try again later"});
                     });
         }
     }
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={loadResults} successTo={'/galleries'} failTo={'/galleries'}/>);
+        return (<SubmitResultHandler submitResult={loadResults} successTo={"/galleries"} failTo={"/galleries"}/>);
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={'/galleries'} failTo={'/galleries'}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/galleries"} failTo={"/galleries"}/>);
     }
 
     return (
-            <div className={'darkBody'} key={'galleryDeleteDiv'}>
+            <div className={"darkBody"} key={"galleryDeleteDiv"}>
                 <Spin spinning={loading}>
                     {!loading && <div>
                         <div>
@@ -116,7 +116,7 @@ export function GalleryDelete() {
                             />}
                         </div>
                         <div>
-                            <Button type={'primary'} danger={true} onClick={deletePage} key={'deleteButton'}>Delete gallery</Button>
+                            <Button type={"primary"} danger={true} onClick={deletePage} key={"deleteButton"}>Delete gallery</Button>
                         </div>
                     </div>}
                 </Spin>

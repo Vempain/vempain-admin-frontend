@@ -11,8 +11,8 @@ export function FormDelete() {
     const {paramId} = useParams();
     const [formId, setFormId] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
-    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
-    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
+    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
+    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [form, setForm] = useState<FormVO | null>(null);
     const [pages, setPages] = useState<PageVO[]>([]);
 
@@ -22,7 +22,7 @@ export function FormDelete() {
         if (tmpFormId < 0) {
             setLoadResults({
                 status: ActionResult.FAIL,
-                message: 'Called with invalid parameter'
+                message: "Called with invalid parameter"
             });
             return;
         }
@@ -46,14 +46,14 @@ export function FormDelete() {
                                     console.error("Error fetching list of pages using form:", error);
                                     setLoadResults({
                                         status: ActionResult.FAIL,
-                                        message: 'Failed to fetch the list of pages using the form, try again later'
+                                        message: "Failed to fetch the list of pages using the form, try again later"
                                     });
                                     return []; // Return an empty array if there's an error
                                 });
                     })
                     .catch((error) => {
                         console.error("Error fetching form details:", error);
-                        setLoadResults({status: ActionResult.FAIL, message: 'Failed to fetch the form details, try again later'});
+                        setLoadResults({status: ActionResult.FAIL, message: "Failed to fetch the form details, try again later"});
                         setLoading(false);
                     })
                     .finally(() => {
@@ -67,29 +67,29 @@ export function FormDelete() {
         if (form !== null) {
             formAPI.delete(formId)
                     .then(() => {
-                        setSubmitResults({status: ActionResult.OK, message: 'Form deleted successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "Form deleted successfully"});
                     })
                     .catch((error) => {
                         console.error("Error deleting form:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to delete the form, try again later'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to delete the form, try again later"});
                     });
         }
     }
 
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={loadResults} successTo={'/forms'} failTo={'/forms'}/>);
+        return (<SubmitResultHandler submitResult={loadResults} successTo={"/forms"} failTo={"/forms"}/>);
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={'/forms'} failTo={'/forms'}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/forms"} failTo={"/forms"}/>);
     }
 
     return (
-            <div className={'darkBody'} key={'componentDeleteDiv'}>
+            <div className={"darkBody"} key={"componentDeleteDiv"}>
                 <Spin spinning={loading}>
                     <div>
-                        <Button type={'primary'} danger={true} onClick={deleteForm} key={'deleteButton'}>Delete form</Button>
+                        <Button type={"primary"} danger={true} onClick={deleteForm} key={"deleteButton"}>Delete form</Button>
                     </div>
 
                     <p>
@@ -99,7 +99,7 @@ export function FormDelete() {
                     <h3 key={"pageHeader"}>Pages</h3>
                     {!loading && pages.map((page, index) => {
                         return (
-                                <div key={'page' + index}>
+                                <div key={"page" + index}>
                                     {page.id} {page.title}
                                 </div>
                         );

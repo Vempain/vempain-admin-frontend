@@ -16,8 +16,8 @@ export function UnitEditor() {
     const [unitForm] = Form.useForm();
     const [acls, setAcls] = useState<AclVO[]>([]);
     const [unit, setUnit] = useState<UnitVO | null>(null);
-    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
-    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
+    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
+    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     useEffect(() => {
         setLoading(true);
@@ -27,7 +27,7 @@ export function UnitEditor() {
         if (tmpUnitId < 0) {
             setLoadResults({
                 status: ActionResult.FAIL,
-                message: 'Called with invalid parameter'
+                message: "Called with invalid parameter"
             });
             return;
         }
@@ -42,13 +42,13 @@ export function UnitEditor() {
                     })
                     .catch((error) => {
                         console.error("Error fetching:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to fetch the unit, try again later'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the unit, try again later"});
                     });
         } else {
             setUnit({
                 id: 0,
-                name: '',
-                description: '',
+                name: "",
+                description: "",
                 acls: [],
                 creator: 0,
                 created: new Date(),
@@ -74,22 +74,22 @@ export function UnitEditor() {
         if (unitId === 0) {
             unitAPI.create(values)
                     .then((response) => {
-                        setSubmitResults({status: ActionResult.OK, message: 'Unit created successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "Unit created successfully"});
                         setUnit(response);
                     })
                     .catch((error) => {
                         console.error("Error creating:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to create a new unit'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to create a new unit"});
                     });
         } else {
             unitAPI.update(values)
                     .then((response) => {
-                        setSubmitResults({status: ActionResult.OK, message: 'Unit updated successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "Unit updated successfully"});
                         setUnit(response);
                     })
                     .catch((error) => {
                         console.error("Error updating:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to update unit'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to update unit"});
                     });
         }
 
@@ -98,16 +98,16 @@ export function UnitEditor() {
     }
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={loadResults} successTo={'/units'} failTo={'/units'}/>);
+        return (<SubmitResultHandler submitResult={loadResults} successTo={"/units"} failTo={"/units"}/>);
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={'/units'} failTo={'/units'}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/units"} failTo={"/units"}/>);
     }
 
     return (
-            <div className={'darkBody'}>
-                <Spin tip={'Loading'} spinning={loading}>
+            <div className={"darkBody"}>
+                <Spin tip={"Loading"} spinning={loading}>
                     {unitId === 0 && <h1>Create new unit</h1>}
                     {unitId > 0 && <h1>Edit unit {unitId}</h1>}
                 </Spin>
@@ -118,42 +118,42 @@ export function UnitEditor() {
                         labelCol={{span: 8}}
                         wrapperCol={{span: 18}}
                         style={{maxWidth: 1400}}
-                        name={'PageForm'}
-                        autoComplete={'off'}
+                        name={"PageForm"}
+                        autoComplete={"off"}
                 >
-                    <Form.Item name={'id'} label={'ID'}>
+                    <Form.Item name={"id"} label={"ID"}>
                         <Input disabled={true}/>
                     </Form.Item>
 
-                    <Form.Item name={'name'} label={'Unit name'}>
+                    <Form.Item name={"name"} label={"Unit name"}>
                         <Input/>
                     </Form.Item>
-                    <Form.Item name={'description'} label={'Description'}>
+                    <Form.Item name={"description"} label={"Description"}>
                         <Input/>
                     </Form.Item>
-                    <Form.Item key={'unit-acl-list'}
-                               label={'Access control'}
+                    <Form.Item key={"unit-acl-list"}
+                               label={"Access control"}
                     >
                         <AclEdit acls={acls} onChange={handleAclsChange} parentForm={unitForm}/>
                     </Form.Item>
-                    <Form.Item wrapperCol={{offset: 8, span: 16,}}><Divider orientation={'left'}>Metadata</Divider></Form.Item>
-                    <Form.Item name={'creator'} label={'Creator'}>
+                    <Form.Item wrapperCol={{offset: 8, span: 16,}}><Divider orientation={"left"}>Metadata</Divider></Form.Item>
+                    <Form.Item name={"creator"} label={"Creator"}>
                         <Input disabled={true}/>
                     </Form.Item>
 
-                    <Form.Item name={'created'} label={'Created'}>
+                    <Form.Item name={"created"} label={"Created"}>
                         <Input disabled={true}/>
                     </Form.Item>
 
-                    <Form.Item name={'modifier'} label={'Modifier'}>
+                    <Form.Item name={"modifier"} label={"Modifier"}>
                         <Input disabled={true}/>
                     </Form.Item>
 
-                    <Form.Item name={'modified'} label={'Modified'}>
+                    <Form.Item name={"modified"} label={"Modified"}>
                         <Input disabled={true}/>
                     </Form.Item>
-                    <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: 'center'}}>
-                        <Button type={'primary'} htmlType={'submit'}>Save</Button>
+                    <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: "center"}}>
+                        <Button type={"primary"} htmlType={"submit"}>Save</Button>
                     </Form.Item>
                 </Form>}
             </div>

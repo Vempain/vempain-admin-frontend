@@ -17,55 +17,55 @@ export function ComponentList() {
 
     const columns: ColumnsType<ComponentVO> = [
         {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
+            title: "ID",
+            dataIndex: "id",
+            key: "id",
             sorter: (a, b) => a.id - b.id
         },
         {
-            title: 'Component Name',
-            dataIndex: 'comp_name',
-            key: 'comp_name',
+            title: "Component Name",
+            dataIndex: "comp_name",
+            key: "comp_name",
             sorter: (a, b) => a.comp_name.localeCompare(b.comp_name)
         },
         {
-            title: 'Locked',
-            dataIndex: 'locked',
-            key: 'locked',
+            title: "Locked",
+            dataIndex: "locked",
+            key: "locked",
             sorter: (a, b) => Number(b.locked) - Number(a.locked)
         },
         {
-            title: 'Creator',
-            dataIndex: 'creator',
-            key: 'creator',
+            title: "Creator",
+            dataIndex: "creator",
+            key: "creator",
             sorter: (a, b) => a.creator - b.creator
         },
         {
-            title: 'Created',
-            dataIndex: 'created',
-            key: 'created',
+            title: "Created",
+            dataIndex: "created",
+            key: "created",
             sorter: (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
         },
         {
-            title: 'Modifier',
-            dataIndex: 'modifier',
-            key: 'modifier',
+            title: "Modifier",
+            dataIndex: "modifier",
+            key: "modifier",
             sorter: (a, b) => a.modifier - b.modifier
         },
         {
-            title: 'Modified',
-            dataIndex: 'modified',
-            key: 'modified',
+            title: "Modified",
+            dataIndex: "modified",
+            key: "modified",
             sorter: (a, b) => new Date(a.modified).getTime() - new Date(b.modified).getTime()
         },
         {
-            title: 'Action',
-            key: 'action',
+            title: "Action",
+            key: "action",
             render: (_text: any, record: ComponentVO) => (
                     <Space>
                         <Button type="primary" href={`/components/${record.id}/edit`}>Edit</Button>
                         {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&
-                                <Button type={'primary'} danger href={`/components/${record.id}/delete`}>Delete</Button>}
+                                <Button type={"primary"} danger href={`/components/${record.id}/delete`}>Delete</Button>}
                     </Space>
 
             ),
@@ -88,9 +88,9 @@ export function ComponentList() {
     }, []);
 
     return (
-            <div className={'darkBody'} key={'componentListDiv'}>
-                <Spin tip={'Loading'} spinning={loading} key={'componentListSpinner'}>
-                    <h1 key={'componentListHeader'}>Component List <Link to={'/components/0/edit'}><PlusCircleFilled/></Link></h1>
+            <div className={"darkBody"} key={"componentListDiv"}>
+                <Spin tip={"Loading"} spinning={loading} key={"componentListSpinner"}>
+                    <h1 key={"componentListHeader"}>Component List <Link to={"/components/0/edit"}><PlusCircleFilled/></Link></h1>
 
                     {componentList.length > 0 && <Table
                             dataSource={componentList.map((item, index) => ({...item, key: `row_${index}`}))}

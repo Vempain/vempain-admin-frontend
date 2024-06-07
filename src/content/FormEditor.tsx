@@ -17,8 +17,8 @@ export function FormEditor() {
     const [formForm] = Form.useForm();
     const [acls, setAcls] = useState<AclVO[]>([]);
     const [form, setForm] = useState<FormVO | null>(null);
-    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
-    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
+    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
+    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     const [componentList, setComponentList] = useState<ComponentVO[]>([]);
     const [layoutList, setLayoutList] = useState<LayoutVO[]>([]);
@@ -32,11 +32,11 @@ export function FormEditor() {
         ])
                 .then((responses) => {
                     setComponentList(responses[0]);
-                    setLayoutList(responses[1])
+                    setLayoutList(responses[1]);
                 })
                 .catch((error) => {
                     console.error("Error fetching:", error);
-                    setSubmitResults({status: ActionResult.FAIL, message: 'Failed to fetch the component and layout list, try again later'});
+                    setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the component and layout list, try again later"});
                 });
 
         let tmpFormId: number = validateParamId(paramId);
@@ -44,7 +44,7 @@ export function FormEditor() {
         if (tmpFormId < 0) {
             setLoadResults({
                 status: ActionResult.FAIL,
-                message: 'Called with invalid parameter'
+                message: "Called with invalid parameter"
             });
             return;
         }
@@ -59,14 +59,14 @@ export function FormEditor() {
                     })
                     .catch((error) => {
                         console.error("Error fetching:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to fetch the form, try again later'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the form, try again later"});
                         setLoading(false);
 
                     });
         } else {
             setForm({
                 id: 0,
-                name: '',
+                name: "",
                 layout_id: 0,
                 components: [],
                 acls: [],
@@ -90,22 +90,22 @@ export function FormEditor() {
         if (formId === 0) {
             formAPI.create(values)
                     .then((response) => {
-                        setSubmitResults({status: ActionResult.OK, message: 'Form created successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "Form created successfully"});
                         setForm(response);
                     })
                     .catch((error) => {
                         console.error("Error creating:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to create a new form'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to create a new form"});
                     });
         } else {
             formAPI.update(values)
                     .then((response) => {
-                        setSubmitResults({status: ActionResult.OK, message: 'Form updated successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "Form updated successfully"});
                         setForm(response);
                     })
                     .catch((error) => {
                         console.error("Error updating:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to update form'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to update form"});
                     });
         }
 
@@ -114,16 +114,16 @@ export function FormEditor() {
     }
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={loadResults} successTo={'/forms'} failTo={'/forms'}/>);
+        return (<SubmitResultHandler submitResult={loadResults} successTo={"/forms"} failTo={"/forms"}/>);
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={'/forms'} failTo={'/forms'}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/forms"} failTo={"/forms"}/>);
     }
 
     return (
-            <div className={'darkBody'}>
-                <Spin tip={'Loading'} spinning={loading}>
+            <div className={"darkBody"}>
+                <Spin tip={"Loading"} spinning={loading}>
                     {formId === 0 && <h1>Create new form</h1>}
                     {formId > 0 && <h1>Edit form {formId}</h1>}
                     {form !== null && <Form
@@ -133,21 +133,21 @@ export function FormEditor() {
                             labelCol={{span: 8}}
                             wrapperCol={{span: 18}}
                             style={{maxWidth: 1400}}
-                            name={'PageForm'}
-                            autoComplete={'off'}
+                            name={"PageForm"}
+                            autoComplete={"off"}
                     >
-                        <Form.Item name={'id'} label={'ID'}>
+                        <Form.Item name={"id"} label={"ID"}>
                             <Input disabled={true}/>
                         </Form.Item>
-                        <Form.Item name={'name'} label={'Form name'}>
+                        <Form.Item name={"name"} label={"Form name"}>
                             <Input/>
                         </Form.Item>
-                        <Form.Item name={'layout_id'} label={'Layout'}>
+                        <Form.Item name={"layout_id"} label={"Layout"}>
                             <Select
-                                    placeholder={'Select a layout'}
+                                    placeholder={"Select a layout"}
                                     showSearch={true}
                             >
-                                <Select.Option value={null} key={'empty'}>None</Select.Option>
+                                <Select.Option value={null} key={"empty"}>None</Select.Option>
                                 {layoutList.map(layout => {
                                     return (
                                             <Select.Option key={layout.id} value={layout.id}>
@@ -159,7 +159,7 @@ export function FormEditor() {
 
 
                         <Form.Item
-                                label={'Components'}
+                                label={"Components"}
 
                         >
                             <Form.List
@@ -170,14 +170,14 @@ export function FormEditor() {
                                     return (<>
                                         {components.map((field, index) => {
                                             return (
-                                                    <Space key={field.key} style={{display: 'flex', marginBottom: 8}} align="baseline">
+                                                    <Space key={field.key} style={{display: "flex", marginBottom: 8}} align="baseline">
                                                         <Form.Item
-                                                                name={[field.name, 'id']}
+                                                                name={[field.name, "id"]}
                                                                 rules={
                                                                     [
                                                                         {
                                                                             required: true,
-                                                                            message: 'Missing component'
+                                                                            message: "Missing component"
                                                                         }
                                                                     ]
                                                                 }
@@ -186,9 +186,9 @@ export function FormEditor() {
                                                                     placeholder="Select a component"
                                                                     showSearch
                                                                     optionFilterProp="children"
-                                                                    style={{width: '300px'}}
+                                                                    style={{width: "300px"}}
                                                             >
-                                                                <Select.Option value={'empty'} key="empty">
+                                                                <Select.Option value={"empty"} key="empty">
                                                                     None
                                                                 </Select.Option>
                                                                 {componentList.map(component => {
@@ -220,19 +220,19 @@ export function FormEditor() {
                             </Form.List>
                         </Form.Item>
 
-                        <Form.Item name={'locked'} label={'Locked'} valuePropName={'checked'}>
+                        <Form.Item name={"locked"} label={"Locked"} valuePropName={"checked"}>
                             <Switch/>
                         </Form.Item>
-                        <Form.Item key={'form-acl-list'}
-                                   label={'Access control'}
+                        <Form.Item key={"form-acl-list"}
+                                   label={"Access control"}
                         >
                             <AclEdit acls={acls} onChange={handleAclsChange} parentForm={formForm}/>
                         </Form.Item>
                         <Form.Item label={" "} colon={false} key={"page-metadata"}>
                             <MetadataForm metadata={{creator: form.creator, created: form.created, modifier: form.modifier, modified: form.modified}}/>
                         </Form.Item>
-                        <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: 'center'}}>
-                            <Button type={'primary'} htmlType={'submit'}>Save</Button>
+                        <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: "center"}}>
+                            <Button type={"primary"} htmlType={"submit"}>Save</Button>
                         </Form.Item>
                     </Form>}
                 </Spin>

@@ -28,45 +28,45 @@ function App() {
 
     return (
             <ConfigProvider theme={{algorithm: darkAlgorithm}}>
-                <Layout className={'layout'}>
+                <Layout className={"layout"}>
                     <TopBar/>
-                    <Content style={{padding: '0 50px'}}>
-                        <div className={'site-layout-content'}>
+                    <Content style={{padding: "0 50px"}}>
+                        <div className={"site-layout-content"}>
                             <Routes>
-                                <Route path={'*'} element={<Navigate to={'/'}/>}/>
-                                <Route path={'/'} element={<Home/>}/>
-                                <Route path={'/login'} element={<Login/>}/>
-                                <Route path={'/logout'} element={<Logout/>}/>
+                                <Route path={"*"} element={<Navigate to={"/"}/>}/>
+                                <Route path={"/"} element={<Home/>}/>
+                                <Route path={"/login"} element={<Login/>}/>
+                                <Route path={"/logout"} element={<Logout/>}/>
                                 {/* Content */}
-                                <Route path={'/components'} element={<ComponentList/>}/>
-                                <Route path={'/components/:paramId/delete'} element={<ComponentDelete/>}/>
-                                <Route path={'/components/:paramId/edit'} element={<ComponentEditor/>}/>
-                                <Route path={'/forms'} element={<FormList/>}/>
-                                <Route path={'/forms/:paramId/delete'} element={<FormDelete/>}/>
-                                <Route path={'/forms/:paramId/edit'} element={<FormEditor/>}/>
-                                <Route path={'/layouts'} element={<LayoutList/>}/>
-                                <Route path={'/layouts/:paramId/delete'} element={<LayoutDelete/>}/>
-                                <Route path={'/layouts/:paramId/edit'} element={<LayoutEditor/>}/>
-                                <Route path={'/pages'} element={<PageList/>}/>
-                                <Route path={'/pages/:paramId/delete'} element={<PageDelete/>}/>
-                                <Route path={'/pages/:paramId/edit'} element={<PageEditor/>}/>
-                                <Route path={'/pages/:paramId/publish'} element={<PagePublisher/>}/>
+                                <Route path={"/components"} element={<ComponentList/>}/>
+                                <Route path={"/components/:paramId/delete"} element={<ComponentDelete/>}/>
+                                <Route path={"/components/:paramId/edit"} element={<ComponentEditor/>}/>
+                                <Route path={"/forms"} element={<FormList/>}/>
+                                <Route path={"/forms/:paramId/delete"} element={<FormDelete/>}/>
+                                <Route path={"/forms/:paramId/edit"} element={<FormEditor/>}/>
+                                <Route path={"/layouts"} element={<LayoutList/>}/>
+                                <Route path={"/layouts/:paramId/delete"} element={<LayoutDelete/>}/>
+                                <Route path={"/layouts/:paramId/edit"} element={<LayoutEditor/>}/>
+                                <Route path={"/pages"} element={<PageList/>}/>
+                                <Route path={"/pages/:paramId/delete"} element={<PageDelete/>}/>
+                                <Route path={"/pages/:paramId/edit"} element={<PageEditor/>}/>
+                                <Route path={"/pages/:paramId/publish"} element={<PagePublisher/>}/>
                                 {/* Files */}
-                                <Route path={'/audios'} element={<AudioList/>}/>
-                                <Route path={'/documents'} element={<DocumentList/>}/>
-                                <Route path={'/galleries'} element={<GalleryList/>}/>
-                                <Route path={'/galleries/:paramId/delete'} element={<GalleryDelete/>}/>
-                                <Route path={'/galleries/:paramId/edit'} element={<GalleryEdit/>}/>
-                                <Route path={'/galleries/:paramId/publish'} element={<GalleryPublish/>}/>
-                                <Route path={'/galleries/:paramId/refresh'} element={<GalleryRefresh/>}/>
-                                <Route path={'/images'} element={<ImageList/>}/>
-                                <Route path={'/import'} element={<FileImport/>}/>
-                                <Route path={'/videos'} element={<VideoList/>}/>
+                                <Route path={"/audios"} element={<AudioList/>}/>
+                                <Route path={"/documents"} element={<DocumentList/>}/>
+                                <Route path={"/galleries"} element={<GalleryList/>}/>
+                                <Route path={"/galleries/:paramId/delete"} element={<GalleryDelete/>}/>
+                                <Route path={"/galleries/:paramId/edit"} element={<GalleryEdit/>}/>
+                                <Route path={"/galleries/:paramId/publish"} element={<GalleryPublish/>}/>
+                                <Route path={"/galleries/:paramId/refresh"} element={<GalleryRefresh/>}/>
+                                <Route path={"/images"} element={<ImageList/>}/>
+                                <Route path={"/import"} element={<FileImport/>}/>
+                                <Route path={"/videos"} element={<VideoList/>}/>
                                 {/* User */}
-                                <Route path={'/units'} element={<UnitList/>}/>
-                                <Route path={'/units/:paramId/edit'} element={<UnitEditor/>}/>
-                                <Route path={'/users'} element={<UserList/>}/>
-                                <Route path={'/users/:paramId/edit'} element={<UserEditor/>}/>
+                                <Route path={"/units"} element={<UnitList/>}/>
+                                <Route path={"/units/:paramId/edit"} element={<UnitEditor/>}/>
+                                <Route path={"/users"} element={<UserList/>}/>
+                                <Route path={"/users/:paramId/edit"} element={<UserEditor/>}/>
                             </Routes>
                         </div>
                         <BottomFooter/>

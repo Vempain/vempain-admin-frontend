@@ -16,8 +16,8 @@ export function LayoutEditor() {
     const [layoutForm] = Form.useForm();
     const [acls, setAcls] = useState<AclVO[]>([]);
     const [layout, setLayout] = useState<LayoutVO | null>(null);
-    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
-    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
+    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
+    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     useEffect(() => {
         setLoading(true);
@@ -26,7 +26,7 @@ export function LayoutEditor() {
         if (tmpLayoutId < 0) {
             setLoadResults({
                 status: ActionResult.FAIL,
-                message: 'Called with invalid parameter'
+                message: "Called with invalid parameter"
             });
             return;
         }
@@ -39,15 +39,15 @@ export function LayoutEditor() {
                     })
                     .catch((error) => {
                         console.error("Error fetching:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to fetch the layout, try again later'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the layout, try again later"});
                         setLoading(false);
 
                     });
         } else {
             setLayout({
                 id: 0,
-                layout_name: '',
-                structure: '',
+                layout_name: "",
+                structure: "",
                 acls: [],
                 locked: false,
                 creator: 0,
@@ -75,22 +75,22 @@ export function LayoutEditor() {
         if (layoutId === 0) {
             layoutAPI.create(values)
                     .then((response) => {
-                        setSubmitResults({status: ActionResult.OK, message: 'Layout created successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "Layout created successfully"});
                         setLayout(response);
                     })
                     .catch((error) => {
                         console.error("Error creating:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to create a new layout'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to create a new layout"});
                     });
         } else {
             layoutAPI.update(values)
                     .then((response) => {
-                        setSubmitResults({status: ActionResult.OK, message: 'Layout updated successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "Layout updated successfully"});
                         setLayout(response);
                     })
                     .catch((error) => {
                         console.error("Error updating:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to update layout'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to update layout"});
                     });
         }
 
@@ -99,15 +99,15 @@ export function LayoutEditor() {
     }
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={loadResults} successTo={'/layouts'} failTo={'/layouts'}/>);
+        return (<SubmitResultHandler submitResult={loadResults} successTo={"/layouts"} failTo={"/layouts"}/>);
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={'/layouts'} failTo={'/layouts'}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/layouts"} failTo={"/layouts"}/>);
     }
 
-    return (<div className={'darkBody'}>
-                <Spin tip={'Loading'} spinning={loading}>
+    return (<div className={"darkBody"}>
+                <Spin tip={"Loading"} spinning={loading}>
                     {layoutId === 0 && <h1>Create new layout</h1>}
                     {layoutId > 0 && <h1>Edit layout {layoutId}</h1>}
                     {layout !== null && <Form
@@ -117,10 +117,10 @@ export function LayoutEditor() {
                             labelCol={{span: 8}}
                             wrapperCol={{span: 18}}
                             style={{maxWidth: 1400}}
-                            name={'PageForm'}
+                            name={"PageForm"}
                             autoComplete="off"
                     >
-                        <Form.Item name={'id'} label={'ID'}>
+                        <Form.Item name={"id"} label={"ID"}>
                             <Input disabled={true}/>
                         </Form.Item>
                         <Form.Item name="layout_name" label="Layout Name">
@@ -129,20 +129,20 @@ export function LayoutEditor() {
                         <Form.Item name="structure" label="Structure">
                             <Input.TextArea/>
                         </Form.Item>
-                        <Form.Item name={'locked'} label={'Locked'} valuePropName={'checked'}>
+                        <Form.Item name={"locked"} label={"Locked"} valuePropName={"checked"}>
                             <Switch/>
                         </Form.Item>
-                        <Form.Item name={'acls'}
-                                   key={'layout-acl-list'}
-                                   label={'Access control'}
+                        <Form.Item name={"acls"}
+                                   key={"layout-acl-list"}
+                                   label={"Access control"}
                         >
                             <AclEdit acls={acls} onChange={handleAclsChange} parentForm={layoutForm}/>
                         </Form.Item>
                         <Form.Item label={" "} colon={false} key={"page-metadata"}>
                             <MetadataForm metadata={{creator: layout.creator, created: layout.created, modifier: layout.modifier, modified: layout.modified}}/>
                         </Form.Item>
-                        <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: 'center'}}>
-                            <Button type={'primary'} htmlType={'submit'}>Save</Button>
+                        <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: "center"}}>
+                            <Button type={"primary"} htmlType={"submit"}>Save</Button>
                         </Form.Item>
                     </Form>}
                 </Spin>

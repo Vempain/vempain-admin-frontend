@@ -16,7 +16,7 @@ const SessionContext = createContext<SessionContextType | undefined>(undefined);
 // Create a SessionProvider component
 export function SessionProvider({children}: any) {
     const [user, setUser] = useState<LoginVO | null>(null);
-    const userKey: string = 'vempainUser';
+    const userKey: string = "vempainUser";
     // Check if user data exists in local storage on initial load
     useEffect(() => {
         const userData = localStorage.getItem(userKey);
@@ -35,20 +35,20 @@ export function SessionProvider({children}: any) {
                     return {
                         status: ActionResultEnum.SUCCESS,
                         message: "Login successful"
-                    }
+                    };
                 })
                 .catch((error) => {
                     return {
                         status: ActionResultEnum.FAILURE,
                         message: "Failed to log on user"
-                    }
+                    };
                 });
     };
 
     // Function to handle logout
     const logoutUser = () => {
         setUser(null);
-        console.log('Logging out so set user data to null and calling authService.logout()');
+        console.log("Logging out so set user data to null and calling authService.logout()");
         authAPI.logout();
     };
 
@@ -69,7 +69,7 @@ export function SessionProvider({children}: any) {
 export function useSession(): SessionContextType {
     const context = useContext(SessionContext);
     if (!context) {
-        throw new Error('useSession must be used within a SessionProvider');
+        throw new Error("useSession must be used within a SessionProvider");
     }
 
     return context;

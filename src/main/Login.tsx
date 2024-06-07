@@ -23,30 +23,30 @@ function Login() {
         const loginRequest: LoginRequest = {
             login: values.username,
             password: values.password
-        }
+        };
 
         const loginStatus: LoginStatus = await loginUser(loginRequest);
 
         if (!loginStatus || loginStatus.status === ActionResultEnum.FAILURE) {
             setLoginResults({status: ActionResult.FAIL, message: "Failed to log in user"});
         } else {
-            navigate('/');
+            navigate("/");
         }
 
         setLoading(false);
     }
 
     const onFinishFailed = (errorInfo: any) => {
-        console.log('Failed:', errorInfo);
+        console.log("Failed:", errorInfo);
     };
 
     function clearStateOnBackButton() {
-        navigate('/')
+        navigate("/");
     }
 
     if (loginResults.status === ActionResult.FAIL) {
         return (<div>
-            <Alert type={'error'}
+            <Alert type={"error"}
                    message={loginResults.message}
                    showIcon
                    action={<Button type={"primary"} onClick={() => clearStateOnBackButton()}>{"Return to front page"}</Button>}
@@ -55,9 +55,9 @@ function Login() {
     }
 
     return (
-            <Spin tip={'Loading'} spinning={loading}>
+            <Spin tip={"Loading"} spinning={loading}>
                 <Space
-                        direction={'vertical'}
+                        direction={"vertical"}
                         style={{width: "100%", margin: 30}}
                         align={"center"}
                         size={"large"}
@@ -75,7 +75,7 @@ function Login() {
                         <Form.Item<FieldType>
                                 label="Username"
                                 name="username"
-                                rules={[{required: true, message: 'Please input your username!'}]}
+                                rules={[{required: true, message: "Please input your username!"}]}
                         >
                             <Input autoFocus/>
                         </Form.Item>
@@ -83,7 +83,7 @@ function Login() {
                         <Form.Item<FieldType>
                                 label="Password"
                                 name="password"
-                                rules={[{required: true, message: 'Please input your password!'}]}
+                                rules={[{required: true, message: "Please input your password!"}]}
                         >
                             <Input.Password/>
                         </Form.Item>
@@ -97,7 +97,7 @@ function Login() {
                         </Form.Item>
 
                         <Form.Item wrapperCol={{offset: 8, span: 16}}>
-                            <Button type={'primary'} htmlType={'submit'}>
+                            <Button type={"primary"} htmlType={"submit"}>
                                 Submit
                             </Button>
                         </Form.Item>

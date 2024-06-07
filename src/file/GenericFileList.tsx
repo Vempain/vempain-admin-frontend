@@ -13,7 +13,7 @@ interface Props<T extends AbstractFileVO> {
 export function GenericFileList<T extends AbstractFileVO>({valueObjectColumns, api}: Props<T>) {
     const [loading, setLoading] = useState<boolean>(false);
     const [valueObjectList, setValueObjectList] = useState<T[]>([]);
-    const defaultFilterColumn: string = 'id';
+    const defaultFilterColumn: string = "id";
 
     const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>({
         current: 1,
@@ -32,8 +32,8 @@ export function GenericFileList<T extends AbstractFileVO>({valueObjectColumns, a
         pagination: tablePaginationConfig,
         columnKey: defaultFilterColumn,
         field: defaultFilterColumn,
-        order: 'descend',
-        filter: '',
+        order: "descend",
+        filter: "",
         filters: {},
         filterColumn: defaultFilterColumn
     });
@@ -42,7 +42,7 @@ export function GenericFileList<T extends AbstractFileVO>({valueObjectColumns, a
     const refreshDataFromServer = useRef(true); // useRef to track whether data should be fetched or not
 
     function handleTableChange(tablePaginationConfig: TablePaginationConfig, filters: Record<string, FilterValue | null>,
-            sorter: SorterResult<T> | SorterResult<T>[]) {
+                               sorter: SorterResult<T> | SorterResult<T>[]) {
         setTablePaginationConfig(tablePaginationConfig);
 
         if (filters) {
@@ -67,7 +67,7 @@ export function GenericFileList<T extends AbstractFileVO>({valueObjectColumns, a
                 ...tableParams,
                 pagination: tablePaginationConfig,
                 field: primarySorter.field === undefined ? defaultFilterColumn : primarySorter.field.toString(),
-                order: primarySorter.order === 'ascend' ? 'asc' : 'desc'
+                order: primarySorter.order === "ascend" ? "asc" : "desc"
             });
         }
 
@@ -97,7 +97,7 @@ export function GenericFileList<T extends AbstractFileVO>({valueObjectColumns, a
     }, [defaultFilterColumn, tableParams, tablePaginationConfig, api]);
 
     return (
-            <div className={'darkBody'}>
+            <div className={"darkBody"}>
                 <h4> {}</h4>
 
                 <Spin spinning={loading}>
@@ -105,7 +105,7 @@ export function GenericFileList<T extends AbstractFileVO>({valueObjectColumns, a
                            columns={valueObjectColumns}
                            pagination={tablePaginationConfig}
                            loading={loading}
-                           rowKey={'id'}
+                           rowKey={"id"}
                            onChange={handleTableChange}
                     />
                 </Spin>

@@ -11,21 +11,21 @@ function SubmitResultHandler({submitResult, successTo, failTo}: SubmitResultHand
 
     if (submitResult.status === ActionResult.OK) {
         return (
-                <div className={'darkBody'}>
-                    <Alert type={'success'}
+                <div className={"darkBody"}>
+                    <Alert type={"success"}
                            showIcon
                            message={submitResult.message}
-                           action={<Button type={'primary'} href={successTo}>Back</Button>}
+                           action={<Button type={"primary"} href={successTo}>Back</Button>}
                     />
                 </div>
         );
     } else {
         return (
-                <div className={'darkBody'}>
-                    <Alert type={'error'}
+                <div className={"darkBody"}>
+                    <Alert type={"error"}
                            showIcon
                            message={submitResult.message}
-                           action={<Button type={'primary'} href={failTo}>Back</Button>}
+                           action={<Button type={"primary"} href={failTo}>Back</Button>}
                     />
                 </div>
         );

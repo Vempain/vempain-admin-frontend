@@ -11,8 +11,8 @@ export function PageDelete() {
     const {paramId} = useParams();
     const [pageId, setPageId] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
-    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
-    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
+    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
+    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [page, setPage] = useState<PageVO | null>(null);
 
     useEffect(() => {
@@ -21,7 +21,7 @@ export function PageDelete() {
         if (tmpPageId < 0) {
             setLoadResults({
                 status: ActionResult.FAIL,
-                message: 'Called with invalid parameter'
+                message: "Called with invalid parameter"
             });
             return;
         }
@@ -39,7 +39,7 @@ export function PageDelete() {
                     })
                     .catch((error) => {
                         console.error("Error fetching page details:", error);
-                        setLoadResults({status: ActionResult.FAIL, message: 'Failed to fetch the page details, try again later'});
+                        setLoadResults({status: ActionResult.FAIL, message: "Failed to fetch the page details, try again later"});
                     })
                     .finally(() => {
                                 setLoading(false);
@@ -52,28 +52,28 @@ export function PageDelete() {
         if (page !== null) {
             pageAPI.delete(pageId)
                     .then(() => {
-                        setSubmitResults({status: ActionResult.OK, message: 'Page deleted successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "Page deleted successfully"});
                     })
                     .catch((error) => {
                         console.error("Error deleting page:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to delete the page, try again later'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to delete the page, try again later"});
                     });
         }
     }
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={loadResults} successTo={'/pages'} failTo={'/pages'}/>);
+        return (<SubmitResultHandler submitResult={loadResults} successTo={"/pages"} failTo={"/pages"}/>);
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={'/pages'} failTo={'/pages'}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/pages"} failTo={"/pages"}/>);
     }
 
     return (
-            <div className={'darkBody'} key={'componentDeleteDiv'}>
+            <div className={"darkBody"} key={"componentDeleteDiv"}>
                 <Spin spinning={loading}>
                     <div>
-                        <Button type={'primary'} danger={true} onClick={deletePage} key={'deleteButton'}>Delete page</Button>
+                        <Button type={"primary"} danger={true} onClick={deletePage} key={"deleteButton"}>Delete page</Button>
                     </div>
                 </Spin>
             </div>

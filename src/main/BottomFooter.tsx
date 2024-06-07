@@ -11,7 +11,8 @@ function BottomFooter() {
                     dangerouslySetInnerHTML={{
                         __html: import.meta.env.VITE_APP_VEMPAIN_COPYRIGHT_FOOTER + "<br/>"
                                 + "v" + buildInfo.version + " " + " built: " + buildInfo.buildTime + "<br/>"
-                                + import.meta.env.VITE_APP_POWERED_BY_VEMPAIN}}/>
+                                + import.meta.env.VITE_APP_POWERED_BY_VEMPAIN
+                    }}/>
     );
 }
 

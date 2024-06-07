@@ -12,14 +12,14 @@ import { LoadingOutlined } from "@ant-design/icons";
 
 
 export function GalleryPublish() {
-    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
+    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [loading, setLoading] = useState<boolean>(true);
     const [loadingMessage, setLoadingMessage] = useState<string>("Loading directories");
 
     const {paramId} = useParams();
     const [galleryId, setGalleryId] = useState<number>(0);
     const [gallery, setGallery] = useState<GalleryVO>();
-    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
+    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     useEffect(() => {
         setLoadingMessage("Loading directories");
@@ -28,7 +28,7 @@ export function GalleryPublish() {
         if (tmpGalleryId < 0) {
             setLoadResults({
                 status: ActionResult.FAIL,
-                message: 'Called with invalid parameter'
+                message: "Called with invalid parameter"
             });
             return;
         }
@@ -42,7 +42,7 @@ export function GalleryPublish() {
                 })
                 .catch((error) => {
                     console.error("Error fetching gallery information:", error);
-                    setLoadResults({status: ActionResult.FAIL, message: 'Failed to fetch gallery, try again later'});
+                    setLoadResults({status: ActionResult.FAIL, message: "Failed to fetch gallery, try again later"});
                 })
                 .finally(() => {
                     setLoading(false);
@@ -55,11 +55,11 @@ export function GalleryPublish() {
             setLoadingMessage("Publishing gallery");
             galleryAPI.publish(galleryId)
                     .then(() => {
-                        setSubmitResults({status: ActionResult.OK, message: 'Gallery published successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "Gallery published successfully"});
                     })
                     .catch((error) => {
                         console.error("Error publishing gallery:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to publish the gallery, try again later'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to publish the gallery, try again later"});
                     })
                     .finally(() => {
                         setLoading(false);
@@ -68,40 +68,40 @@ export function GalleryPublish() {
     }
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={loadResults} successTo={'/galleries'} failTo={'/galleries'}/>);
+        return (<SubmitResultHandler submitResult={loadResults} successTo={"/galleries"} failTo={"/galleries"}/>);
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={'/galleries'} failTo={'/galleries'}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/galleries"} failTo={"/galleries"}/>);
     }
 
     return (
-            <div className={'darkBody'} key={'pagePublishDiv'}>
+            <div className={"darkBody"} key={"pagePublishDiv"}>
                 <Spin spinning={loading}
                       tip={loadingMessage}
                       indicator={<LoadingOutlined style={{fontSize: 24}} spin={true}/>}
                 >
                     {gallery !== null && gallery?.id !== undefined && <div>
                         <Space direction={"vertical"} size={"large"}>
-                            <Input key={'galleryShortname'}
+                            <Input key={"galleryShortname"}
                                    value={gallery.short_name}
                                    style={{width: 800}}
                                    disabled={true}
                             />
                             <TextArea key={"galleryDescription"}
                                       value={gallery.description}
-                                      style={{width: 800, height: '100%'}}
+                                      style={{width: 800, height: "100%"}}
                                       disabled={true}
                                       autoSize={true}
                             />
-                            <Button key={'publishButton-top'} type={'primary'} onClick={publishGallery}>Publish gallery</Button>
+                            <Button key={"publishButton-top"} type={"primary"} onClick={publishGallery}>Publish gallery</Button>
                             {
                                     gallery.common_files.length > 0 &&
                                     gallery.common_files.map(commonFile => {
-                                        return (<CommonFileCard key={"commonFileCard-" + commonFile.id} commonFile={commonFile}/>)
+                                        return (<CommonFileCard key={"commonFileCard-" + commonFile.id} commonFile={commonFile}/>);
                                     })
                             }
-                            <Button key={'publishButton-bottom'} type={'primary'} onClick={publishGallery}>Publish gallery</Button>
+                            <Button key={"publishButton-bottom"} type={"primary"} onClick={publishGallery}>Publish gallery</Button>
                         </Space>
                     </div>}
                 </Spin>

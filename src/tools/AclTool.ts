@@ -2,6 +2,16 @@ import {PrivilegeEnum} from "../models";
 import {AclVO, UnitVO} from "../models/Responses";
 
 class AclTool {
+    public static validateAcl(item: AclVO): boolean {
+        if (item.unit === null && item.user === null) {
+            return false;
+        }
+
+        // This comparison has to use only == so that it compares the enum value only, false == 0, YesNo.YES == 1
+        // We also need to use the numeric values in the checkbox true-false definitions
+        return !(!item.read_privilege && !item.modify_privilege && !item.create_privilege && !item.delete_privilege);
+    }
+
     public verifyAclList(aclList: AclVO[]): boolean {
         let response: boolean = true;
         const permissionIdList: number[] = [];
@@ -20,18 +30,6 @@ class AclTool {
         });
 
         return response;
-    }
-
-    public static validateAcl(item: AclVO): boolean {
-        if (item.unit === null && item.user === null) {
-            return false;
-        }
-
-        // This comparison has to use only == so that it compares the enum value only, false == 0, YesNo.YES == 1
-        // We also need to use the numeric values in the checkbox true-false definitions
-        return !(!item.read_privilege && !item.modify_privilege && !item.create_privilege && !item.delete_privilege);
-
-
     }
 
     public matchAcl(acl1: AclVO, acl2: AclVO) {

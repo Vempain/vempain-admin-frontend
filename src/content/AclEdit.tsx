@@ -35,38 +35,38 @@ export function AclEdit({acls, onChange, parentForm}: AclEditProps) {
     }, []);
 
     function validateAclRow(rule: any, value: any, index: number): Promise<void> {
-        const fieldName = rule.field.split('.')[2];
+        const fieldName = rule.field.split(".")[2];
 
-        if (fieldName === 'user' || fieldName === 'unit') {
-            const userValue = parentForm.getFieldValue(['acls', index, 'user']);
-            const unitValue = parentForm.getFieldValue(['acls', index, 'unit']);
+        if (fieldName === "user" || fieldName === "unit") {
+            const userValue = parentForm.getFieldValue(["acls", index, "user"]);
+            const unitValue = parentForm.getFieldValue(["acls", index, "unit"]);
 
-            const userId: number | undefined = (userValue === undefined || userValue === null || userValue === 'empty' || userValue === '') ? undefined : parseInt(userValue, 10);
-            const unitId: number | undefined = (unitValue === undefined || unitValue === null || unitValue === 'empty' || unitValue === '') ? undefined : parseInt(unitValue, 10);
+            const userId: number | undefined = (userValue === undefined || userValue === null || userValue === "empty" || userValue === "") ? undefined : parseInt(userValue, 10);
+            const unitId: number | undefined = (unitValue === undefined || unitValue === null || unitValue === "empty" || unitValue === "") ? undefined : parseInt(unitValue, 10);
 
             // One of the two must be selected
             if ((userId === undefined) && (unitId === undefined)) {
-                return Promise.reject('Either User or Unit must be selected.');
+                return Promise.reject("Either User or Unit must be selected.");
             }
 
             // Both cannot be selected
             if ((userId !== undefined) && (unitId !== undefined)) {
-                return Promise.reject('Either User or Unit must be selected, not both.');
+                return Promise.reject("Either User or Unit must be selected, not both.");
             }
         }
 
-        if (fieldName.endsWith('_privilege')) {
-            const readPrivilegeValue = parentForm.getFieldValue(['acls', index, 'read_privilege']);
-            const modifyPrivilegeValue = parentForm.getFieldValue(['acls', index, 'modify_privilege']);
-            const deletePrivilegeValue = parentForm.getFieldValue(['acls', index, 'delete_privilege']);
+        if (fieldName.endsWith("_privilege")) {
+            const readPrivilegeValue = parentForm.getFieldValue(["acls", index, "read_privilege"]);
+            const modifyPrivilegeValue = parentForm.getFieldValue(["acls", index, "modify_privilege"]);
+            const deletePrivilegeValue = parentForm.getFieldValue(["acls", index, "delete_privilege"]);
 
             if (!readPrivilegeValue) {
-                return Promise.reject('Read privilege must be selected.');
+                return Promise.reject("Read privilege must be selected.");
             }
 
-            if ((fieldName === 'delete_privilege' || fieldName === 'modify_privilege')
+            if ((fieldName === "delete_privilege" || fieldName === "modify_privilege")
                     && deletePrivilegeValue && !modifyPrivilegeValue) {
-                return Promise.reject('Delete privilege requires modify privilege.');
+                return Promise.reject("Delete privilege requires modify privilege.");
             }
         }
 
@@ -86,16 +86,16 @@ export function AclEdit({acls, onChange, parentForm}: AclEditProps) {
                                 <Col span={3}><strong>Delete</strong></Col>
                             </Row>
 
-                            <Form.List name={'acls'} key={'layout-acl-list'}>
+                            <Form.List name={"acls"} key={"layout-acl-list"}>
                                 {(acls, {add, remove}) => (
                                         <>
                                             {acls.map((field, index) => (
                                                     <Row gutter={16} align="middle" key={field.key}>
                                                         {/* User Dropdown */}
                                                         <Col span={4}>
-                                                            <Form.Item name={[field.name, 'permission_id']} hidden={true}></Form.Item>
-                                                            <Form.Item name={[field.name, 'acl_id']} hidden={true}></Form.Item>
-                                                            <Form.Item name={[field.name, 'user']}
+                                                            <Form.Item name={[field.name, "permission_id"]} hidden={true}></Form.Item>
+                                                            <Form.Item name={[field.name, "acl_id"]} hidden={true}></Form.Item>
+                                                            <Form.Item name={[field.name, "user"]}
                                                                        rules={[
                                                                            {
                                                                                validator: (rule, value) => validateAclRow(rule, value, index)
@@ -122,7 +122,7 @@ export function AclEdit({acls, onChange, parentForm}: AclEditProps) {
 
                                                         {/* Unit Dropdown */}
                                                         <Col span={4}>
-                                                            <Form.Item name={[field.name, 'unit']}
+                                                            <Form.Item name={[field.name, "unit"]}
                                                                        rules={[
                                                                            {
                                                                                validator: (rule, value) => validateAclRow(rule, value, index)
@@ -144,8 +144,8 @@ export function AclEdit({acls, onChange, parentForm}: AclEditProps) {
                                                         </Col>
 
                                                         {/* Privileges Switches */}
-                                                        {['create_privilege', 'read_privilege', 'modify_privilege', 'delete_privilege'].map((privilege, privIndex) => (
-                                                                <Col span={3} key={index + '-' + privIndex}>
+                                                        {["create_privilege", "read_privilege", "modify_privilege", "delete_privilege"].map((privilege, privIndex) => (
+                                                                <Col span={3} key={index + "-" + privIndex}>
                                                                     <Form.Item
                                                                             name={[field.name, privilege]}
                                                                             valuePropName="checked"

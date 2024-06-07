@@ -12,29 +12,29 @@ export function UserEditor() {
     const {paramId} = useParams();
     const [userId, setUserId] = useState<number>(0);
 
-    const PRIVACY_TYPE: string[] = ['PRIVATE', 'GROUP', 'PUBLIC'];
+    const PRIVACY_TYPE: string[] = ["PRIVATE", "GROUP", "PUBLIC"];
 
     const [loading, setLoading] = useState<boolean>(false);
     const [userForm] = Form.useForm();
     const [acls, setAcls] = useState<AclVO[]>([]);
     const [user, setUser] = useState<UserVO | null>(null);
-    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
-    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
+    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
+    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     useEffect(() => {
         const emptyUser: UserVO = {
             id: 0,
             private_user: false,
-            name: '',
-            nick: '',
-            login_name: '',
-            privacy_type: '',
-            email: '',
-            street: '',
-            pob: '',
+            name: "",
+            nick: "",
+            login_name: "",
+            privacy_type: "",
+            email: "",
+            street: "",
+            pob: "",
             birthday: new Date(),
-            description: '',
-            password: '',
+            description: "",
+            password: "",
             acls: [],
             creator: 0,
             created: new Date(),
@@ -50,7 +50,7 @@ export function UserEditor() {
         if (tmpUserId < 0) {
             setLoadResults({
                 status: ActionResult.FAIL,
-                message: 'Called with invalid parameter'
+                message: "Called with invalid parameter"
             });
             return;
         }
@@ -65,7 +65,7 @@ export function UserEditor() {
                     })
                     .catch((error) => {
                         console.error("Error fetching:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to fetch the user, try again later'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the user, try again later"});
                     });
         } else {
             setUser(emptyUser);
@@ -88,22 +88,22 @@ export function UserEditor() {
         if (userId === 0) {
             userAPI.create(values)
                     .then((response) => {
-                        setSubmitResults({status: ActionResult.OK, message: 'User created successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "User created successfully"});
                         setUser(response);
                     })
                     .catch((error) => {
                         console.error("Error creating:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to create a new user'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to create a new user"});
                     });
         } else {
             userAPI.update(values)
                     .then((response) => {
-                        setSubmitResults({status: ActionResult.OK, message: 'User updated successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "User updated successfully"});
                         setUser(response);
                     })
                     .catch((error) => {
                         console.error("Error updating:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to update user'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to update user"});
                     });
         }
 
@@ -112,16 +112,16 @@ export function UserEditor() {
     }
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={loadResults} successTo={'/units'} failTo={'/units'}/>);
+        return (<SubmitResultHandler submitResult={loadResults} successTo={"/units"} failTo={"/units"}/>);
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={'/users'} failTo={'/users'}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/users"} failTo={"/users"}/>);
     }
 
     return (
-            <div className={'darkBody'}>
-                <Spin tip={'Loading'} spinning={loading}>
+            <div className={"darkBody"}>
+                <Spin tip={"Loading"} spinning={loading}>
                     {userId === 0 && <h1>Create new user</h1>}
                     {userId > 0 && <h1>Edit user {userId}</h1>}
                 </Spin>
@@ -132,25 +132,25 @@ export function UserEditor() {
                         labelCol={{span: 8}}
                         wrapperCol={{span: 18}}
                         style={{maxWidth: 1400}}
-                        name={'PageForm'}
-                        autoComplete={'off'}
+                        name={"PageForm"}
+                        autoComplete={"off"}
                 >
-                    <Form.Item name={'id'} label={'ID'}>
+                    <Form.Item name={"id"} label={"ID"}>
                         <Input disabled={true}/>
                     </Form.Item>
-                    <Form.Item name={'private_user'} label={'Is user private'} valuePropName={'checked'}>
+                    <Form.Item name={"private_user"} label={"Is user private"} valuePropName={"checked"}>
                         <Switch/>
                     </Form.Item>
-                    <Form.Item name={'name'} label={'User name'}>
+                    <Form.Item name={"name"} label={"User name"}>
                         <Input/>
                     </Form.Item>
-                    <Form.Item name={'nick'} label={'Nick'}>
+                    <Form.Item name={"nick"} label={"Nick"}>
                         <Input/>
                     </Form.Item>
-                    <Form.Item name={'login_name'} label={'Login name'}>
+                    <Form.Item name={"login_name"} label={"Login name"}>
                         <Input/>
                     </Form.Item>
-                    <Form.Item name={'privacy_type'} label={'Privacy type'}>
+                    <Form.Item name={"privacy_type"} label={"Privacy type"}>
                         <Select>
                             {PRIVACY_TYPE.map((privacyType) => {
                                 return (<Select.Option value={privacyType}>{privacyType}</Select.Option>);
@@ -158,59 +158,59 @@ export function UserEditor() {
                         </Select>
                     </Form.Item>
                     <Form.Item
-                            name={'email'}
-                            label={'Email'}
+                            name={"email"}
+                            label={"Email"}
                             rules={[
                                 {
-                                    type: 'email',
-                                    message: 'The input is not valid E-mail!'
+                                    type: "email",
+                                    message: "The input is not valid E-mail!"
                                 },
                                 {
                                     required: true,
-                                    message: 'Please input your E-mail!'
+                                    message: "Please input your E-mail!"
                                 },
                             ]}>
                         <Input/>
                     </Form.Item>
-                    <Form.Item name={'street'} label={'Street'}>
+                    <Form.Item name={"street"} label={"Street"}>
                         <Input/>
                     </Form.Item>
-                    <Form.Item name={'pob'} label={'Post office box'}>
+                    <Form.Item name={"pob"} label={"Post office box"}>
                         <Input/>
                     </Form.Item>
-                    <Form.Item name={'birthday'} label={'Birthday (YYYY-MM-DD'}>
+                    <Form.Item name={"birthday"} label={"Birthday (YYYY-MM-DD"}>
                         <Input/>
                     </Form.Item>
-                    <Form.Item name={'description'} label={'Description'}>
+                    <Form.Item name={"description"} label={"Description"}>
                         <Input/>
                     </Form.Item>
-                    <Form.Item name={'password'} label={'Password'}>
+                    <Form.Item name={"password"} label={"Password"}>
                         <Input/>
                     </Form.Item>
 
-                    <Form.Item key={'user-acl-list'}
-                               label={'Access control'}
+                    <Form.Item key={"user-acl-list"}
+                               label={"Access control"}
                     >
                         <AclEdit acls={acls} onChange={handleAclsChange} parentForm={userForm}/>
                     </Form.Item>
-                    <Form.Item wrapperCol={{offset: 8, span: 16,}}><Divider orientation={'left'}>Metadata</Divider></Form.Item>
-                    <Form.Item name={'creator'} label={'Creator'}>
+                    <Form.Item wrapperCol={{offset: 8, span: 16,}}><Divider orientation={"left"}>Metadata</Divider></Form.Item>
+                    <Form.Item name={"creator"} label={"Creator"}>
                         <Input disabled={true}/>
                     </Form.Item>
 
-                    <Form.Item name={'created'} label={'Created'}>
+                    <Form.Item name={"created"} label={"Created"}>
                         <Input disabled={true}/>
                     </Form.Item>
 
-                    <Form.Item name={'modifier'} label={'Modifier'}>
+                    <Form.Item name={"modifier"} label={"Modifier"}>
                         <Input disabled={true}/>
                     </Form.Item>
 
-                    <Form.Item name={'modified'} label={'Modified'}>
+                    <Form.Item name={"modified"} label={"Modified"}>
                         <Input disabled={true}/>
                     </Form.Item>
-                    <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: 'center'}}>
-                        <Button type={'primary'} htmlType={'submit'}>Save</Button>
+                    <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: "center"}}>
+                        <Button type={"primary"} htmlType={"submit"}>Save</Button>
                     </Form.Item>
                 </Form>}
             </div>

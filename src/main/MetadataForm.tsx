@@ -19,7 +19,7 @@ function MetadataForm({metadata}: MetadataFormProps) {
     };
 
     return (
-            <div style={{backgroundColor: 'rgba(190, 190, 190, 0.1)', padding: '16px', borderRadius: '4px'}}>
+            <div style={{backgroundColor: "rgba(190, 190, 190, 0.1)", padding: "16px", borderRadius: "4px"}}>
                 <Divider orientation={"left"} key={"page-meta-divider"}>Metadata</Divider>
                 <div>
                     <Row gutter={[16, 16]}>

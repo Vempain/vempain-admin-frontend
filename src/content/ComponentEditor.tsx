@@ -12,11 +12,11 @@ export function ComponentEditor() {
     const {paramId} = useParams<{ paramId: string }>();
     const [componentId, setComponentId] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
-    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
+    const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [componentForm] = Form.useForm();
     const [acls, setAcls] = useState<AclVO[]>([]);
     const [component, setComponent] = useState<ComponentVO | null>(null);
-    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
+    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     useEffect(() => {
         let tmpComponentId: number = validateParamId(paramId);
@@ -24,7 +24,7 @@ export function ComponentEditor() {
         if (tmpComponentId < 0) {
             setLoadResults({
                 status: ActionResult.FAIL,
-                message: 'Called with invalid parameter'
+                message: "Called with invalid parameter"
             });
             return;
         }
@@ -40,7 +40,7 @@ export function ComponentEditor() {
                     })
                     .catch((error) => {
                         console.error("Error fetching:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to fetch the component, try again later'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the component, try again later"});
                     })
                     .finally(() => {
                         setLoading(false);
@@ -48,8 +48,8 @@ export function ComponentEditor() {
         } else {
             setComponent({
                 id: 0,
-                comp_name: '',
-                comp_data: '',
+                comp_name: "",
+                comp_data: "",
                 acls: [],
                 locked: false,
                 creator: 0,
@@ -77,22 +77,22 @@ export function ComponentEditor() {
         if (componentId === 0) {
             componentAPI.create(values)
                     .then((response) => {
-                        setSubmitResults({status: ActionResult.OK, message: 'Component created successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "Component created successfully"});
                         setComponent(response);
                     })
                     .catch((error) => {
                         console.error("Error creating:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to create a new component'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to create a new component"});
                     });
         } else {
             componentAPI.update(values)
                     .then((response) => {
-                        setSubmitResults({status: ActionResult.OK, message: 'Component updated successfully'});
+                        setSubmitResults({status: ActionResult.OK, message: "Component updated successfully"});
                         setComponent(response);
                     })
                     .catch((error) => {
                         console.error("Error updating:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: 'Failed to update component'});
+                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to update component"});
                     });
         }
 
@@ -101,16 +101,16 @@ export function ComponentEditor() {
     }
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={loadResults} successTo={'/components'} failTo={'/components'}/>);
+        return (<SubmitResultHandler submitResult={loadResults} successTo={"/components"} failTo={"/components"}/>);
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={'/components'} failTo={'/components'}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/components"} failTo={"/components"}/>);
     }
 
     return (
-            <div className={'darkBody'}>
-                <Spin tip={'Loading'} spinning={loading}>
+            <div className={"darkBody"}>
+                <Spin tip={"Loading"} spinning={loading}>
                     {componentId === 0 && <h1>Create new component</h1>}
                     {componentId > 0 && <h1>Edit component {componentId}</h1>}
                     {component !== null && <Form
@@ -120,10 +120,10 @@ export function ComponentEditor() {
                             labelCol={{span: 8}}
                             wrapperCol={{span: 18}}
                             style={{maxWidth: 1400}}
-                            name={'PageForm'}
+                            name={"PageForm"}
                             autoComplete="off"
                     >
-                        <Form.Item name={'id'} label={'ID'}>
+                        <Form.Item name={"id"} label={"ID"}>
                             <Input disabled={true}/>
                         </Form.Item>
                         <Form.Item name="comp_name" label="Component Name">
@@ -132,20 +132,25 @@ export function ComponentEditor() {
                         <Form.Item name="comp_data" label="Component data">
                             <Input.TextArea/>
                         </Form.Item>
-                        <Form.Item name={'locked'} label={'Locked'} valuePropName={'checked'}>
+                        <Form.Item name={"locked"} label={"Locked"} valuePropName={"checked"}>
                             <Switch/>
                         </Form.Item>
-                        <Form.Item name={'acls'}
-                                   key={'component-acl-list'}
-                                   label={'Access control'}
+                        <Form.Item name={"acls"}
+                                   key={"component-acl-list"}
+                                   label={"Access control"}
                         >
                             <AclEdit acls={acls} onChange={handleAclsChange} parentForm={componentForm}/>
                         </Form.Item>
                         <Form.Item label={" "} colon={false} key={"page-metadata"}>
-                            <MetadataForm metadata={{creator: component.creator, created: component.created, modifier: component.modifier, modified: component.modified}}/>
+                            <MetadataForm metadata={{
+                                creator: component.creator,
+                                created: component.created,
+                                modifier: component.modifier,
+                                modified: component.modified
+                            }}/>
                         </Form.Item>
-                        <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: 'center'}}>
-                            <Button type={'primary'} htmlType={'submit'}>Save</Button>
+                        <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: "center"}}>
+                            <Button type={"primary"} htmlType={"submit"}>Save</Button>
                         </Form.Item>
                     </Form>}
                 </Spin>

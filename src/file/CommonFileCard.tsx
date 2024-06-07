@@ -3,7 +3,7 @@ import { Card, Collapse, Descriptions, Input } from "antd";
 import { formatDateTime, formatFileSize } from "../tools";
 
 interface CommonFileCardProps {
-    commonFile: CommonFileVO
+    commonFile: CommonFileVO;
 }
 
 export function CommonFileCard({commonFile}: CommonFileCardProps) {
@@ -12,7 +12,7 @@ export function CommonFileCard({commonFile}: CommonFileCardProps) {
     // Generate Collapse items dynamically
     const metadataProps = Object.keys(metaData).map(key => ({
         label: key,
-        items: typeof metaData[key] === 'string' ? (
+        items: typeof metaData[key] === "string" ? (
                 // Render directly if value is a string
                 <Input value={metaData[key]}/>
         ) : (
