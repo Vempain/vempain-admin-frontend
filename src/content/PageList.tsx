@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
-import { Button, Space, Spin, Table, TablePaginationConfig } from "antd";
+import { useEffect, useRef, useState } from "react";
+import { Button, Input, InputRef, Space, Spin, Table, TableColumnType, TablePaginationConfig } from "antd";
 import { ColumnsType } from "antd/lib/table";
 import { Link } from "react-router-dom";
-import { PlusCircleFilled } from "@ant-design/icons";
+import { PlusCircleFilled, SearchOutlined } from "@ant-design/icons";
 import { QueryDetailEnum } from "../models";
 import { PageVO } from "../models/Responses";
 import { pageAPI } from "../services";
 import dayjs from "dayjs";
 import { getPaginationConfig } from "../tools";
+import { FilterDropdownProps } from "antd/es/table/interface";
+import Highlighter from "react-highlight-words";
 
 // Define an hash containing the spin messages
 const spinMessages: Record<string, string> = {
@@ -20,6 +22,109 @@ export function PageList() {
     const [pageList, setPageList] = useState<PageVO[]>([]);
     const [spinMessage, setSpinMessage] = useState<string>(spinMessages.loading);
     const [pagination, setPagination] = useState<TablePaginationConfig>({});
+
+    const [searchText, setSearchText] = useState("");
+    const [searchedColumn, setSearchedColumn] = useState("");
+    const searchInput = useRef<InputRef>(null);
+    type DataIndex = keyof PageVO;
+
+    function handleSearch(
+            selectedKeys: string[],
+            confirm: FilterDropdownProps["confirm"],
+            dataIndex: DataIndex,
+    ) {
+        confirm();
+        setSearchText(selectedKeys[0]);
+        setSearchedColumn(dataIndex);
+    }
+
+    function handleReset(clearFilters: () => void) {
+        clearFilters();
+        setSearchText("");
+    }
+
+    const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<PageVO> => ({
+        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters, close}) => (
+                <div style={{padding: 8}} onKeyDown={(e) => e.stopPropagation()}>
+                    <Input
+                            ref={searchInput}
+                            placeholder={`Search ${dataIndex}`}
+                            value={selectedKeys[0]}
+                            onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                            onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+                            style={{marginBottom: 8, display: "block"}}
+                    />
+                    <Space>
+                        <Button
+                                type="primary"
+                                onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
+                                icon={<SearchOutlined/>}
+                                size="small"
+                                style={{width: 90}}
+                        >
+                            Search
+                        </Button>
+                        <Button
+                                onClick={() => clearFilters && handleReset(clearFilters)}
+                                size="small"
+                                style={{width: 90}}
+                        >
+                            Reset
+                        </Button>
+                        <Button
+                                type="link"
+                                size="small"
+                                onClick={() => {
+                                    confirm({closeDropdown: false});
+                                    setSearchText((selectedKeys as string[])[0]);
+                                    setSearchedColumn(dataIndex);
+                                }}
+                        >
+                            Filter
+                        </Button>
+                        <Button
+                                type="link"
+                                size="small"
+                                onClick={() => {
+                                    close();
+                                }}
+                        >
+                            close
+                        </Button>
+                    </Space>
+                </div>
+        ),
+        filterIcon: (filtered: boolean) => (
+                <SearchOutlined style={{color: filtered ? "#1677ff" : undefined}}/>
+        ),
+        onFilter: (value, record) => {
+            if (record !== null && dataIndex !== null && record[dataIndex] !== null && value !== null) {
+                // @ts-ignore
+                return record[dataIndex]
+                        .toString()
+                        .toLowerCase()
+                        .includes((value as string).toLowerCase());
+            }
+
+            return false;
+        },
+        onFilterDropdownOpenChange: (visible) => {
+            if (visible) {
+                setTimeout(() => searchInput.current?.select(), 100);
+            }
+        },
+        render: (text) =>
+                searchedColumn === dataIndex ? (
+                        <Highlighter
+                                highlightStyle={{backgroundColor: "#ffc069", padding: 0}}
+                                searchWords={[searchText]}
+                                autoEscape
+                                textToHighlight={text ? text.toString() : ""}
+                        />
+                ) : (
+                        text
+                ),
+    });
 
     const columns: ColumnsType<PageVO> = [
         {
@@ -44,7 +149,8 @@ export function PageList() {
             title: "Path",
             dataIndex: "path",
             key: "path",
-            sorter: (a, b) => a.path.localeCompare(b.path)
+            sorter: (a, b) => a.path.localeCompare(b.path),
+            ...getColumnSearchProps("path")
         },
         {
             title: "Secure",
@@ -62,7 +168,8 @@ export function PageList() {
             title: "Title",
             dataIndex: "title",
             key: "title",
-            sorter: (a, b) => a.title.localeCompare(b.title)
+            sorter: (a, b) => a.title.localeCompare(b.title),
+            ...getColumnSearchProps("title")
         },
         {
             title: "Locked",
