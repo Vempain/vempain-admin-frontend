@@ -115,7 +115,7 @@ function TopBar() {
                 },
                 {
                     label: (<Link to={"/schedule/publishing"}>Publishing</Link>),
-                    key: "units",
+                    key: "publishing",
                     icon: <FieldTimeOutlined/>
                 },
             ],
