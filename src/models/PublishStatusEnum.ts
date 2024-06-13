@@ -1,0 +1,6 @@
+export enum PublishStatusEnum {
+    NOT_PUBLISHED= 'NOT_PUBLISHED',
+    PROCESSING = 'PROCESSING',
+    PUBLISHED = 'PUBLISHED',
+    CANCELLED = 'CANCELLED'
+}

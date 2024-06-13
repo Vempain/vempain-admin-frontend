@@ -1,14 +1,16 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { validateParamId } from "../tools";
-import { ActionResult, QueryDetailEnum, SubmitResult } from "../models";
-import { PageVO } from "../models/Responses";
-import { pageAPI } from "../services";
-import { Button, Space, Spin, Table } from "antd";
-import { SubmitResultHandler } from "../main";
+import {useParams} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {validateParamId} from "../tools";
+import {ActionResult, QueryDetailEnum, SubmitResult} from "../models";
+import {PageVO} from "../models/Responses";
+import {pageAPI} from "../services";
+import {Button, DatePicker, Space, Spin, Switch, Table} from "antd";
+import {SubmitResultHandler} from "../main";
 import TextArea from "antd/es/input/TextArea";
-import { galleryAPI } from "../services/Files";
-import { GalleryVO } from "../models/Responses/Files";
+import {galleryAPI} from "../services/Files";
+import {GalleryVO} from "../models/Responses/Files";
+import dayjs, {Dayjs} from "dayjs";
+import {PublishRequest} from "../models/Requests/PublishRequest";
 
 export function PagePublisher() {
     const {paramId} = useParams();
@@ -18,6 +20,8 @@ export function PagePublisher() {
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [page, setPage] = useState<PageVO | null>(null);
     const [galleryList, setGalleryList] = useState<GalleryVO[]>([]);
+    const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
+    const [publishDate, setPublishDate] = useState<Dayjs>(dayjs());
 
     const galleryColumns = [
         {
@@ -68,9 +72,14 @@ export function PagePublisher() {
     function publishPage() {
         if (page !== null) {
             setLoading(true);
-            pageAPI.publish(pageId)
+            const publishRequest: PublishRequest = {
+                id: pageId,
+                publish_schedule: schedulePublish,
+                publish_datetime: schedulePublish ? publishDate.toDate() : null,
+            };
+            pageAPI.publish(publishRequest)
                     .then(() => {
-                        setSubmitResults({status: ActionResult.OK, message: "Page published successfully"});
+                        setSubmitResults({status: ActionResult.OK, message: "Page publishing completed"});
                     })
                     .catch((error) => {
                         console.error("Error publishing page:", error);
@@ -104,6 +113,22 @@ export function PagePublisher() {
                                                               columns={galleryColumns}
                                                               dataSource={galleryList}
                                                               pagination={false}/>}
+                            <h3 key={"publishDate"}>Schedule publishing</h3>
+                            <Switch key={"scheduleSwitch"}
+                                    checkedChildren={"Yes"}
+                                    unCheckedChildren={"No"}
+                                    onChange={(checked) => {
+                                        setSchedulePublish(checked);
+                                    }}
+                            />
+                            {schedulePublish && <DatePicker key={"publishDate"}
+                                                            showTime={{format: 'HH:mm', defaultValue: dayjs()}}
+                                                            minuteStep={15 as 15}
+                                                            format={'YYYY-DD-MM HH:mm'}
+                                                            onChange={(value, _dateString) => {
+                                                                setPublishDate(value);
+                                                            }}
+                            />}
                             <Button key={"publishButton"} type={"primary"} onClick={publishPage}>Publish page</Button>
                         </Space>
                     </div>}

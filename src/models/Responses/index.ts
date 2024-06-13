@@ -7,6 +7,7 @@ export type {JwtResponse} from './JwtResponse';
 export type {PageableVO} from './PageableVO';
 export type {PageableResponse} from './PageableResponse';
 export type {PageVO} from './PageVO';
+export type {PublishScheduleResponse} from './PublishScheduleResponse';
 export type {StringListVO} from './StringListVO';
 export type {TestVO} from './TestVO';
 export type {UnitVO} from './UnitVO';

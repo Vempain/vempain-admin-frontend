@@ -14,7 +14,8 @@ class FileImportAPI extends AbstractAPI<GalleryVO, GalleryVO> {
         pagePath: string,
         pageTitle: string,
         pageDescription: string,
-        pageFormId: number
+        pageFormId: number,
+        schedule: boolean
     ): Promise<ImportResponseVO> {
         const request: AddDirectoryRequest = {
             source_directory: sourceDir,
@@ -26,7 +27,8 @@ class FileImportAPI extends AbstractAPI<GalleryVO, GalleryVO> {
             page_path: pagePath,
             page_title: pageTitle,
             page_body: pageDescription,
-            page_form_id: pageFormId
+            page_form_id: pageFormId,
+            schedule: schedule
         };
 
         this.setAuthorizationHeader();

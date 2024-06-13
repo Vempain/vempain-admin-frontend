@@ -1,9 +1,11 @@
-import { Button, Flex, Layout, Menu, MenuProps } from "antd";
-import React, { useState } from "react";
+import {Button, Flex, Layout, Menu, MenuProps} from "antd";
+import React, {useState} from "react";
 import {
     AppstoreOutlined,
     AudioOutlined,
+    ClockCircleOutlined,
     ContainerOutlined,
+    FieldTimeOutlined,
     FileImageOutlined,
     FileOutlined,
     FileTextOutlined,
@@ -16,13 +18,14 @@ import {
     SettingFilled,
     SnippetsOutlined,
     SwapOutlined,
+    UploadOutlined,
     UserAddOutlined,
     UsergroupAddOutlined,
     UserOutlined,
     VideoCameraOutlined
 } from "@ant-design/icons";
-import { useSession } from "../session";
-import { Link } from "react-router-dom";
+import {useSession} from "../session";
+import {Link} from "react-router-dom";
 
 const {Header} = Layout;
 
@@ -92,6 +95,28 @@ function TopBar() {
                     label: (<Link to={"/import"}>File import</Link>),
                     key: "import",
                     icon: <ImportOutlined/>
+                },
+            ],
+        },
+        {
+            label: "Schedule Management",
+            key: "scheduleManagement",
+            icon: <ClockCircleOutlined/>,
+            children: [
+                {
+                    label: (<Link to={"/schedule/system"}>System schedules</Link>),
+                    key: "systemSchedules",
+                    icon: <AppstoreOutlined/>
+                },
+                {
+                    label: (<Link to={"/schedule/file-imports"}>File imports</Link>),
+                    key: "fileImports",
+                    icon: <UploadOutlined/>
+                },
+                {
+                    label: (<Link to={"/schedule/publishing"}>Publishing</Link>),
+                    key: "units",
+                    icon: <FieldTimeOutlined/>
                 },
             ],
         },

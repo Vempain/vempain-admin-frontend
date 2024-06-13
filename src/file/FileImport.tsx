@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Button, Checkbox, Col, Form, Input, Row, Select, Spin, TreeSelect } from "antd";
-import { fileImportAPI, fileSystemAPI } from "../services/Files";
+import React, {useEffect, useState} from "react";
+import {Button, Checkbox, Col, Form, Input, Row, Select, Spin, TreeSelect} from "antd";
+import {fileImportAPI, fileSystemAPI} from "../services/Files";
 import TextArea from "antd/es/input/TextArea";
-import { SubmitResultHandler } from "../main";
-import { ActionResult, QueryDetailEnum, SubmitResult } from "../models";
-import { DirectoryNodeResponse } from "../models/Responses/Files/DirectoryNodeResponse";
-import { FileImageOutlined, LoadingOutlined } from "@ant-design/icons";
-import { formAPI } from "../services";
+import {SubmitResultHandler} from "../main";
+import {ActionResult, QueryDetailEnum, SubmitResult} from "../models";
+import {DirectoryNodeResponse} from "../models/Responses/Files/DirectoryNodeResponse";
+import {FileImageOutlined, LoadingOutlined} from "@ant-design/icons";
+import {formAPI} from "../services";
 
 interface FileImportFormProps {
     source_directory: string;
@@ -19,6 +19,7 @@ interface FileImportFormProps {
     page_path: string | undefined;
     page_body: string | undefined;
     page_form_id: number | undefined;
+    schedule: boolean;
 }
 
 interface TreeNode {
@@ -108,10 +109,11 @@ export function FileImport() {
         const pageTitle = values.page_title === undefined ? "" : values.page_title;
         const pageBody = values.page_body === undefined ? "" : values.page_body;
         const pageFormId = values.page_form_id === undefined ? 0 : values.page_form_id;
+        const schedule = values.schedule === undefined ? false : values.schedule;
 
         fileImportAPI.importDirectory(values.source_directory, values.site_directory,
                 values.create_gallery, shortName, description,
-                values.create_page, pagePath, pageTitle, pageBody, pageFormId)
+                values.create_page, pagePath, pageTitle, pageBody, pageFormId, schedule)
                 .then(() => {
                     console.log("Imported directory successfully");
                     setSubmitResults({status: ActionResult.OK, message: "Directory imported successfully"});
@@ -203,7 +205,7 @@ export function FileImport() {
                                 <Row gutter={12}>
                                     <Col span={6}>
                                     </Col>
-                                    <Col span={5}>
+                                    <Col span={4}>
                                         <Form.Item name="create_gallery"
                                                    valuePropName="checked"
                                         >
@@ -212,12 +214,21 @@ export function FileImport() {
                                             </Checkbox>
                                         </Form.Item>
                                     </Col>
-                                    <Col span={5}>
+                                    <Col span={4}>
                                         <Form.Item name="create_page"
                                                    valuePropName="checked"
                                         >
                                             <Checkbox>
                                                 Create new page of uploaded files?
+                                            </Checkbox>
+                                        </Form.Item>
+                                    </Col>
+                                    <Col span={4}>
+                                        <Form.Item name="schedule"
+                                                   valuePropName="checked"
+                                        >
+                                            <Checkbox>
+                                                Schedule directory for import
                                             </Checkbox>
                                         </Form.Item>
                                     </Col>

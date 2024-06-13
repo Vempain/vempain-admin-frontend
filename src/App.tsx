@@ -1,8 +1,8 @@
 import React from "react";
-import { ConfigProvider, Layout, theme } from "antd";
-import { Navigate, Route, Routes } from "react-router-dom";
+import {ConfigProvider, Layout, theme} from "antd";
+import {Navigate, Route, Routes} from "react-router-dom";
 import "./App.css";
-import { BottomFooter, Home, Login, Logout, TopBar } from "./main";
+import {BottomFooter, Home, Login, Logout, TopBar} from "./main";
 import {
     ComponentDelete,
     ComponentEditor,
@@ -17,9 +17,10 @@ import {
     PageList,
     PagePublisher
 } from "./content";
-import { UnitEditor, UnitList, UserEditor, UserList } from "./user";
-import { LayoutDelete } from "./content/LayoutDelete";
-import { AudioList, DocumentList, FileImport, GalleryDelete, GalleryEdit, GalleryList, GalleryPublish, GalleryRefresh, ImageList, VideoList } from "./file";
+import {UnitEditor, UnitList, UserEditor, UserList} from "./user";
+import {LayoutDelete} from "./content/LayoutDelete";
+import {AudioList, DocumentList, FileImport, GalleryDelete, GalleryEdit, GalleryList, GalleryPublish, GalleryRefresh, ImageList, VideoList} from "./file";
+import {FileImportScheduleList, FileImportScheduleTrigger, ItemPublishingList, ItemPublishTrigger, SystemScheduleList, SystemScheduleTrigger} from "./schedule";
 
 const {Content, Footer} = Layout;
 
@@ -62,6 +63,13 @@ function App() {
                                 <Route path={"/images"} element={<ImageList/>}/>
                                 <Route path={"/import"} element={<FileImport/>}/>
                                 <Route path={"/videos"} element={<VideoList/>}/>
+                                {/* Schedules */}
+                                <Route path={"/schedule/system"} element={<SystemScheduleList/>}/>
+                                <Route path={"/schedule/system/:paramName/trigger"} element={<SystemScheduleTrigger/>}/>
+                                <Route path={"/schedule/file-imports"} element={<FileImportScheduleList/>}/>
+                                <Route path={"/schedule/file-imports/:paramId/trigger"} element={<FileImportScheduleTrigger/>}/>
+                                <Route path={"/schedule/publishing"} element={<ItemPublishingList/>}/>
+                                <Route path={"/schedule/publish/:paramId/trigger"} element={<ItemPublishTrigger/>}/>
                                 {/* User */}
                                 <Route path={"/units"} element={<UnitList/>}/>
                                 <Route path={"/units/:paramId/edit"} element={<UnitEditor/>}/>

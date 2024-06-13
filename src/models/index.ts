@@ -10,4 +10,5 @@ export type {SubmitResult} from './SubmitResult';
 export {ActionResult} from './ActionResult';
 export {ActionResultEnum} from './ActionResultEnum';
 export {PrivilegeEnum} from './PrivilegeEnum';
+export {PublishStatusEnum} from './PublishStatusEnum';
 export {QueryDetailEnum} from './QueryDetailEnum';
