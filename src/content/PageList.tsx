@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState } from "react";
-import { Button, Input, InputRef, Space, Spin, Table, TableColumnType, TablePaginationConfig } from "antd";
-import { ColumnsType } from "antd/lib/table";
-import { Link } from "react-router-dom";
-import { PlusCircleFilled, SearchOutlined } from "@ant-design/icons";
-import { QueryDetailEnum } from "../models";
-import { PageVO } from "../models/Responses";
-import { pageAPI } from "../services";
+import {useEffect, useRef, useState} from "react";
+import {Button, Input, InputRef, Space, Spin, Table, TableColumnType, TablePaginationConfig} from "antd";
+import {ColumnsType} from "antd/lib/table";
+import {Link} from "react-router-dom";
+import {PlusCircleFilled, SearchOutlined} from "@ant-design/icons";
+import {QueryDetailEnum} from "../models";
+import {PageVO} from "../models/Responses";
+import {pageAPI} from "../services";
 import dayjs from "dayjs";
-import { getPaginationConfig } from "../tools";
-import { FilterDropdownProps } from "antd/es/table/interface";
+import {getPaginationConfig} from "../tools";
+import {FilterDropdownProps} from "antd/es/table/interface";
 import Highlighter from "react-highlight-words";
 
-// Define an hash containing the spin messages
+// Define a hash containing the spin messages
 const spinMessages: Record<string, string> = {
     loading: "Loading page list...",
     publishing: "Publishing all pages..."

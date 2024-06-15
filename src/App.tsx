@@ -15,7 +15,7 @@ import {
     PageDelete,
     PageEditor,
     PageList,
-    PagePublisher
+    PagePublish
 } from "./content";
 import {UnitEditor, UnitList, UserEditor, UserList} from "./user";
 import {LayoutDelete} from "./content/LayoutDelete";
@@ -51,7 +51,7 @@ function App() {
                                 <Route path={"/pages"} element={<PageList/>}/>
                                 <Route path={"/pages/:paramId/delete"} element={<PageDelete/>}/>
                                 <Route path={"/pages/:paramId/edit"} element={<PageEditor/>}/>
-                                <Route path={"/pages/:paramId/publish"} element={<PagePublisher/>}/>
+                                <Route path={"/pages/:paramId/publish"} element={<PagePublish/>}/>
                                 {/* Files */}
                                 <Route path={"/audios"} element={<AudioList/>}/>
                                 <Route path={"/documents"} element={<DocumentList/>}/>

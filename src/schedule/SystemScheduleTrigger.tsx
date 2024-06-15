@@ -5,6 +5,8 @@ import {scheduleAPI} from "../services";
 import {Button, InputNumber, Space, Spin, Table} from "antd";
 import {ScheduleTriggerRequest} from "../models/Requests/ScheduleTriggerRequest";
 import {ColumnsType} from "antd/lib/table";
+import {ActionResult, SubmitResult} from "../models";
+import {SubmitResultHandler} from "../main";
 
 function SystemScheduleTrigger() {
     const {paramName} = useParams();
@@ -12,6 +14,7 @@ function SystemScheduleTrigger() {
     const [loading, setLoading] = useState<boolean>(true);
     const [schedule, setSchedule] = useState<ScheduleTriggerResponse | null>(null);
     const [delay, setDelay] = useState<number>(3);
+    const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     const columns: ColumnsType<ScheduleTriggerResponse> = [
         {
@@ -54,7 +57,6 @@ function SystemScheduleTrigger() {
                 .finally(() => {
                     setLoading(false);
                 });
-
     }, []);
 
     function triggerSchedule() {
@@ -71,32 +73,37 @@ function SystemScheduleTrigger() {
 
         scheduleAPI.triggerSystemSchedule(triggerRequest)
                 .then(() => {
-                    console.log("Triggered schedule");
+                    setSubmitResults({status: ActionResult.OK, message: "System schedule triggered successfully"})
                 })
                 .catch((error) => {
                     console.error(error);
+                    setSubmitResults({status: ActionResult.FAIL, message: "Failed to trigger system schedule"});
                 })
                 .finally(() => {
                     setLoading(false);
                 });
     }
 
+    if (submitResults.status !== ActionResult.NO_CHANGE) {
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/schedule/system"} failTo={"/schedule/system"}/>);
+    }
+
     return (
             <div className={"darkBody"} key={"pagePublishDiv"}>
                 <Spin spinning={loading} tip={"Fetching schedule details..."}>
                     <Space direction={"vertical"} size={"large"}>
-                        <h1>System Schedule Trigger</h1>
+                        <h2>System Schedule Trigger</h2>
                         {schedule !== null && <>
                             <Table key={"scheduleTable"}
                                    columns={columns}
                                    dataSource={[schedule]}
                                    pagination={false}/>
-                            <h3>Delay trigger (seconds)</h3>
+                            <h4>Delay trigger (seconds)</h4>
                             <InputNumber min={1} max={10_000} defaultValue={3} onChange={(delayValue) => {
                                 if (typeof delayValue === "number") {
                                     setDelay(delayValue);
                                 }
-                            }} changeOnWheel />
+                            }} changeOnWheel/>
                             <Button type={"primary"} onClick={triggerSchedule}>Trigger</Button>
                         </>}
                     </Space>

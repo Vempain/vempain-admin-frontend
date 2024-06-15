@@ -3,6 +3,7 @@ import {JwtResponse, PublishScheduleResponse} from "../models/Responses";
 import {ScheduleTriggerRequest} from "../models/Requests/ScheduleTriggerRequest";
 import {ScheduleTriggerResponse} from "../models/Responses/ScheduleTriggerResponse";
 import {FileImportScheduleResponse} from "../models/Responses/FileImportScheduleResponse";
+import {PublishScheduleRequest} from "../models/Requests/PublishScheduleRequest";
 
 class ScheduleAPI {
     protected axiosInstance: AxiosInstance;
@@ -51,6 +52,20 @@ class ScheduleAPI {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
         const response = await this.axiosInstance.get<PublishScheduleResponse[]>("/publishing");
+        return response.data;
+    }
+
+    public async getPublishSchedule(publishScheduleId: number): Promise<PublishScheduleResponse> {
+        this.setAuthorizationHeader();
+        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
+        const response = await this.axiosInstance.get<PublishScheduleResponse>("/publishing/" + publishScheduleId);
+        return response.data;
+    }
+
+    public async triggerPublishSchedule(publishScheduleRequest: PublishScheduleRequest): Promise<ScheduleTriggerResponse> {
+        this.setAuthorizationHeader();
+        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
+        const response = await this.axiosInstance.post<ScheduleTriggerResponse>("/publishing", publishScheduleRequest);
         return response.data;
     }
 

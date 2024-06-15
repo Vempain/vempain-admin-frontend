@@ -1,6 +1,6 @@
 import Axios, {AxiosInstance} from "axios";
 import {ActionVO, JwtResponse, PageableResponse} from "../models/Responses";
-import {PublishRequest} from "../models/Requests/PublishRequest";
+import {PublishItemRequest} from "../models/Requests/PublishItemRequest";
 
 export abstract class AbstractAPI<REQUEST, RESPONSE> {
     protected axiosInstance: AxiosInstance;
@@ -61,9 +61,9 @@ export abstract class AbstractAPI<REQUEST, RESPONSE> {
         return response.status === 200;
     }
 
-    public async publish(request: PublishRequest): Promise<ActionVO> {
+    public async publish(request: PublishItemRequest): Promise<ActionVO> {
         this.setAuthorizationHeader();
-        const response = await this.axiosInstance.patch<ActionVO>("/publish", {params: request});
+        const response = await this.axiosInstance.patch<ActionVO>("/publish", request);
         return response.data;
     }
 

@@ -21,12 +21,12 @@ function ItemPublishingList() {
             dataIndex: "publish_time",
             key: "publish_time",
             defaultSortOrder: "descend",
-            sorter: (a, b) => a.publish_time.getMilliseconds() - b.publish_time.getMilliseconds(),
+            sorter: (a, b) => new Date(a.publish_time).getTime() - new Date(b.publish_time).getTime(),
         },
         {
             title: "Status",
-            dataIndex: "status",
-            key: "status",
+            dataIndex: "publish_status",
+            key: "publish_status",
             sorter: (a, b) => a.publish_status.localeCompare(b.publish_status),
         },
         {

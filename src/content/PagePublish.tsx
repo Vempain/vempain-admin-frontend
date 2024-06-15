@@ -4,15 +4,15 @@ import {validateParamId} from "../tools";
 import {ActionResult, QueryDetailEnum, SubmitResult} from "../models";
 import {PageVO} from "../models/Responses";
 import {pageAPI} from "../services";
-import {Button, DatePicker, Space, Spin, Switch, Table} from "antd";
+import {Button, DatePicker, Divider, Space, Spin, Switch, Table} from "antd";
 import {SubmitResultHandler} from "../main";
 import TextArea from "antd/es/input/TextArea";
 import {galleryAPI} from "../services/Files";
 import {GalleryVO} from "../models/Responses/Files";
 import dayjs, {Dayjs} from "dayjs";
-import {PublishRequest} from "../models/Requests/PublishRequest";
+import {PublishItemRequest} from "../models/Requests/PublishItemRequest";
 
-export function PagePublisher() {
+export function PagePublish() {
     const {paramId} = useParams();
     const [pageId, setFpageId] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
@@ -22,6 +22,7 @@ export function PagePublisher() {
     const [galleryList, setGalleryList] = useState<GalleryVO[]>([]);
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<Dayjs>(dayjs());
+    const [publishMessage, setPublishMessage] = useState<string>("");
 
     const galleryColumns = [
         {
@@ -72,11 +73,13 @@ export function PagePublisher() {
     function publishPage() {
         if (page !== null) {
             setLoading(true);
-            const publishRequest: PublishRequest = {
-                id: pageId,
+            const publishRequest: PublishItemRequest = {
+                id: page.id,
+                publish_message: publishMessage,
                 publish_schedule: schedulePublish,
-                publish_datetime: schedulePublish ? publishDate.toDate() : null,
+                publish_date_time: schedulePublish ? publishDate.toDate() : null,
             };
+
             pageAPI.publish(publishRequest)
                     .then(() => {
                         setSubmitResults({status: ActionResult.OK, message: "Page publishing completed"});
@@ -113,7 +116,9 @@ export function PagePublisher() {
                                                               columns={galleryColumns}
                                                               dataSource={galleryList}
                                                               pagination={false}/>}
-                            <h3 key={"publishDate"}>Schedule publishing</h3>
+                            <Divider orientation={"left"}>Publish message</Divider>
+                            <TextArea key={"publishMessage"} onChange={(event) => {setPublishMessage(event.target.value);}}/>
+                            <Divider orientation={"left"}>Publish schedule</Divider>
                             <Switch key={"scheduleSwitch"}
                                     checkedChildren={"Yes"}
                                     unCheckedChildren={"No"}
@@ -121,7 +126,7 @@ export function PagePublisher() {
                                         setSchedulePublish(checked);
                                     }}
                             />
-                            {schedulePublish && <DatePicker key={"publishDate"}
+                            {schedulePublish && <DatePicker key={"publishDatePicker"}
                                                             showTime={{format: 'HH:mm', defaultValue: dayjs()}}
                                                             minuteStep={15 as 15}
                                                             format={'YYYY-DD-MM HH:mm'}

@@ -1,14 +1,16 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { validateParamId } from "../tools";
-import { ActionResult, SubmitResult } from "../models";
-import { galleryAPI } from "../services/Files";
-import { GalleryVO } from "../models/Responses/Files";
-import { Button, Input, Space, Spin } from "antd";
+import {useParams} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {validateParamId} from "../tools";
+import {ActionResult, SubmitResult} from "../models";
+import {galleryAPI} from "../services/Files";
+import {GalleryVO} from "../models/Responses/Files";
+import {Button, DatePicker, Divider, Input, Space, Spin, Switch} from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { SubmitResultHandler } from "../main";
-import { CommonFileCard } from "./CommonFileCard";
-import { LoadingOutlined } from "@ant-design/icons";
+import {SubmitResultHandler} from "../main";
+import {CommonFileCard} from "./CommonFileCard";
+import {LoadingOutlined} from "@ant-design/icons";
+import {PublishItemRequest} from "../models/Requests/PublishItemRequest";
+import dayjs, {Dayjs} from "dayjs";
 
 
 export function GalleryPublish() {
@@ -20,6 +22,9 @@ export function GalleryPublish() {
     const [galleryId, setGalleryId] = useState<number>(0);
     const [gallery, setGallery] = useState<GalleryVO>();
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
+    const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
+    const [publishDate, setPublishDate] = useState<Dayjs>(dayjs());
+    const [publishMessage, setPublishMessage] = useState<string>("");
 
     useEffect(() => {
         setLoadingMessage("Loading directories");
@@ -53,7 +58,15 @@ export function GalleryPublish() {
         if (gallery !== null && gallery !== undefined && gallery.id > 0) {
             setLoading(true);
             setLoadingMessage("Publishing gallery");
-            galleryAPI.publish(galleryId)
+
+            const publishRequest: PublishItemRequest = {
+                id: gallery.id,
+                publish_message: publishMessage,
+                publish_schedule: schedulePublish,
+                publish_date_time: schedulePublish ? publishDate.toDate() : null,
+            };
+
+            galleryAPI.publish(publishRequest)
                     .then(() => {
                         setSubmitResults({status: ActionResult.OK, message: "Gallery published successfully"});
                     })
@@ -94,6 +107,24 @@ export function GalleryPublish() {
                                       disabled={true}
                                       autoSize={true}
                             />
+                            <Divider orientation={"left"}>Publish message</Divider>
+                            <TextArea key={"publishMessage"} onChange={(event) => {setPublishMessage(event.target.value);}}/>
+                            <Divider orientation={"left"}>Publish schedule</Divider>
+                            <Switch key={"scheduleSwitch"}
+                                    checkedChildren={"Yes"}
+                                    unCheckedChildren={"No"}
+                                    onChange={(checked) => {
+                                        setSchedulePublish(checked);
+                                    }}
+                            />
+                            {schedulePublish && <DatePicker key={"publishDatePicker"}
+                                                            showTime={{format: 'HH:mm', defaultValue: dayjs()}}
+                                                            minuteStep={15 as 15}
+                                                            format={'YYYY-DD-MM HH:mm'}
+                                                            onChange={(value, _dateString) => {
+                                                                setPublishDate(value);
+                                                            }}
+                            />}
                             <Button key={"publishButton-top"} type={"primary"} onClick={publishGallery}>Publish gallery</Button>
                             {
                                     gallery.common_files.length > 0 &&

@@ -10,4 +10,4 @@ export {LayoutList} from './LayoutList';
 export {PageDelete} from './PageDelete';
 export {PageEditor} from './PageEditor';
 export {PageList} from './PageList';
-export {PagePublisher} from './PagePublisher';
+export {PagePublish} from './PagePublish';
