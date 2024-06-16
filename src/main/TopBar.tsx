@@ -169,16 +169,18 @@ function TopBar() {
     };
 
     return (
-            <Header style={{display: "flex", alignItems: "center"}}>
-                <div className="demo-logo"/>
+            <Header style={{display: "flex", alignItems: "center"}} key={"topBarHeader"}>
+                <div className="demo-logo" key={"mainBarLogoDiv"}>
+                    <Link to={"/"} key={"topBarHomeLink"}>Home</Link>
+                </div>
                 {userSession && <Flex gap={"middle"} vertical={false}>
-                    <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={mainMenuItems}/>
+                    <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={mainMenuItems} key={"mainMenu"}/>
                 </Flex>}
-                <div style={{marginLeft: "auto"}}>
+                <div style={{marginLeft: "auto"}} key={"userMenuDiv"}>
                     {userSession ? (
-                            <Menu mode={"horizontal"} items={userMenuItems}/>
+                            <Menu mode={"horizontal"} items={userMenuItems} key={"userMenu"}/>
                     ) : (
-                            <Button type={"text"} href={"/login"}>
+                            <Button type={"text"} href={"/login"} key={"loginButton"}>
                                 Login
                             </Button>
                     )}

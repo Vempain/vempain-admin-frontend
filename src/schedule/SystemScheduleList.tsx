@@ -12,7 +12,7 @@ function SystemScheduleList() {
         {
             title: "ID",
             dataIndex: "id",
-            key: "id",
+            key: "scheduleId",
             defaultSortOrder: "descend",
             sorter: (a, b) => a.id - b.id
         },
@@ -26,7 +26,7 @@ function SystemScheduleList() {
         {
             title: "Status",
             dataIndex: "status",
-            key: "status",
+            key: "scheduleStatus",
             sorter: (a, b) => a.status.localeCompare(b.status),
         },
         {
@@ -34,7 +34,7 @@ function SystemScheduleList() {
             dataIndex: "action",
             key: "action",
             render: (_text: any, record: any) => (
-                    <Button type="primary" href={`/schedule/system/${record.schedule_name}/trigger`}>Trigger</Button>
+                    <Button type="primary" href={`/schedule/system/${record.schedule_name}/trigger`} key={record.id + "-triggerButton"}>Trigger</Button>
             )
         }
     ];
@@ -54,14 +54,16 @@ function SystemScheduleList() {
                 });
     }, []);
     return (
-            <div className={"darkBody"} key={"layoutListDiv"}>
+            <div className={"darkBody"} key={"systemScheduleListDiv"}>
                 <Spin tip={"Loading"} spinning={loading} key={"systemScheduleListSpinner"}>
                     <h1 key={"systemScheduleListHeader"}>System schedule List</h1>
 
                     {systemScheduleList.length > 0 && <Table
                             dataSource={systemScheduleList}
                             columns={columns}
-                            key={"systemScheduleListTable"}/>}
+                            key={"systemScheduleListTable"}
+                            rowKey={"systemScheduleListTableRow"}
+                    />}
                     {systemScheduleList.length === 0 && <h2 key={"systemScheduleListEmpty"}>No system schedules found</h2>}
                 </Spin>
             </div>

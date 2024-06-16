@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import { Button, Space, Spin, Table, TablePaginationConfig } from "antd";
-import { ColumnsType } from "antd/lib/table";
-import { Link } from "react-router-dom";
-import { PlusCircleFilled } from "@ant-design/icons";
-import { useSession } from "../session";
-import { PrivilegeEnum, QueryDetailEnum } from "../models";
-import { ComponentVO, FormVO } from "../models/Responses";
-import { aclTool, getPaginationConfig } from "../tools";
-import { formAPI } from "../services";
+import {useEffect, useState} from "react";
+import {Button, Space, Spin, Table, TablePaginationConfig} from "antd";
+import {ColumnsType} from "antd/lib/table";
+import {Link} from "react-router-dom";
+import {PlusCircleFilled} from "@ant-design/icons";
+import {useSession} from "../session";
+import {PrivilegeEnum, QueryDetailEnum} from "../models";
+import {FormVO} from "../models/Responses";
+import {aclTool, getPaginationConfig} from "../tools";
+import {formAPI} from "../services";
 
 export function FormList() {
     const [loading, setLoading] = useState<boolean>(false);
@@ -39,13 +39,18 @@ export function FormList() {
             dataIndex: "components",
             key: "components",
             sorter: (a, b) => a.components.length - b.components.length,
-            render: (components: ComponentVO[]) => (
-                    <div>
-                        {components.map((comp, index) => (
-                                <span key={comp.id}>{comp.comp_name} {index < components.length - 1 && <br/>}</span>
-                        ))}
-                    </div>
-            )
+            render: (_text: string, record: FormVO) => {
+                const spans = [];
+                for (let i = 0; i < record.components.length; i++) {
+                    const comp = record.components[i];
+                    spans.push(
+                            <span key={`${record.id}-${comp.id}-${i}`}>
+                {i}: {comp.comp_name} {i < record.components.length - 1 && <br/>}
+            </span>
+                    );
+                }
+                return <div>{spans}</div>;
+            }
         },
         {
             title: "Locked",

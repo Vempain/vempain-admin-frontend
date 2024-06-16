@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { ActionResultEnum, LoginStatus, LoginVO } from "../models";
-import { LoginRequest } from "../models/Requests";
-import { authAPI } from "../services";
+import React, {createContext, useContext, useEffect, useState} from "react";
+import {ActionResultEnum, LoginStatus, LoginVO} from "../models";
+import {LoginRequest} from "../models/Requests";
+import {authAPI} from "../services";
 
 // Define the type for the session context
 interface SessionContextType {
@@ -59,7 +59,7 @@ export function SessionProvider({children}: any) {
     };
 
     return (
-            <SessionContext.Provider value={contextValue}>
+            <SessionContext.Provider value={contextValue} key={"MainContext"}>
                 {children}
             </SessionContext.Provider>
     );

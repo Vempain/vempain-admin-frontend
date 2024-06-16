@@ -1,5 +1,5 @@
-import { Alert, Button } from "antd";
-import { ActionResult, SubmitResult } from "../models";
+import {Alert, Button} from "antd";
+import {ActionResult, SubmitResult} from "../models";
 
 interface SubmitResultHandlerProps {
     submitResult: SubmitResult,
@@ -11,21 +11,23 @@ function SubmitResultHandler({submitResult, successTo, failTo}: SubmitResultHand
 
     if (submitResult.status === ActionResult.OK) {
         return (
-                <div className={"darkBody"}>
+                <div className={"darkBody"} key={"submitResultOkHandlerDiv"}>
                     <Alert type={"success"}
                            showIcon
                            message={submitResult.message}
                            action={<Button type={"primary"} href={successTo}>Back</Button>}
+                           key={"submitResultHandlerSuccessAlert"}
                     />
                 </div>
         );
     } else {
         return (
-                <div className={"darkBody"}>
+                <div className={"darkBody"} key={"submitResultFailHandlerDiv"}>
                     <Alert type={"error"}
                            showIcon
                            message={submitResult.message}
                            action={<Button type={"primary"} href={failTo}>Back</Button>}
+                           key={"submitResultHandlerErrorAlert"}
                     />
                 </div>
         );

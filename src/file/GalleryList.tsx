@@ -1,23 +1,33 @@
-import React, { useEffect, useState } from "react";
-import { useSession } from "../session";
-import { GalleryVO } from "../models/Responses/Files";
-import { fileSystemAPI, galleryAPI } from "../services/Files";
-import { ColumnsType } from "antd/lib/table";
-import { Button, Space, Spin, Table, TablePaginationConfig } from "antd";
-import { aclTool, getPaginationConfig } from "../tools";
-import { ActionResult, PrivilegeEnum, QueryDetailEnum, SubmitResult } from "../models";
-import { Link } from "react-router-dom";
-import { PlusCircleFilled } from "@ant-design/icons";
-import { SubmitResultHandler } from "../main";
+import React, {useEffect, useState} from "react";
+import {useSession} from "../session";
+import {GalleryVO} from "../models/Responses/Files";
+import {fileSystemAPI, galleryAPI} from "../services/Files";
+import {ColumnsType} from "antd/lib/table";
+import {Button, Space, Spin, Table, TablePaginationConfig} from "antd";
+import {aclTool, getPaginationConfig} from "../tools";
+import {ActionResult, PrivilegeEnum, QueryDetailEnum, SubmitResult} from "../models";
+import {Link} from "react-router-dom";
+import {PlusCircleFilled} from "@ant-design/icons";
+import {SubmitResultHandler} from "../main";
+
+interface GalleryListItem {
+    id: number;
+    name: string;
+    description: string;
+    fileCount: number;
+    createPrivilege: boolean,
+    modifyPrivilege: boolean,
+    deletePrivilege: boolean,
+}
 
 export function GalleryList() {
     const [loading, setLoading] = useState<boolean>(false);
-    const [galleryList, setGalleryList] = useState<GalleryVO[]>([]);
+    const [galleryList, setGalleryList] = useState<GalleryListItem[]>([]);
     const {userSession} = useSession();
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [pagination, setPagination] = useState<TablePaginationConfig>({});
 
-    const columns: ColumnsType<GalleryVO> = [
+    const columns: ColumnsType<GalleryListItem> = [
         {
             title: "ID",
             dataIndex: "id",
@@ -26,9 +36,9 @@ export function GalleryList() {
         },
         {
             title: "Name",
-            dataIndex: "short_name",
-            key: "short_name",
-            sorter: (a, b) => a.short_name.localeCompare(b.short_name)
+            dataIndex: "name",
+            key: "name",
+            sorter: (a, b) => a.name.localeCompare(b.name)
         },
         {
             title: "Description",
@@ -40,48 +50,83 @@ export function GalleryList() {
             title: "File count",
             dataIndex: "common_files",
             key: "fileCount",
-            sorter: (a, b) => a.common_files.length - b.common_files.length,
-            render: (_, record: GalleryVO) => {
-                return (<div key={record.id + "-file-count"}>{record.common_files.length}</div>);
+            sorter: (a, b) => a.fileCount - b.fileCount,
+            render: (_, record: GalleryListItem) => {
+                return (<div key={`${record.id}-fileCount`}>{record.fileCount}</div>);
             }
         },
         {
             title: "Action",
             key: "action",
-            render: (_text: any, record: GalleryVO) => (
-                    <Space key={record.id + "-button-space"}>
-                        <Button type="primary"
-                                key={record.id + "-edit-button"}
+            render: (_text: any, record: GalleryListItem) => (
+                    <Space key={`${record.id}-buttonSpace`}>
+                        <Button
+                                type="primary"
+                                key={`${record.id}-editButton`}
                                 href={`/galleries/${record.id}/edit`}
-                        >Edit</Button>
-                        {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&
-                                <Button type={"primary"}
+                        >
+                            Edit
+                        </Button>
+                        {record.deletePrivilege && (
+                                <Button
+                                        type="primary"
                                         danger
-                                        key={record.id + "-delete-button"}
+                                        key={`${record.id}-deleteButton`}
                                         href={`/galleries/${record.id}/delete`}
-                                >Delete</Button>}
-                        {aclTool.hasPrivilege(PrivilegeEnum.CREATE, userSession?.id, userSession?.units, record.acls) &&
-                                <Button type={"primary"}
+                                >
+                                    Delete
+                                </Button>
+                        )}
+                        {record.createPrivilege && (
+                                <Button
+                                        type="primary"
                                         style={{background: "green"}}
-                                        key={record.id + "-publish-button"}
+                                        key={`${record.id}-publishButton`}
                                         href={`/galleries/${record.id}/publish`}
-                                >Publish</Button>}
-                        {aclTool.hasPrivilege(PrivilegeEnum.MODIFY, userSession?.id, userSession?.units, record.acls) &&
-                                <Button type={"primary"}
+                                >
+                                    Publish
+                                </Button>
+                        )}
+                        {record.modifyPrivilege && (
+                                <Button
+                                        type="primary"
                                         style={{background: "fuchsia"}}
-                                        key={record.id + "-refresh-button"}
+                                        key={`${record.id}-refreshButton`}
                                         href={`/galleries/${record.id}/refresh`}
-                                >Refresh files</Button>}
+                                >
+                                    Refresh files
+                                </Button>
+                        )}
                     </Space>
             ),
         }
     ];
 
+    function convertResponseToGalleryListItems(response: GalleryVO[]) {
+        let tmpGalleryList: GalleryListItem[] = [];
+
+        for (let gallery of response) {
+            tmpGalleryList.push({
+                id: gallery.id,
+                name: gallery.short_name,
+                description: gallery.description,
+                fileCount: gallery.common_files.length,
+                createPrivilege: aclTool.hasPrivilege(PrivilegeEnum.CREATE, userSession?.id, userSession?.units, gallery.acls),
+                modifyPrivilege: aclTool.hasPrivilege(PrivilegeEnum.MODIFY, userSession?.id, userSession?.units, gallery.acls),
+                deletePrivilege: aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, gallery.acls),
+            });
+         console.log("Gallery acl:", gallery.acls);
+        }
+
+        console.log("Gallery list:", tmpGalleryList);
+        setGalleryList(tmpGalleryList);
+    }
+
     useEffect(() => {
         setLoading(true);
         galleryAPI.findAll({details: QueryDetailEnum.MINIMAL})
                 .then((response) => {
-                    setGalleryList(response);
+                    convertResponseToGalleryListItems(response);
                     setPagination(getPaginationConfig(response.length));
                 })
                 .catch((error) => {
@@ -105,7 +150,7 @@ export function GalleryList() {
                 .then(() => {
                     galleryAPI.findAll()
                             .then((response) => {
-                                setGalleryList(response);
+                                convertResponseToGalleryListItems(response);
                             })
                             .catch((error) => {
                                 console.error("Error fetching gallery list:", error);
@@ -114,8 +159,6 @@ export function GalleryList() {
                                 setLoading(false);
                             });
                 });
-
-        setLoading(false);
     }
 
     function refreshhAll(): void {
@@ -143,28 +186,39 @@ export function GalleryList() {
                 .finally(() => {
                     setLoading(false);
                 });
-
-        setLoading(false);
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={"/galleries"} failTo={"/galleries"}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/galleries"} failTo={"/galleries"} key={"GalleryListSubmitResultHandler"}/>);
     }
 
     return (
             <div className={"darkBody"} key={"galleryListDiv"}>
                 <Spin tip={"Loading"} spinning={loading} key={"galleryListSpinner"}>
                     <Space direction={"vertical"} size={"large"} key={"pageListSpace"}>
-                        <h1 key={"pageListHeader"}>Gallery List <Link to={"/galleries/0/edit"}><PlusCircleFilled/></Link></h1>
-                        <Space direction={"horizontal"} size={12} style={{width: "100%", justifyContent: "left", margin: 0}}>
-                            <Button type={"primary"} onClick={publishAll}>Publish all galleries</Button>
-                            <Button type={"primary"} onClick={refreshhAll} style={{background: "fuchsia"}}>Refresh all gallery files</Button>
+                        <h1 key={"pageListHeader"}>Gallery List <Link to={"/galleries/0/edit"} key={"galleryAddLink"}><PlusCircleFilled/></Link></h1>
+                        <Space direction={"horizontal"}
+                               size={12}
+                               style={{width: "100%", justifyContent: "left", margin: 0}}
+                               key={"pageListSpaceMainButtonSpace"}
+                        >
+                            <Button type={"primary"}
+                                    onClick={publishAll}
+                                    key={"publishAllButton"}
+                            >Publish all galleries</Button>
+                            <Button type={"primary"}
+                                    onClick={refreshhAll}
+                                    style={{background: "fuchsia"}}
+                                    key={"refreshAllButton"}
+                            >Refresh all gallery files</Button>
                         </Space>
                         {galleryList.length > 0 && <Table
                                 dataSource={galleryList}
                                 columns={columns}
                                 pagination={pagination}
-                                key={"galleryListTable"}/>}
+                                key={"galleryListTable"}
+                                rowKey={"galleryListTableRow"}
+                        />}
                     </Space>
                 </Spin>
             </div>
