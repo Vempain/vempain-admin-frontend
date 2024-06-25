@@ -28,6 +28,18 @@ jobs:
         run: |
           yarn test:coverage
 
+  version-and-upload:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up NodeJS
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: '20'
+
       - name: Get main and base version
         id: basemain
         shell: bash
@@ -69,7 +81,6 @@ jobs:
 
       - name: Upload package to GitHub
         uses: actions/upload-artifact@v4
-        if: success()
         with:
           name: "vempain-admin-frontend-${{ steps.newVer.outputs.newVersion }}"
           path: build/*
