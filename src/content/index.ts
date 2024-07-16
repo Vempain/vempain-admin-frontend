@@ -11,3 +11,4 @@ export {PageDelete} from './PageDelete';
 export {PageEditor} from './PageEditor';
 export {PageList} from './PageList';
 export {PagePublish} from './PagePublish';
+export {PublishSchedule} from './PublishSchedule';

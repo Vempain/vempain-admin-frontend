@@ -1,27 +1,27 @@
-import {useParams} from "react-router-dom";
-import React, {useEffect, useState} from "react";
-import {validateParamId} from "../tools";
-import {ActionResult, QueryDetailEnum, SubmitResult} from "../models";
-import {PageVO} from "../models/Responses";
-import {pageAPI} from "../services";
-import {Button, DatePicker, Divider, Space, Spin, Switch, Table} from "antd";
-import {SubmitResultHandler} from "../main";
+import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { validateParamId } from "../tools";
+import { ActionResult, QueryDetailEnum, SubmitResult } from "../models";
+import { PageVO } from "../models/Responses";
+import { pageAPI } from "../services";
+import { Button, Divider, Space, Spin, Table } from "antd";
+import { SubmitResultHandler } from "../main";
 import TextArea from "antd/es/input/TextArea";
-import {galleryAPI} from "../services/Files";
-import {GalleryVO} from "../models/Responses/Files";
-import dayjs, {Dayjs} from "dayjs";
-import {PublishItemRequest} from "../models/Requests/PublishItemRequest";
+import { galleryAPI } from "../services/Files";
+import { GalleryVO } from "../models/Responses/Files";
+import dayjs, { Dayjs } from "dayjs";
+import { PublishItemRequest } from "../models/Requests/PublishItemRequest";
+import { PublishSchedule } from "./PublishSchedule";
 
 export function PagePublish() {
     const {paramId} = useParams();
-    const [pageId, setFpageId] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [page, setPage] = useState<PageVO | null>(null);
     const [galleryList, setGalleryList] = useState<GalleryVO[]>([]);
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
-    const [publishDate, setPublishDate] = useState<Dayjs>(dayjs());
+    const [publishDate, setPublishDate] = useState<Dayjs|null>(null);
     const [publishMessage, setPublishMessage] = useState<string>("");
 
     const galleryColumns = [
@@ -50,8 +50,6 @@ export function PagePublish() {
             return;
         }
 
-        setFpageId(tmpPageId);
-
         setLoading(true);
         Promise.all([
             pageAPI.findById(tmpPageId, null),
@@ -73,11 +71,13 @@ export function PagePublish() {
     function publishPage() {
         if (page !== null) {
             setLoading(true);
+            const selectedPublishDate: Date = publishDate !== null ? publishDate.toDate() : dayjs().toDate();
+
             const publishRequest: PublishItemRequest = {
                 id: page.id,
                 publish_message: publishMessage,
                 publish_schedule: schedulePublish,
-                publish_date_time: schedulePublish ? publishDate.toDate() : null,
+                publish_date_time: schedulePublish ? selectedPublishDate : null,
             };
 
             pageAPI.publish(publishRequest)
@@ -118,22 +118,7 @@ export function PagePublish() {
                                                               pagination={false}/>}
                             <Divider orientation={"left"}>Publish message</Divider>
                             <TextArea key={"publishMessage"} onChange={(event) => {setPublishMessage(event.target.value);}}/>
-                            <Divider orientation={"left"}>Publish schedule</Divider>
-                            <Switch key={"scheduleSwitch"}
-                                    checkedChildren={"Yes"}
-                                    unCheckedChildren={"No"}
-                                    onChange={(checked) => {
-                                        setSchedulePublish(checked);
-                                    }}
-                            />
-                            {schedulePublish && <DatePicker key={"publishDatePicker"}
-                                                            showTime={{format: 'HH:mm', defaultValue: dayjs()}}
-                                                            minuteStep={15 as 15}
-                                                            format={'YYYY-DD-MM HH:mm'}
-                                                            onChange={(value, _dateString) => {
-                                                                setPublishDate(value);
-                                                            }}
-                            />}
+                            <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate} />
                             <Button key={"publishButton"} type={"primary"} onClick={publishPage}>Publish page</Button>
                         </Space>
                     </div>}

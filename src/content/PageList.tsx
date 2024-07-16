@@ -1,15 +1,16 @@
-import {useEffect, useRef, useState} from "react";
-import {Button, Input, InputRef, Space, Spin, Table, TableColumnType, TablePaginationConfig} from "antd";
-import {ColumnsType} from "antd/lib/table";
-import {Link} from "react-router-dom";
-import {PlusCircleFilled, SearchOutlined} from "@ant-design/icons";
-import {QueryDetailEnum} from "../models";
-import {PageVO} from "../models/Responses";
-import {pageAPI} from "../services";
+import { useEffect, useRef, useState } from "react";
+import { Button, Input, InputRef, Space, Spin, Table, TableColumnType, TablePaginationConfig } from "antd";
+import { ColumnsType } from "antd/lib/table";
+import { Link } from "react-router-dom";
+import { PlusCircleFilled, SearchOutlined } from "@ant-design/icons";
+import { QueryDetailEnum } from "../models";
+import { PageVO } from "../models/Responses";
+import { pageAPI } from "../services";
 import dayjs from "dayjs";
-import {getPaginationConfig} from "../tools";
-import {FilterDropdownProps} from "antd/es/table/interface";
+import { getPaginationConfig } from "../tools";
+import { FilterDropdownProps } from "antd/es/table/interface";
 import Highlighter from "react-highlight-words";
+import { PublishSchedule } from "./PublishSchedule";
 
 // Define a hash containing the spin messages
 const spinMessages: Record<string, string> = {
@@ -27,6 +28,9 @@ export function PageList() {
     const [searchedColumn, setSearchedColumn] = useState("");
     const searchInput = useRef<InputRef>(null);
     type DataIndex = keyof PageVO;
+
+    const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
+    const [publishDate, setPublishDate] = useState<dayjs.Dayjs | null>(null);
 
     function handleSearch(
             selectedKeys: string[],
@@ -302,6 +306,7 @@ export function PageList() {
                     <Space direction={"vertical"} size={"large"} key={"pageListSpace"}>
                         <h1 key={"pageListHeader"}>Page List <Link to={"/pages/0/edit"}><PlusCircleFilled/></Link></h1>
                         <Button type={"primary"} onClick={publishAll}>Publish all pages</Button>
+                        <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate} />
                         {pageList.length > 0 && <Table
                                 dataSource={pageList.map((item, index) => ({...item, key: `row_${index}`}))}
                                 columns={columns}

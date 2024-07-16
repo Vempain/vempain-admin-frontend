@@ -1,14 +1,16 @@
-import React, {useEffect, useState} from "react";
-import {useSession} from "../session";
-import {GalleryVO} from "../models/Responses/Files";
-import {fileSystemAPI, galleryAPI} from "../services/Files";
-import {ColumnsType} from "antd/lib/table";
-import {Button, Space, Spin, Table, TablePaginationConfig} from "antd";
-import {aclTool, getPaginationConfig} from "../tools";
-import {ActionResult, PrivilegeEnum, QueryDetailEnum, SubmitResult} from "../models";
-import {Link} from "react-router-dom";
-import {PlusCircleFilled} from "@ant-design/icons";
-import {SubmitResultHandler} from "../main";
+import React, { useEffect, useState } from "react";
+import { useSession } from "../session";
+import { GalleryVO } from "../models/Responses/Files";
+import { fileSystemAPI, galleryAPI } from "../services/Files";
+import { ColumnsType } from "antd/lib/table";
+import { Button, Space, Spin, Table, TablePaginationConfig } from "antd";
+import { aclTool, getPaginationConfig } from "../tools";
+import { ActionResult, PrivilegeEnum, QueryDetailEnum, SubmitResult } from "../models";
+import { Link } from "react-router-dom";
+import { PlusCircleFilled } from "@ant-design/icons";
+import { SubmitResultHandler } from "../main";
+import { PublishSchedule } from "../content";
+import dayjs from "dayjs";
 
 interface GalleryListItem {
     id: number;
@@ -26,6 +28,9 @@ export function GalleryList() {
     const {userSession} = useSession();
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [pagination, setPagination] = useState<TablePaginationConfig>({});
+
+    const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
+    const [publishDate, setPublishDate] = useState<dayjs.Dayjs | null>(null);
 
     const columns: ColumnsType<GalleryListItem> = [
         {
@@ -212,6 +217,8 @@ export function GalleryList() {
                                     key={"refreshAllButton"}
                             >Refresh all gallery files</Button>
                         </Space>
+                        <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate} />
+
                         {galleryList.length > 0 && <Table
                                 dataSource={galleryList}
                                 columns={columns}
