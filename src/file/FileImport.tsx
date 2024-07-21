@@ -59,12 +59,26 @@ export function FileImport() {
             };
 
             if (node.children !== null && node.children.length > 0) {
+                console.log("Node contains children: ", node.directory_name);
                 for (let i = 0; i < node.children.length; i++) {
                     treeNode.children.push(generateTreeData(parentPrefix + node.directory_name, node.children[i]));
                 }
             }
 
             return treeNode;
+        }
+
+        function sortNodeTree(root: TreeNode): TreeNode {
+            // Recursive function to sort children
+            const sortChildren = (node: TreeNode): TreeNode => {
+                // Create a deep copy of the node to avoid mutating the original
+                return {
+                    ...node,
+                    children: node.children.map(child => sortChildren(child)).sort((a, b) => a.title.localeCompare(b.title))
+                };
+            };
+
+            return sortChildren(root);
         }
 
         setLoading(true);
@@ -78,7 +92,7 @@ export function FileImport() {
                     for (let i = 0; i < response[0].length; i++) {
                         // We only add the root directories to the list which contain children
                         if (response[0][i].children !== null && response[0][i].children.length > 0) {
-                            listOfRootDirs.push(generateTreeData("", response[0][i]));
+                            listOfRootDirs.push(sortNodeTree(generateTreeData("", response[0][i])));
                         }
                     }
 
@@ -282,6 +296,10 @@ export function FileImport() {
                                     </Button>
                                 </Form.Item>
                             </Form>}
+                    {directoryTree.length === 0 &&
+                            <div>
+                                <h2>There are no sub-directories to import</h2>
+                            </div>}
                 </Spin>
             </div>
     );
