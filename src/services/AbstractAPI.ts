@@ -67,9 +67,9 @@ export abstract class AbstractAPI<REQUEST, RESPONSE> {
         return response.data;
     }
 
-    public async publishAll(): Promise<ActionVO> {
+    public async publishAll(params?: Record<string, any>): Promise<ActionVO> {
         this.setAuthorizationHeader();
-        const response = await this.axiosInstance.get<ActionVO>("/publish");
+        const response = await this.axiosInstance.get<ActionVO>("/publish", {params: params});
         return response.data;
     }
 

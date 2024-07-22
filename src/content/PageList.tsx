@@ -282,10 +282,16 @@ export function PageList() {
         setSpinMessage(spinMessages.publishing);
         setLoading(true);
 
-        pageAPI.publishAll()
+        let publishParams: Record<string, any> | undefined = undefined;
+
+        if (schedulePublish && publishDate !== null) {
+            publishParams = {publish_date: publishDate.format("YYYY-MM-DDTHH:mm:ssZ")};
+        }
+
+        pageAPI.publishAll(publishParams)
                 .then(() => {
                     setLoading(true);
-                    pageAPI.findAll()
+                    pageAPI.findAll({details: QueryDetailEnum.UNPOPULATED})
                             .then((response) => {
                                 // This actually responds with: {"result":"OK","message":"Successfully published all pages","timestamp":"2024-04-02T20:02:01.247530395Z"}
                                 // TODO Handle the response
@@ -297,6 +303,12 @@ export function PageList() {
                             .finally(() => {
                                 setLoading(false);
                             });
+                })
+                .catch((error) => {
+                    console.error("Error publishing all pages");
+                })
+                .finally(() => {
+                    setLoading(false);
                 });
     }
 

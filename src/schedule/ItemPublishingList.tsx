@@ -1,8 +1,9 @@
-import {Button, Spin, Table} from "antd";
-import {useEffect, useState} from "react";
-import {PublishScheduleResponse} from "../models/Responses";
-import {ColumnsType} from "antd/lib/table";
-import {scheduleAPI} from "../services";
+import { Button, Spin, Table, Tag } from "antd";
+import { useEffect, useState } from "react";
+import { PublishScheduleResponse } from "../models/Responses";
+import { ColumnsType } from "antd/lib/table";
+import { scheduleAPI } from "../services";
+import { ContentTypeEnum } from "../models/ContentTypeEnum";
 
 function ItemPublishingList() {
     const [loading, setLoading] = useState<boolean>(true);
@@ -40,6 +41,43 @@ function ItemPublishingList() {
             dataIndex: "publish_type",
             key: "publish_type",
             sorter: (a, b) => a.publish_type.localeCompare(b.publish_type),
+            render: (_: any, response: PublishScheduleResponse) => {
+                let color = "";
+                let typeLabel: string = "";
+
+                switch (response.publish_type) {
+                    case ContentTypeEnum.GALLERY:
+                        color = "blue";
+                        typeLabel = "Gallery";
+                        break;
+                    case ContentTypeEnum.COMPONENT:
+                        color = "green";
+                        typeLabel = "Component";
+                        break;
+                    case ContentTypeEnum.LAYOUT:
+                        color = "purple";
+                        typeLabel = "Layout";
+                        break;
+                    case ContentTypeEnum.FORM:
+                        color = "orange";
+                        typeLabel = "Form";
+                        break;
+                    case ContentTypeEnum.PAGE:
+                        color = "red";
+                        typeLabel = "Page";
+                        break;
+                    default:
+                        color = "gray";
+                        typeLabel = "Unknown";
+                        break;
+                }
+
+                return (
+                        <Tag color={color} key={typeLabel + response.id}>
+                            {typeLabel}
+                        </Tag>
+                );
+            }
         },
         {
             title: "Publish ID",
@@ -88,4 +126,4 @@ function ItemPublishingList() {
     );
 }
 
-export {ItemPublishingList};
+export { ItemPublishingList };

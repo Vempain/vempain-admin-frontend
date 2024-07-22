@@ -151,9 +151,15 @@ export function GalleryList() {
 
         setLoading(true);
 
-        galleryAPI.publishAll()
+        let publishParams: Record<string, any> | undefined = undefined;
+
+        if (schedulePublish && publishDate !== null) {
+            publishParams = {publish_date: publishDate.format("YYYY-MM-DDTHH:mm:ssZ")};
+        }
+
+        galleryAPI.publishAll(publishParams)
                 .then(() => {
-                    galleryAPI.findAll()
+                    galleryAPI.findAll({details: QueryDetailEnum.MINIMAL})
                             .then((response) => {
                                 convertResponseToGalleryListItems(response);
                             })
@@ -162,7 +168,13 @@ export function GalleryList() {
                             })
                             .finally(() => {
                                 setLoading(false);
-                            });
+                            })
+                })
+                .catch((error) => {
+                    console.error("Error publishing all galleries");
+                })
+                .finally(() => {
+                    setLoading(false);
                 });
     }
 
