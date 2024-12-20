@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Input, InputRef, Space, Spin, Table, TableColumnType, TablePaginationConfig } from "antd";
 import { ColumnsType } from "antd/lib/table";
 import { Link } from "react-router-dom";
@@ -9,7 +9,6 @@ import { pageAPI } from "../services";
 import dayjs from "dayjs";
 import { getPaginationConfig } from "../tools";
 import { FilterDropdownProps } from "antd/es/table/interface";
-import Highlighter from "react-highlight-words";
 import { PublishSchedule } from "./PublishSchedule";
 
 // Define a hash containing the spin messages
@@ -117,17 +116,17 @@ export function PageList() {
                 setTimeout(() => searchInput.current?.select(), 100);
             }
         },
-        render: (text) =>
-                searchedColumn === dataIndex ? (
-                        <Highlighter
-                                highlightStyle={{backgroundColor: "#ffc069", padding: 0}}
-                                searchWords={[searchText]}
-                                autoEscape
-                                textToHighlight={text ? text.toString() : ""}
-                        />
-                ) : (
-                        text
-                ),
+        // render: (text) =>
+        //         searchedColumn === dataIndex ? (
+        //                 <Highlighter
+        //                         highlightStyle={{backgroundColor: "#ffc069", padding: 0}}
+        //                         searchWords={[searchText]}
+        //                         autoEscape
+        //                         textToHighlight={text ? text.toString() : ""}
+        //                 />
+        //         ) : (
+        //                 text
+        //         ),
     });
 
     const columns: ColumnsType<PageVO> = [
