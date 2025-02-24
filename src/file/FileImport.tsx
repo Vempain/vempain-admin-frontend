@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from "react";
-import {Button, Checkbox, Col, Form, Input, Row, Select, Spin, TreeSelect} from "antd";
-import {fileImportAPI, fileSystemAPI} from "../services/Files";
+import React, { ReactElement, useEffect, useState } from "react";
+import { Button, Checkbox, Col, Form, Input, Row, Select, Spin, TreeSelect } from "antd";
+import { fileImportAPI, fileSystemAPI } from "../services/Files";
 import TextArea from "antd/es/input/TextArea";
-import {SubmitResultHandler} from "../main";
-import {ActionResult, QueryDetailEnum, SubmitResult} from "../models";
-import {DirectoryNodeResponse} from "../models/Responses/Files/DirectoryNodeResponse";
-import {FileImageOutlined, LoadingOutlined} from "@ant-design/icons";
-import {formAPI} from "../services";
+import { SubmitResultHandler } from "../main";
+import { ActionResult, QueryDetailEnum, SubmitResult } from "../models";
+import { DirectoryNodeResponse } from "../models/Responses/Files/DirectoryNodeResponse";
+import { FileImageOutlined, LoadingOutlined } from "@ant-design/icons";
+import { formAPI } from "../services";
 
 interface FileImportFormProps {
     source_directory: string;
@@ -25,7 +25,7 @@ interface FileImportFormProps {
 interface TreeNode {
     title: string;
     value: string;
-    icon: JSX.Element;
+    icon: ReactElement;
     children: TreeNode[];
 }
 
