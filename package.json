@@ -10,7 +10,7 @@
     "@types/dompurify": "^3.0.5",
     "@types/jest": "^29.5.12",
     "@types/node": "^22.10.2",
-    "@types/react": "^18.3.12",
+    "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@types/react-highlight-words": "^0.20.0",
     "@vitejs/plugin-react": "^4.3.4",
