@@ -5,6 +5,11 @@ updates:
     registries: "*"
     schedule:
       interval: weekly
+  - package-ecosystem: "npm"
+    directory: /
+    registries: "*"
+    schedule:
+      interval: weekly
     open-pull-requests-limit: 15
     groups:
       dependencies:
