@@ -26,7 +26,7 @@
     "typescript": "^5.7.3",
     "vite": "^6.1.1",
     "vite-tsconfig-paths": "^5.1.4",
-    "web-vitals": "^5.0.0"
+    "web-vitals": "^5.0.1"
   },
   "scripts": {
     "prebuild": "node generateBuildInfo.js",
@@ -61,7 +61,6 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@types/dompurify": "^3.0.5",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "ts-jest": "^29.1.2"
