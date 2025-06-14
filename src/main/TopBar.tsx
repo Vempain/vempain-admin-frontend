@@ -1,4 +1,4 @@
-import {Button, Flex, Layout, Menu, MenuProps} from "antd";
+import {Button, Drawer, Grid, Layout, Menu, MenuProps, Tooltip} from "antd";
 import React, {useState} from "react";
 import {
     AppstoreOutlined,
@@ -14,6 +14,7 @@ import {
     ImportOutlined,
     InfoCircleOutlined,
     LogoutOutlined,
+    MenuOutlined,
     PictureOutlined,
     SettingFilled,
     SnippetsOutlined,
@@ -25,15 +26,19 @@ import {
     VideoCameraOutlined
 } from "@ant-design/icons";
 import {useSession} from "../session";
-import {Link} from "react-router-dom";
+import {Link, NavLink} from "react-router-dom";
 
 const {Header} = Layout;
+const {useBreakpoint} = Grid;
 
 function TopBar() {
     const [current, setCurrent] = useState("mail");
+    const [drawerOpen, setDrawerOpen] = useState(false);
     const {userSession} = useSession();
+    type MenuItem = Required<MenuProps>["items"][number];
+    const screens = useBreakpoint();
 
-    const mainMenuItems: MenuProps["items"] = [
+    const menuBarItems: MenuItem[] = [
         {
             label: "Content Management",
             key: "pageManagement",
@@ -137,6 +142,37 @@ function TopBar() {
                 },
             ],
         },
+        ...(userSession &&
+                [
+                    {
+                        label: "Profile",
+                        key: "profile",
+                        icon: <InfoCircleOutlined/>,
+                        children: [
+                            {
+                                label: "Account",
+                                key: "account",
+                                icon: <SettingFilled/>
+                            },
+                            {
+                                label: "Change Password",
+                                key: "changePassword",
+                                icon: <SwapOutlined/>
+                            },
+                            {
+                                label: (<Link to={"/logout"}>Log out</Link>),
+                                key: "logout",
+                                icon: <LogoutOutlined/>
+                            }
+                        ]
+                    }
+                ] || [
+                    {
+                        label: (<Link to={"/login"}>Login</Link>),
+                        key: "login",
+                        icon: <UserOutlined/>
+                    }
+                ])
     ];
 
     const userMenuItems: MenuProps["items"] = [
@@ -169,24 +205,79 @@ function TopBar() {
     };
 
     return (
-            <Header style={{display: "flex", alignItems: "center"}} key={"topBarHeader"}>
-                <div className="demo-logo" key={"mainBarLogoDiv"}>
-                    <Link to={"/"} key={"topBarHomeLink"}>Home</Link>
-                </div>
-                {userSession && <Flex gap={"middle"} vertical={false}>
-                    <Menu onClick={onClick} selectedKeys={[current]} mode="horizontal" items={mainMenuItems} key={"mainMenu"}/>
-                </Flex>}
-                <div style={{marginLeft: "auto"}} key={"userMenuDiv"}>
-                    {userSession ? (
-                            <Menu mode={"horizontal"} items={userMenuItems} key={"userMenu"}/>
-                    ) : (
-                            <Button type={"text"} href={"/login"} key={"loginButton"}>
-                                Login
-                            </Button>
+            <Header
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: 1000,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        padding: "0 16px",
+                        backgroundColor: "#191919",
+                        maxWidth: "100%"
+                    }}
+                    key={"topBarHeader"}
+            >
+                {/* Logo + (desktop) menu */}
+                <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            flex: 1,
+                            overflow: "hidden"
+                        }}
+                >
+                    <Tooltip title={"organizationName"}>
+                        <div style={{width: 156, height: 64, marginRight: 20}}>
+                            <NavLink to={"/"}>
+                                Some Logo
+                            </NavLink>
+                        </div>
+                    </Tooltip>
+
+                    {/* show horizontal Menu only on ≥ md */}
+                    {screens.md && (
+                            <Menu
+                                    onClick={onClick}
+                                    selectedKeys={[current]}
+                                    mode="horizontal"
+                                    items={menuBarItems}
+                                    style={{width: "100%"}}
+                            />
                     )}
                 </div>
+
+                {/* Hamburger button – hidden on desktop */}
+                {!screens.md && (
+                        <>
+                            <Button
+                                    type="text"
+                                    icon={<MenuOutlined style={{fontSize: 24}}/>}
+                                    onClick={() => setDrawerOpen(true)}
+                                    aria-label="Open menu"
+                            />
+                            <Drawer
+                                    placement="right"
+                                    onClose={() => setDrawerOpen(false)}
+                                    open={drawerOpen}
+                                    styles={{body: {padding: "0"}}}
+                                    width={260}
+                            >
+                                <Menu
+                                        onClick={onClick}
+                                        selectedKeys={[current]}
+                                        mode="inline"
+                                        items={menuBarItems}
+                                        style={{border: "none"}}
+                                />
+                            </Drawer>
+                        </>
+                )}
             </Header>
     );
 }
 
-export { TopBar };
+export {TopBar};

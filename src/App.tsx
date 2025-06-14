@@ -31,7 +31,7 @@ function App() {
             <ConfigProvider theme={{algorithm: darkAlgorithm}}>
                 <Layout className={"layout"}>
                     <TopBar/>
-                    <Content style={{padding: "0 50px"}}>
+                    <Content style={{padding: "0 50px", marginTop: '42px'}}>
                         <div className={"site-layout-content"}>
                             <Routes>
                                 <Route path={"*"} element={<Navigate to={"/"}/>}/>
