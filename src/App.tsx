@@ -21,7 +21,7 @@ import {LayoutDelete} from "./content/LayoutDelete";
 import {AudioList, DocumentList, FileImport, GalleryDelete, GalleryEdit, GalleryList, GalleryPublish, GalleryRefresh, ImageList, VideoList} from "./file";
 import {FileImportScheduleList, FileImportScheduleTrigger, ItemPublishingList, ItemPublishTrigger, SystemScheduleList, SystemScheduleTrigger} from "./schedule";
 
-const {Content, Footer} = Layout;
+const {Content} = Layout;
 
 function App() {
     const {darkAlgorithm} = theme;

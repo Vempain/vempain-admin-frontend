@@ -36,7 +36,7 @@ export function SessionProvider({children}: any) {
                         message: "Login successful"
                     };
                 })
-                .catch((error) => {
+                .catch((_error) => {
                     return {
                         status: ActionResultEnum.FAILURE,
                         message: "Failed to log on user"
