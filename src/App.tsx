@@ -1,4 +1,3 @@
-import React from "react";
 import {ConfigProvider, Layout, theme} from "antd";
 import {Navigate, Route, Routes} from "react-router-dom";
 import "./App.css";

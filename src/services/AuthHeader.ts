@@ -1,4 +1,4 @@
-import {JwtResponse} from "../models/Responses";
+import type {JwtResponse} from "../models";
 
 export function authHeader() {
     const user: JwtResponse = JSON.parse(localStorage.getItem("vempainUser") || "{}");

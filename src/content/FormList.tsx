@@ -1,11 +1,10 @@
 import {useEffect, useState} from "react";
-import {Button, Space, Spin, Table, TablePaginationConfig} from "antd";
-import {ColumnsType} from "antd/lib/table";
+import {Button, Space, Spin, Table, type TablePaginationConfig} from "antd";
+import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {PlusCircleFilled} from "@ant-design/icons";
 import {useSession} from "../session";
-import {PrivilegeEnum, QueryDetailEnum} from "../models";
-import {FormVO} from "../models/Responses";
+import {type FormVO, PrivilegeEnum, QueryDetailEnum} from "../models";
 import {aclTool, getPaginationConfig} from "../tools";
 import {formAPI} from "../services";
 

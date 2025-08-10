@@ -8,3 +8,5 @@ export {pageAPI} from './PageAPI';
 export {scheduleAPI} from './ScheduleAPI';
 export {unitAPI} from './UnitAPI';
 export {userAPI} from './UserAPI';
+
+export * from './Files';

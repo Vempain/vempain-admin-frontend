@@ -1,12 +1,11 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { Button, Form, Input, Spin, Switch } from "antd";
-import { MetadataForm, SubmitResultHandler } from "../main";
-import { AclEdit } from "./AclEdit";
-import { AclVO, ComponentVO } from "../models/Responses";
-import { ActionResult, SubmitResult } from "../models";
-import { componentAPI } from "../services";
-import { aclTool, validateParamId } from "../tools";
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {Button, Form, Input, Spin, Switch} from "antd";
+import {MetadataForm, SubmitResultHandler} from "../main";
+import {AclEdit} from "./AclEdit";
+import {type AclVO, ActionResult, type ComponentVO, type SubmitResult} from "../models";
+import {componentAPI} from "../services";
+import {aclTool, validateParamId} from "../tools";
 
 export function ComponentEditor() {
     const {paramId} = useParams<{ paramId: string }>();

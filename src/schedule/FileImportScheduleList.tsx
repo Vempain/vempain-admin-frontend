@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
 import {Spin, Table} from "antd";
-import {ColumnsType} from "antd/lib/table";
+import type {ColumnsType} from "antd/lib/table";
 import {scheduleAPI} from "../services";
-import {FileImportScheduleResponse} from "../models/Responses/FileImportScheduleResponse";
+import type {FileImportScheduleResponse} from "../models";
 import {CheckOutlined} from "@ant-design/icons";
 
 function FileImportScheduleList() {

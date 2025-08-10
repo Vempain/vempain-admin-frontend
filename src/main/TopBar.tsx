@@ -1,5 +1,5 @@
-import {Button, Drawer, Grid, Layout, Menu, MenuProps, Tooltip} from "antd";
-import React, {useState} from "react";
+import {Button, Drawer, Grid, Layout, Menu, type MenuProps, Tooltip} from "antd";
+import {useState} from "react";
 import {
     AppstoreOutlined,
     AudioOutlined,

@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { validateParamId } from "../tools";
-import { ActionResult, SubmitResult } from "../models";
-import { fileSystemAPI, galleryAPI } from "../services/Files";
-import { GalleryVO } from "../models/Responses/Files";
-import { SubmitResultHandler } from "../main";
-import { LoadingOutlined } from "@ant-design/icons";
-import { Button, Space, Spin } from "antd";
-import { CommonFileCard } from "./CommonFileCard";
+import {useEffect, useState} from "react";
+import {useParams} from "react-router-dom";
+import {validateParamId} from "../tools";
+import {ActionResult, type GalleryVO, type SubmitResult} from "../models";
+import {fileSystemAPI, galleryAPI} from "../services";
+import {SubmitResultHandler} from "../main";
+import {LoadingOutlined} from "@ant-design/icons";
+import {Button, Space, Spin} from "antd";
+import {CommonFileCard} from "./CommonFileCard";
 
 export function GalleryRefresh() {
     const {paramId} = useParams();

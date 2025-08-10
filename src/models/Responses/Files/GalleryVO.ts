@@ -1,5 +1,5 @@
-import {AbstractPermissionVO} from "../../AbstractPermissionVO";
-import CommonFileVO from "./CommonFileVO";
+import type {AbstractPermissionVO} from "../../AbstractPermissionVO";
+import type {CommonFileVO} from "./CommonFileVO";
 
 export interface GalleryVO extends AbstractPermissionVO {
     id: number;

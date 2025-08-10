@@ -1,5 +1,5 @@
 import {AbstractAPI} from "./AbstractAPI";
-import {FormVO} from "../models/Responses";
+import type {FormVO} from "../models";
 
 class FormAPI extends AbstractAPI<FormVO, FormVO> {
     public async findFormsByComponentId(componentId: number): Promise<FormVO[]> {

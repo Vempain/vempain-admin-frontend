@@ -1,11 +1,10 @@
 import {useParams} from "react-router-dom";
-import React, {useEffect, useState} from "react";
-import {ScheduleTriggerResponse} from "../models/Responses/ScheduleTriggerResponse";
+import {useEffect, useState} from "react";
+import type {ScheduleTriggerRequest, ScheduleTriggerResponse} from "../models";
+import {ActionResult, type SubmitResult} from "../models";
 import {scheduleAPI} from "../services";
 import {Button, InputNumber, Space, Spin, Table} from "antd";
-import {ScheduleTriggerRequest} from "../models/Requests/ScheduleTriggerRequest";
-import {ColumnsType} from "antd/lib/table";
-import {ActionResult, SubmitResult} from "../models";
+import type {ColumnsType} from "antd/lib/table";
 import {SubmitResultHandler} from "../main";
 
 function SystemScheduleTrigger() {

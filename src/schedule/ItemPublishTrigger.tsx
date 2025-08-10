@@ -1,13 +1,12 @@
 import {useParams} from "react-router-dom";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {validateParamId} from "../tools";
 import {scheduleAPI} from "../services";
 import {Button, DatePicker, Space, Spin, Table} from "antd";
-import {PublishScheduleResponse} from "../models/Responses";
-import {ColumnsType} from "antd/lib/table";
-import {PublishScheduleRequest} from "../models/Requests/PublishScheduleRequest";
+import type {PublishScheduleRequest} from "../models";
+import {ActionResult, type PublishScheduleResponse, type SubmitResult} from "../models";
+import type {ColumnsType} from "antd/lib/table";
 import dayjs, {Dayjs} from "dayjs";
-import {ActionResult, SubmitResult} from "../models";
 import {SubmitResultHandler} from "../main";
 
 // Define the loading messages

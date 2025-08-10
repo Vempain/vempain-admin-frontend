@@ -1,7 +1,5 @@
-import {GalleryVO} from "../../models/Responses/Files";
+import {type GalleryRequest, type GalleryVO, QueryDetailEnum} from "../../models";
 import {AbstractAPI} from "../AbstractAPI";
-import {GalleryRequest} from "../../models/Requests";
-import {QueryDetailEnum} from "../../models";
 
 class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryVO> {
     public async findAllByPage(params: { details: QueryDetailEnum }, pageId: number) {

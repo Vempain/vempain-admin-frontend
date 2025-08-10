@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { Spin, Table, TablePaginationConfig } from "antd";
-import { SortableTableParams } from "../models";
-import type { ColumnsType } from "antd/es/table";
-import { FilterValue, SorterResult } from "antd/es/table/interface";
-import { AbstractFileVO } from "../models/Responses/Files";
+import {useEffect, useRef, useState} from "react";
+import {Spin, Table, type TablePaginationConfig} from "antd";
+import type {AbstractFileVO, SortableTableParams} from "../models";
+import type {ColumnsType} from "antd/es/table";
+import type {FilterValue, SorterResult} from "antd/es/table/interface";
 
 interface Props<T extends AbstractFileVO> {
     valueObjectColumns: ColumnsType<T>;

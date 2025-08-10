@@ -1,8 +1,8 @@
-import { audioFileAPI } from "../services/Files";
-import { AudioFileVO } from "../models/Responses/Files";
-import type { ColumnsType } from "antd/es/table";
-import { formatDateTimeWithMs } from "../tools";
-import { GenericFileList } from "./GenericFileList";
+import {audioFileAPI} from "../services";
+import type {AudioFileVO} from "../models";
+import type {ColumnsType} from "antd/es/table";
+import {formatDateTimeWithMs} from "../tools";
+import {GenericFileList} from "./GenericFileList";
 
 export function AudioList() {
     const audioFileColumns: ColumnsType<AudioFileVO> = [

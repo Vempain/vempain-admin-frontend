@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Button, Col, Form, Row, Select, Switch } from "antd";
-import { MinusCircleFilled, PlusCircleFilled } from "@ant-design/icons";
-import { AclVO, UnitVO, UserVO } from "../models/Responses";
-import { unitAPI, userAPI } from "../services";
+import {useEffect, useState} from "react";
+import {Button, Col, Form, Row, Select, Switch} from "antd";
+import {MinusCircleFilled, PlusCircleFilled} from "@ant-design/icons";
+import type {AclVO, UnitVO, UserVO} from "../models";
+import {unitAPI, userAPI} from "../services";
 
 interface AclEditProps {
     acls: AclVO[];
@@ -34,7 +34,7 @@ export function AclEdit({acls, onChange, parentForm}: AclEditProps) {
                 });
     }, []);
 
-    function validateAclRow(rule: any, value: any, index: number): Promise<void> {
+    function validateAclRow(rule: any, _value: any, index: number): Promise<void> {
         const fieldName = rule.field.split(".")[2];
 
         if (fieldName === "user" || fieldName === "unit") {

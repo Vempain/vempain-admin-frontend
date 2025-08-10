@@ -1,13 +1,12 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { Button, Form, Input, Select, Space, Spin, Switch } from "antd";
-import { MinusCircleFilled, PlusOutlined } from "@ant-design/icons";
-import { MetadataForm, SubmitResultHandler } from "../main";
-import { AclEdit } from "./AclEdit";
-import { AclVO, ComponentVO, FormVO, LayoutVO } from "../models/Responses";
-import { ActionResult, SubmitResult } from "../models";
-import { componentAPI, formAPI, layoutAPI } from "../services";
-import { validateParamId } from "../tools";
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {Button, Form, Input, Select, Space, Spin, Switch} from "antd";
+import {MinusCircleFilled, PlusOutlined} from "@ant-design/icons";
+import {MetadataForm, SubmitResultHandler} from "../main";
+import {AclEdit} from "./AclEdit";
+import {type AclVO, ActionResult, type ComponentVO, type FormVO, type LayoutVO, type SubmitResult} from "../models";
+import {componentAPI, formAPI, layoutAPI} from "../services";
+import {validateParamId} from "../tools";
 
 export function FormEditor() {
     const {paramId} = useParams();
@@ -168,7 +167,7 @@ export function FormEditor() {
                             >
                                 {(components, {add, remove}) => {
                                     return (<>
-                                        {components.map((field, index) => {
+                                        {components.map((field, _) => {
                                             return (
                                                     <Space key={field.key} style={{display: "flex", marginBottom: 8}} align="baseline">
                                                         <Form.Item

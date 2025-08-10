@@ -1,4 +1,4 @@
-import {TablePaginationConfig} from 'antd/es/table';
+import type {TablePaginationConfig} from 'antd/es/table';
 
 const tablePaginationConfig: TablePaginationConfig = {
     position: ["topRight", "bottomRight"],

@@ -1,13 +1,12 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { formatDateTimeWithMs, validateParamId } from "../tools";
-import { ActionResult, SubmitResult } from "../models";
-import { SubmitResultHandler } from "../main";
-import { galleryAPI } from "../services/Files";
-import { GalleryVO } from "../models/Responses/Files";
-import { Button, Spin, Table } from "antd";
-import type { ColumnsType } from "antd/es/table";
-import CommonFileVO from "../models/Responses/Files/CommonFileVO";
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {formatDateTimeWithMs, validateParamId} from "../tools";
+import type {CommonFileVO} from "../models";
+import {ActionResult, type GalleryVO, type SubmitResult} from "../models";
+import {SubmitResultHandler} from "../main";
+import {galleryAPI} from "../services";
+import {Button, Spin, Table} from "antd";
+import type {ColumnsType} from "antd/es/table";
 
 export function GalleryDelete() {
     const {paramId} = useParams();

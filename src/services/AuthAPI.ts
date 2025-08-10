@@ -1,6 +1,5 @@
-import Axios, {AxiosInstance} from "axios";
-import {LoginRequest} from "../models/Requests";
-import {JwtResponse} from "../models/Responses";
+import Axios, {type AxiosInstance} from "axios";
+import type {JwtResponse, LoginRequest} from "../models";
 
 class AuthAPI {
     userKey: string = 'vempainUser';

@@ -1,11 +1,10 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { ActionResult, SubmitResult } from "../models";
-import { FormVO, LayoutVO, PageVO } from "../models/Responses";
-import { SubmitResultHandler } from "../main";
-import { formAPI, layoutAPI, pageAPI } from "../services";
-import { Button, Spin } from "antd";
-import { validateParamId } from "../tools";
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {ActionResult, type FormVO, type LayoutVO, type PageVO, type SubmitResult} from "../models";
+import {SubmitResultHandler} from "../main";
+import {formAPI, layoutAPI, pageAPI} from "../services";
+import {Button, Spin} from "antd";
+import {validateParamId} from "../tools";
 
 export function LayoutDelete() {
     const {paramId} = useParams();

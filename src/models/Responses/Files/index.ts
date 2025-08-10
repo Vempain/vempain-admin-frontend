@@ -1,8 +1,12 @@
 export type {AbstractFileVO} from './AbstractFileVO';
 export type {AudioFileVO} from './AudioFileVO';
+export type {CommonFileVO} from './CommonFileVO';
+export type {DirectoryNodeResponse} from './DirectoryNodeResponse';
 export type {DocumentFileVO} from './DocumentFileVO';
 export type {GalleryVO} from './GalleryVO';
 export type {ImageFileVO} from './ImageFileVO';
 export type {ImportResponseVO} from './ImportResponseVO';
 export type {PageableImageListVO} from './PageableImageListVO';
+export type {RefreshDetailResponse} from './RefreshDetailResponse';
+export type {RefreshResponse} from './RefreshResponse';
 export type {VideoFileVO} from './VideoFileVO';

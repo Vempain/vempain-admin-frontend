@@ -1,6 +1,6 @@
-import {AbstractPermissionVO} from "../../AbstractPermissionVO";
+import type {AbstractPermissionVO} from "../../AbstractPermissionVO";
 
-export default interface CommonFileVO extends AbstractPermissionVO {
+export interface CommonFileVO extends AbstractPermissionVO {
     comment: string;
     file_class_id: number;
     id: number;

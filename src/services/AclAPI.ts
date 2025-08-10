@@ -1,5 +1,5 @@
 import {AbstractAPI} from "./AbstractAPI";
-import {AclVO} from "../models/Responses";
+import type {AclVO} from "../models";
 
 class AclAPI extends AbstractAPI<AclVO, AclVO> {
     private static convertNullUserUnit(aclList: AclVO[]): AclVO[] {

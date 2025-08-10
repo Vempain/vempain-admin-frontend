@@ -1,6 +1,7 @@
 // This mirrors the fi.poltsi.vempain.admin.api.response.UserResponse
 
-import {AbstractPermissionVO} from "../AbstractPermissionVO";
+// This mirrors the fi.poltsi.vempain.admin.api.response.UserResponse
+import type {AbstractPermissionVO} from "../AbstractPermissionVO";
 
 export interface UserVO extends AbstractPermissionVO {
     id: number;

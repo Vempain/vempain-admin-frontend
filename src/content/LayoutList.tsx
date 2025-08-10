@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
-import { Button, Space, Spin, Table, TablePaginationConfig } from "antd";
-import { ColumnsType } from "antd/lib/table";
-import { Link } from "react-router-dom";
-import { PlusCircleFilled } from "@ant-design/icons";
-import { useSession } from "../session";
-import { PrivilegeEnum } from "../models";
-import { LayoutVO } from "../models/Responses";
-import { aclTool, getPaginationConfig } from "../tools";
-import { layoutAPI } from "../services";
+import {useEffect, useState} from "react";
+import {Button, Space, Spin, Table, type TablePaginationConfig} from "antd";
+import type {ColumnsType} from "antd/lib/table";
+import {Link} from "react-router-dom";
+import {PlusCircleFilled} from "@ant-design/icons";
+import {useSession} from "../session";
+import {type LayoutVO, PrivilegeEnum} from "../models";
+import {aclTool, getPaginationConfig} from "../tools";
+import {layoutAPI} from "../services";
 
 export function LayoutList() {
     const [loading, setLoading] = useState<boolean>(false);

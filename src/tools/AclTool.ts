@@ -1,5 +1,4 @@
-import {PrivilegeEnum} from "../models";
-import {AclVO, UnitVO} from "../models/Responses";
+import {type AclVO, PrivilegeEnum, type UnitVO} from "../models";
 
 class AclTool {
     public static validateAcl(item: AclVO): boolean {

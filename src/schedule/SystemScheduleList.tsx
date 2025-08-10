@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
-import {ScheduleTriggerResponse} from "../models/Responses/ScheduleTriggerResponse";
+import type {ScheduleTriggerResponse} from "../models";
 import {scheduleAPI} from "../services";
-import {ColumnsType} from "antd/lib/table";
+import type {ColumnsType} from "antd/lib/table";
 import {Button, Spin, Table} from "antd";
 
 function SystemScheduleList() {

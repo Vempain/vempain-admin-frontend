@@ -1,4 +1,4 @@
-import {AbstractPermissionVO} from "../AbstractPermissionVO";
+import type {AbstractPermissionVO} from "../AbstractPermissionVO";
 
 export interface ComponentVO extends AbstractPermissionVO {
     id: number;

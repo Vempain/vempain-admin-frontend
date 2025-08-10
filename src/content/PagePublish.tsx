@@ -1,17 +1,14 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { validateParamId } from "../tools";
-import { ActionResult, QueryDetailEnum, SubmitResult } from "../models";
-import { PageVO } from "../models/Responses";
-import { pageAPI } from "../services";
-import { Button, Divider, Space, Spin, Table } from "antd";
-import { SubmitResultHandler } from "../main";
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {validateParamId} from "../tools";
+import type {GalleryVO, PublishItemRequest} from "../models";
+import {ActionResult, type PageVO, QueryDetailEnum, type SubmitResult} from "../models";
+import {galleryAPI, pageAPI} from "../services";
+import {Button, Divider, Space, Spin, Table} from "antd";
+import {SubmitResultHandler} from "../main";
 import TextArea from "antd/es/input/TextArea";
-import { galleryAPI } from "../services/Files";
-import { GalleryVO } from "../models/Responses/Files";
-import dayjs, { Dayjs } from "dayjs";
-import { PublishItemRequest } from "../models/Requests/PublishItemRequest";
-import { PublishSchedule } from "./PublishSchedule";
+import dayjs, {Dayjs} from "dayjs";
+import {PublishSchedule} from "./PublishSchedule";
 
 export function PagePublish() {
     const {paramId} = useParams();
