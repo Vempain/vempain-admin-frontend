@@ -2,7 +2,7 @@
 FROM nginx:alpine
 
 # Create custom nginx config to serve static files and proxy API requests
-RUN cat > /etc/nginx/conf.d/default.conf << 'EOL'
+RUN cat > /etc/nginx/conf.d/default.conf << EOL
 server {
     listen 8080;
 
