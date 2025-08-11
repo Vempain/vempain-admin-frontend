@@ -42,8 +42,8 @@ function ItemPublishingList() {
             key: "publish_type",
             sorter: (a, b) => a.publish_type.localeCompare(b.publish_type),
             render: (_: any, response: PublishScheduleResponse) => {
-                let color = "";
-                let typeLabel: string = "";
+                let color: string;
+                let typeLabel: string;
 
                 switch (response.publish_type) {
                     case ContentTypeEnum.GALLERY:
