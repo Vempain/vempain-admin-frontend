@@ -1,5 +1,5 @@
-import {PageableVO} from "../PageableVO";
-import {ImageFileVO} from "./ImageFileVO";
+import type {PageableVO} from "../PageableVO";
+import type {ImageFileVO} from "./ImageFileVO";
 
 export interface PageableImageListVO {
     page: PageableVO;

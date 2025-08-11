@@ -1,5 +1,5 @@
 import {Alert, Button} from "antd";
-import {ActionResult, SubmitResult} from "../models";
+import {ActionResult, type SubmitResult} from "../models";
 
 interface SubmitResultHandlerProps {
     submitResult: SubmitResult,

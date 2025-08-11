@@ -1,6 +1,6 @@
-import CommonFileVO from "../models/Responses/Files/CommonFileVO";
-import { Card, Collapse, Descriptions, Input } from "antd";
-import { formatDateTime, formatFileSize } from "../tools";
+import type {CommonFileVO} from "../models";
+import {Card, Collapse, Descriptions, Input} from "antd";
+import {formatDateTime, formatFileSize} from "../tools";
 
 interface CommonFileCardProps {
     commonFile: CommonFileVO;

@@ -1,6 +1,7 @@
 // This is used to log on the user to the application
 
-import {UnitVO} from "./UnitVO";
+// This is used to log on the user to the application
+import type {UnitVO} from "./UnitVO";
 
 export interface JwtResponse {
     id: number;

@@ -1,6 +1,5 @@
-import {DirectoryNodeResponse} from "../../models/Responses/Files/DirectoryNodeResponse";
+import type {DirectoryNodeResponse, RefreshResponse} from "../../models";
 import {AbstractAPI} from "../AbstractAPI";
-import {RefreshResponse} from "../../models/Responses/Files/RefreshResponse";
 
 class FileSystemAPI extends AbstractAPI<DirectoryNodeResponse, DirectoryNodeResponse[]> {
     public async getConvertedDirectoryTree(): Promise<DirectoryNodeResponse[]> {

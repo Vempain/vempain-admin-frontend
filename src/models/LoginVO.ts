@@ -1,6 +1,7 @@
 // This is used to log on the user to the application
 
-import {UnitVO} from "./Responses";
+// This is used to log on the user to the application
+import type {UnitVO} from "./Responses";
 
 export class LoginVO {
     id: number;

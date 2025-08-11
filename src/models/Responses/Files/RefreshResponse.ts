@@ -1,4 +1,4 @@
-import {RefreshDetailResponse} from "./RefreshDetailResponse";
+import type {RefreshDetailResponse} from "./RefreshDetailResponse";
 import {ActionResult} from "../../ActionResult";
 
 export interface RefreshResponse {

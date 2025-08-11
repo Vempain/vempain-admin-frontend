@@ -1,5 +1,5 @@
 import {AbstractAPI} from "../AbstractAPI";
-import CommonFileVO from "../../models/Responses/Files/CommonFileVO";
+import type {CommonFileVO} from "../../models";
 
 class CommonFileAPI extends AbstractAPI<CommonFileVO, CommonFileVO> {
 }

@@ -1,6 +1,6 @@
-import dayjs, { Dayjs } from "dayjs";
-import { DatePicker, Divider, Space, Switch } from "antd";
-import { useState } from "react";
+import dayjs, {Dayjs} from "dayjs";
+import {DatePicker, Divider, Space, Switch} from "antd";
+import {useState} from "react";
 
 interface PublishScheduleProps {
     setSchedulePublish: (checked: boolean) => void;

@@ -1,4 +1,4 @@
-import {ImageFileVO} from "../../models/Responses/Files";
+import type {ImageFileVO} from "../../models";
 import {AbstractAPI} from "../AbstractAPI";
 
 class ImageFileAPI extends AbstractAPI<ImageFileVO, ImageFileVO> {

@@ -1,5 +1,5 @@
 import {AbstractAPI} from "./AbstractAPI";
-import {ComponentVO} from "../models/Responses";
+import type {ComponentVO} from "../models";
 
 class ComponentAPI extends AbstractAPI<ComponentVO, ComponentVO> {
 }

@@ -1,4 +1,4 @@
-import {AclVO} from "./Responses/AclVO";
+import type {AclVO} from "./Responses";
 
 export interface AbstractPermissionVO {
     acls: AclVO[];

@@ -1,15 +1,13 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { Button, Col, Form, Input, Row, Select, Spin, Switch } from "antd";
-import { AclEdit } from "./AclEdit";
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
+import {AclEdit} from "./AclEdit";
 import TextArea from "antd/es/input/TextArea";
-import { MetadataForm, SubmitResultHandler } from "../main";
-import { AclVO, FormVO, PageVO } from "../models/Responses";
-import { ActionResult, QueryDetailEnum, SubmitResult } from "../models";
-import { formAPI, pageAPI } from "../services";
-import { aclTool, validateParamId } from "../tools";
-import { galleryAPI } from "../services/Files";
-import { ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined } from "@ant-design/icons";
+import {MetadataForm, SubmitResultHandler} from "../main";
+import {type AclVO, ActionResult, type FormVO, type PageVO, QueryDetailEnum, type SubmitResult} from "../models";
+import {formAPI, galleryAPI, pageAPI} from "../services";
+import {aclTool, validateParamId} from "../tools";
+import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-design/icons";
 
 // Define the loading messages
 const spinMessages: Record<string, string> = {
@@ -139,11 +137,12 @@ export function PageEditor() {
                     .then((response) => {
                         console.debug("Update response:", response);
                         setSubmitResults({status: ActionResult.OK, message: "Page updated"});
-                        setLoading(false);
                     })
                     .catch((error) => {
                         console.error("Error updating:", error);
                         setSubmitResults({status: ActionResult.FAIL, message: "Failed to update the page, try again later"});
+                    })
+                    .finally(() => {
                         setLoading(false);
                     });
         } else {
@@ -151,11 +150,12 @@ export function PageEditor() {
                     .then((response) => {
                         console.debug("Create response:", response);
                         setSubmitResults({status: ActionResult.OK, message: "Page created"});
-                        setLoading(false);
                     })
                     .catch((error) => {
                         console.error("Error creating:", error);
                         setSubmitResults({status: ActionResult.FAIL, message: "Failed to create the page, try again later"});
+                    })
+                    .finally(() => {
                         setLoading(false);
                     });
         }
@@ -186,7 +186,7 @@ export function PageEditor() {
                 });
     }
 
-    function formValidation(rule: any, value: number): Promise<void> {
+    function formValidation(_rule: any, value: number): Promise<void> {
         if (value > 0 && formList.filter(form => form.id === value).length > 0) {
             return Promise.resolve();
         }

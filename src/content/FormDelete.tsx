@@ -1,11 +1,10 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { ActionResult, SubmitResult } from "../models";
-import { FormVO, PageVO } from "../models/Responses";
-import { SubmitResultHandler } from "../main";
-import { Button, Spin } from "antd";
-import { formAPI, pageAPI } from "../services";
-import { validateParamId } from "../tools";
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {ActionResult, type FormVO, type PageVO, type SubmitResult} from "../models";
+import {SubmitResultHandler} from "../main";
+import {Button, Spin} from "antd";
+import {formAPI, pageAPI} from "../services";
+import {validateParamId} from "../tools";
 
 export function FormDelete() {
     const {paramId} = useParams();

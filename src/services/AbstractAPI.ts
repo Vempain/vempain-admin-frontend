@@ -1,6 +1,5 @@
-import Axios, {AxiosInstance} from "axios";
-import {ActionVO, JwtResponse, PageableResponse} from "../models/Responses";
-import {PublishItemRequest} from "../models/Requests/PublishItemRequest";
+import Axios, {type AxiosInstance} from "axios";
+import type {ActionVO, JwtResponse, PageableResponse, PublishItemRequest} from "../models";
 
 export abstract class AbstractAPI<REQUEST, RESPONSE> {
     protected axiosInstance: AxiosInstance;

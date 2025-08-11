@@ -1,11 +1,10 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { SubmitResultHandler } from "../main";
-import { ActionResult, SubmitResult } from "../models";
-import { ComponentVO, FormVO, PageVO } from "../models/Responses";
-import { componentAPI, formAPI, pageAPI } from "../services";
-import { Button, Spin } from "antd";
-import { validateParamId } from "../tools";
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {SubmitResultHandler} from "../main";
+import {ActionResult, type ComponentVO, type FormVO, type PageVO, type SubmitResult} from "../models";
+import {componentAPI, formAPI, pageAPI} from "../services";
+import {Button, Spin} from "antd";
+import {validateParamId} from "../tools";
 
 export function ComponentDelete() {
     const {paramId} = useParams();

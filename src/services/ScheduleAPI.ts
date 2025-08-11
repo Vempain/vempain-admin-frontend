@@ -1,9 +1,12 @@
-import Axios, {AxiosInstance} from "axios";
-import {JwtResponse, PublishScheduleResponse} from "../models/Responses";
-import {ScheduleTriggerRequest} from "../models/Requests/ScheduleTriggerRequest";
-import {ScheduleTriggerResponse} from "../models/Responses/ScheduleTriggerResponse";
-import {FileImportScheduleResponse} from "../models/Responses/FileImportScheduleResponse";
-import {PublishScheduleRequest} from "../models/Requests/PublishScheduleRequest";
+import Axios, {type AxiosInstance} from "axios";
+import type {
+    FileImportScheduleResponse,
+    JwtResponse,
+    PublishScheduleRequest,
+    PublishScheduleResponse,
+    ScheduleTriggerRequest,
+    ScheduleTriggerResponse
+} from "../models";
 
 class ScheduleAPI {
     protected axiosInstance: AxiosInstance;

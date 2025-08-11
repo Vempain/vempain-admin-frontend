@@ -1,5 +1,5 @@
 import {AbstractAPI} from "./AbstractAPI";
-import {LayoutVO} from "../models/Responses";
+import type {LayoutVO} from "../models";
 
 class LayoutAPI extends AbstractAPI<LayoutVO, LayoutVO> {
 }

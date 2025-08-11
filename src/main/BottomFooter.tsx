@@ -1,6 +1,5 @@
-import React from "react";
-import { Footer } from "antd/es/layout/layout";
-import { BuildInfo } from "../models";
+import {Footer} from "antd/es/layout/layout";
+import type {BuildInfo} from "../models";
 import BuildInfoData from "../buildInfo.json";
 
 function BottomFooter() {

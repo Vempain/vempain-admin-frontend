@@ -1,9 +1,8 @@
-import { Alert, Button, Checkbox, Form, Input, Space, Spin } from "antd";
-import { useState } from "react";
-import { useSession } from "../session";
-import { NavigateFunction, useNavigate } from "react-router-dom";
-import { LoginRequest } from "../models/Requests";
-import { ActionResult, ActionResultEnum, LoginStatus, SubmitResult } from "../models";
+import {Alert, Button, Checkbox, Form, Input, Space, Spin} from "antd";
+import {useState} from "react";
+import {useSession} from "../session";
+import {type NavigateFunction, useNavigate} from "react-router-dom";
+import {ActionResult, ActionResultEnum, type LoginRequest, type LoginStatus, type SubmitResult} from "../models";
 
 function Login() {
     type FieldType = {

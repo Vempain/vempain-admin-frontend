@@ -1,8 +1,8 @@
-import { DocumentFileVO } from "../models/Responses/Files";
-import { documentFileAPI } from "../services/Files";
-import { GenericFileList } from "./GenericFileList";
-import type { ColumnsType } from "antd/es/table";
-import { formatDateTimeWithMs } from "../tools";
+import type {DocumentFileVO} from "../models";
+import {documentFileAPI} from "../services";
+import {GenericFileList} from "./GenericFileList";
+import type {ColumnsType} from "antd/es/table";
+import {formatDateTimeWithMs} from "../tools";
 
 export function DocumentList() {
     const documentFileColumns: ColumnsType<DocumentFileVO> = [

@@ -12,3 +12,6 @@ export {ActionResultEnum} from './ActionResultEnum';
 export {PrivilegeEnum} from './PrivilegeEnum';
 export {PublishStatusEnum} from './PublishStatusEnum';
 export {QueryDetailEnum} from './QueryDetailEnum';
+
+export * from './Requests';
+export * from './Responses';

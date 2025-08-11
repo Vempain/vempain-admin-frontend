@@ -1,15 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { useSession } from "../session";
-import { GalleryVO } from "../models/Responses/Files";
-import { fileSystemAPI, galleryAPI } from "../services/Files";
-import { ColumnsType } from "antd/lib/table";
-import { Button, Space, Spin, Table, TablePaginationConfig } from "antd";
-import { aclTool, getPaginationConfig } from "../tools";
-import { ActionResult, PrivilegeEnum, QueryDetailEnum, SubmitResult } from "../models";
-import { Link } from "react-router-dom";
-import { PlusCircleFilled } from "@ant-design/icons";
-import { SubmitResultHandler } from "../main";
-import { PublishSchedule } from "../content";
+import {useEffect, useState} from "react";
+import {useSession} from "../session";
+import {ActionResult, type GalleryVO, PrivilegeEnum, QueryDetailEnum, type SubmitResult} from "../models";
+import {fileSystemAPI, galleryAPI} from "../services";
+import type {ColumnsType} from "antd/lib/table";
+import {Button, Space, Spin, Table, type TablePaginationConfig} from "antd";
+import {aclTool, getPaginationConfig} from "../tools";
+import {Link} from "react-router-dom";
+import {PlusCircleFilled} from "@ant-design/icons";
+import {SubmitResultHandler} from "../main";
+import {PublishSchedule} from "../content";
 import dayjs from "dayjs";
 
 interface GalleryListItem {
@@ -170,7 +169,7 @@ export function GalleryList() {
                                 setLoading(false);
                             })
                 })
-                .catch((error) => {
+                .catch((_error) => {
                     console.error("Error publishing all galleries");
                 })
                 .finally(() => {

@@ -1,9 +1,9 @@
-import { Button, Spin, Table, Tag } from "antd";
-import { useEffect, useState } from "react";
-import { PublishScheduleResponse } from "../models/Responses";
-import { ColumnsType } from "antd/lib/table";
-import { scheduleAPI } from "../services";
-import { ContentTypeEnum } from "../models/ContentTypeEnum";
+import {Button, Spin, Table, Tag} from "antd";
+import {useEffect, useState} from "react";
+import type {PublishScheduleResponse} from "../models";
+import type {ColumnsType} from "antd/lib/table";
+import {scheduleAPI} from "../services";
+import {ContentTypeEnum} from "../models/ContentTypeEnum";
 
 function ItemPublishingList() {
     const [loading, setLoading] = useState<boolean>(true);
@@ -42,8 +42,8 @@ function ItemPublishingList() {
             key: "publish_type",
             sorter: (a, b) => a.publish_type.localeCompare(b.publish_type),
             render: (_: any, response: PublishScheduleResponse) => {
-                let color = "";
-                let typeLabel: string = "";
+                let color: string;
+                let typeLabel: string;
 
                 switch (response.publish_type) {
                     case ContentTypeEnum.GALLERY:

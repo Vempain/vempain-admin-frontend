@@ -1,4 +1,4 @@
-import {DocumentFileVO} from "../../models/Responses/Files";
+import type {DocumentFileVO} from "../../models";
 import {AbstractAPI} from "../AbstractAPI";
 
 class DocumentFileAPI extends AbstractAPI<DocumentFileVO, DocumentFileVO> {

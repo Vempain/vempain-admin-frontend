@@ -1,5 +1,5 @@
 import {AbstractAPI} from "./AbstractAPI";
-import {UserVO} from "../models/Responses";
+import type {UserVO} from "../models";
 
 class UserAPI extends AbstractAPI<UserVO, UserVO> {
 }

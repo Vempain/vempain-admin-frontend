@@ -1,17 +1,15 @@
-import { useParams } from "react-router-dom";
-import React, { useEffect, useState } from "react";
-import { validateParamId } from "../tools";
-import { ActionResult, SubmitResult } from "../models";
-import { galleryAPI } from "../services/Files";
-import { GalleryVO } from "../models/Responses/Files";
-import { Button, Divider, Input, Space, Spin } from "antd";
+import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {validateParamId} from "../tools";
+import {ActionResult, type GalleryVO, type PublishItemRequest, type SubmitResult} from "../models";
+import {galleryAPI} from "../services";
+import {Button, Divider, Input, Space, Spin} from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { SubmitResultHandler } from "../main";
-import { CommonFileCard } from "./CommonFileCard";
-import { LoadingOutlined } from "@ant-design/icons";
-import { PublishItemRequest } from "../models/Requests/PublishItemRequest";
-import dayjs, { Dayjs } from "dayjs";
-import { PublishSchedule } from "../content";
+import {SubmitResultHandler} from "../main";
+import {CommonFileCard} from "./CommonFileCard";
+import {LoadingOutlined} from "@ant-design/icons";
+import dayjs, {Dayjs} from "dayjs";
+import {PublishSchedule} from "../content";
 
 
 export function GalleryPublish() {

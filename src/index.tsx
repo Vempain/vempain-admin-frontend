@@ -3,8 +3,9 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { BrowserRouter } from "react-router-dom";
-import { SessionProvider } from "./session";
+import {BrowserRouter} from "react-router-dom";
+import {SessionProvider} from "./session";
+import '@ant-design/v5-patch-for-react-19';
 
 const root = ReactDOM.createRoot(
         document.getElementById("root") as HTMLElement

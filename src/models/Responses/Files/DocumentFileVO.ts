@@ -1,5 +1,5 @@
-import CommonFileVO from "./CommonFileVO";
-import {AbstractFileVO} from "./AbstractFileVO";
+import type {CommonFileVO} from "./CommonFileVO";
+import type {AbstractFileVO} from "./AbstractFileVO";
 
 export interface DocumentFileVO extends AbstractFileVO {
     common: CommonFileVO;

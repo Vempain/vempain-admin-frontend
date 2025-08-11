@@ -1,5 +1,5 @@
 import {AbstractAPI} from "./AbstractAPI";
-import {PageVO} from "../models/Responses";
+import type {PageVO} from "../models";
 
 class PageAPI extends AbstractAPI<PageVO, PageVO> {
     public async findPagesByFormId(formId: number): Promise<PageVO[]> {

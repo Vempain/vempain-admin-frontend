@@ -1,6 +1,6 @@
-import { useSession } from "../session";
-import { NavigateFunction, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import {useSession} from "../session";
+import {type NavigateFunction, useNavigate} from "react-router-dom";
+import {useEffect} from "react";
 
 function Logout() {
     const {logoutUser} = useSession();

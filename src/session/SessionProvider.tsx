@@ -1,6 +1,5 @@
-import React, {createContext, useContext, useEffect, useState} from "react";
-import {ActionResultEnum, LoginStatus, LoginVO} from "../models";
-import {LoginRequest} from "../models/Requests";
+import {createContext, useContext, useEffect, useState} from "react";
+import {ActionResultEnum, type LoginRequest, type LoginStatus, type LoginVO} from "../models";
 import {authAPI} from "../services";
 
 // Define the type for the session context
@@ -37,7 +36,7 @@ export function SessionProvider({children}: any) {
                         message: "Login successful"
                     };
                 })
-                .catch((error) => {
+                .catch((_error) => {
                     return {
                         status: ActionResultEnum.FAILURE,
                         message: "Failed to log on user"

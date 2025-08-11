@@ -1,15 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Button, Input, InputRef, Space, Spin, Table, TableColumnType, TablePaginationConfig } from "antd";
-import { ColumnsType } from "antd/lib/table";
-import { Link } from "react-router-dom";
-import { PlusCircleFilled, SearchOutlined } from "@ant-design/icons";
-import { QueryDetailEnum } from "../models";
-import { PageVO } from "../models/Responses";
-import { pageAPI } from "../services";
+import {useEffect, useRef, useState} from "react";
+import {Button, Input, type InputRef, Space, Spin, Table, type TableColumnType, type TablePaginationConfig} from "antd";
+import type {ColumnsType} from "antd/lib/table";
+import {Link} from "react-router-dom";
+import {PlusCircleFilled, SearchOutlined} from "@ant-design/icons";
+import {type PageVO, QueryDetailEnum} from "../models";
+import {pageAPI} from "../services";
 import dayjs from "dayjs";
-import { getPaginationConfig } from "../tools";
-import { FilterDropdownProps } from "antd/es/table/interface";
-import { PublishSchedule } from "./PublishSchedule";
+import {getPaginationConfig} from "../tools";
+import type {FilterDropdownProps} from "antd/es/table/interface";
+import {PublishSchedule} from "./PublishSchedule";
 
 // Define a hash containing the spin messages
 const spinMessages: Record<string, string> = {
@@ -305,7 +304,7 @@ export function PageList() {
                                 setLoading(false);
                             });
                 })
-                .catch((error) => {
+                .catch((_error) => {
                     console.error("Error publishing all pages");
                 })
                 .finally(() => {

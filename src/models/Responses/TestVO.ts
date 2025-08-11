@@ -1,4 +1,4 @@
-import {AclVO} from "./AclVO";
+import type {AclVO} from "./AclVO";
 
 export interface TestVO {
     id: number;

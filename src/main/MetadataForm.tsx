@@ -1,5 +1,4 @@
-import { Col, Divider, Row } from "antd";
-import React from "react";
+import {Col, Divider, Row} from "antd";
 import dayjs from "dayjs";
 
 interface Metadata {

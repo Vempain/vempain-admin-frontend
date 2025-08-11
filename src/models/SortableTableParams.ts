@@ -1,5 +1,5 @@
-import {TablePaginationConfig} from "antd";
-import {FilterValue} from "antd/es/table/interface";
+import type {TablePaginationConfig} from "antd";
+import type {FilterValue} from "antd/es/table/interface";
 
 export interface SortableTableParams {
     pagination: TablePaginationConfig;

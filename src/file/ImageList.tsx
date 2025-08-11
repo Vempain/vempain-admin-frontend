@@ -1,8 +1,8 @@
-import { imageFileAPI } from "../services/Files";
-import { ImageFileVO } from "../models/Responses/Files";
-import type { ColumnsType } from "antd/es/table";
-import { formatDateTimeWithMs } from "../tools";
-import { GenericFileList } from "./GenericFileList";
+import {imageFileAPI} from "../services";
+import type {ImageFileVO} from "../models";
+import type {ColumnsType} from "antd/es/table";
+import {formatDateTimeWithMs} from "../tools";
+import {GenericFileList} from "./GenericFileList";
 
 export function ImageList() {
     const imageFileColumns: ColumnsType<ImageFileVO> = [

@@ -1,4 +1,4 @@
-import {BaseRequest} from "./BaseRequest";
+import type {BaseRequest} from "./BaseRequest";
 
 export interface GalleryRequest extends BaseRequest {
     short_name: string;

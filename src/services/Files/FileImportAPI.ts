@@ -1,6 +1,4 @@
-import {GalleryVO, ImportResponseVO} from "../../models/Responses/Files";
-import {AddDirectoryRequest} from "../../models/Requests";
-import {StringListVO} from "../../models/Responses";
+import type {AddDirectoryRequest, GalleryVO, ImportResponseVO, StringListVO} from "../../models";
 import {AbstractAPI} from "../AbstractAPI";
 
 class FileImportAPI extends AbstractAPI<GalleryVO, GalleryVO> {

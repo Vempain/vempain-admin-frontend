@@ -1,8 +1,8 @@
-import { documentFileAPI } from "../services/Files";
-import { VideoFileVO } from "../models/Responses/Files";
-import type { ColumnsType } from "antd/es/table";
-import { formatDateTimeWithMs } from "../tools";
-import { GenericFileList } from "./GenericFileList";
+import {documentFileAPI} from "../services";
+import type {VideoFileVO} from "../models";
+import type {ColumnsType} from "antd/es/table";
+import {formatDateTimeWithMs} from "../tools";
+import {GenericFileList} from "./GenericFileList";
 
 export function VideoList() {
     const videoFileColumns: ColumnsType<VideoFileVO> = [
