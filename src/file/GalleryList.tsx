@@ -119,7 +119,7 @@ export function GalleryList() {
                 modifyPrivilege: aclTool.hasPrivilege(PrivilegeEnum.MODIFY, userSession?.id, userSession?.units, gallery.acls),
                 deletePrivilege: aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, gallery.acls),
             });
-         console.log("Gallery acl:", gallery.acls);
+            console.log("Gallery acl:", gallery.acls);
         }
 
         console.log("Gallery list:", tmpGalleryList);
@@ -228,7 +228,7 @@ export function GalleryList() {
                                     key={"refreshAllButton"}
                             >Refresh all gallery files</Button>
                         </Space>
-                        <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate} />
+                        <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
 
                         {galleryList.length > 0 && <Table
                                 dataSource={galleryList}

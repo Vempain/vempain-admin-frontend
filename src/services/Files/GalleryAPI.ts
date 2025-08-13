@@ -21,6 +21,7 @@ class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryVO> {
         const response = await this.axiosInstance.patch<ActionVO>("/publish", request);
         return response.data;
     }
+
     public async publishAll(params?: Record<string, any>): Promise<ActionVO> {
         this.setAuthorizationHeader();
         const response = await this.axiosInstance.get<ActionVO>("/publish", {params: params});

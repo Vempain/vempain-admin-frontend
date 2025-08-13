@@ -37,6 +37,7 @@ export function ComponentEditor() {
             componentAPI.findById(tmpComponentId, null)
                     .then((response) => {
                         setComponent(response);
+                        setAcls(response.acls);
                     })
                     .catch((error) => {
                         console.error("Error fetching:", error);
@@ -60,10 +61,6 @@ export function ComponentEditor() {
             setLoading(false);
         }
     }, [paramId]);
-
-    const handleAclsChange = (updatedAcls: AclVO[]) => {
-        setAcls(updatedAcls);
-    };
 
     function onFinish(values: ComponentVO): void {
         console.debug("onFinish", values);
@@ -139,7 +136,7 @@ export function ComponentEditor() {
                                    key={"component-acl-list"}
                                    label={"Access control"}
                         >
-                            <AclEdit acls={acls} onChange={handleAclsChange} parentForm={componentForm}/>
+                            <AclEdit acls={acls} parentForm={componentForm}/>
                         </Form.Item>
                         <Form.Item label={" "} colon={false} key={"page-metadata"}>
                             <MetadataForm metadata={{

@@ -81,13 +81,11 @@ export function PageEditor() {
                                 .then((response) => {
                                     setPage(response);
                                     setPageTitle(response.title);
-                                    setLoading(false);
+                                    setAcls(response.acls);
                                 })
                                 .catch((error) => {
                                     console.error("Error fetching:", error);
                                     setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the page, try again later"});
-                                    setLoading(false);
-
                                 });
                     } else {
                         setPage({
@@ -118,10 +116,6 @@ export function PageEditor() {
                     setLoading(false);
                 });
     }, [paramId]);
-
-    const handleAclsChange = (updatedAcls: AclVO[]) => {
-        setAcls(updatedAcls);
-    };
 
     function onFinish(values: PageVO): void {
         console.debug("onFinish", values);
@@ -289,7 +283,7 @@ export function PageEditor() {
                         <Form.Item key={"page-acl-list"}
                                    label={"Access control"}
                         >
-                            <AclEdit acls={acls} onChange={handleAclsChange} parentForm={pageForm}/>
+                            <AclEdit acls={acls} parentForm={pageForm}/>
                         </Form.Item>
                         <Form.Item label={" "} colon={false} key={"page-metadata"}>
                             <MetadataForm metadata={{creator: page.creator, created: page.created, modifier: page.modifier, modified: page.modified}}/>

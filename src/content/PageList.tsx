@@ -326,7 +326,7 @@ export function PageList() {
                     <Space direction={"vertical"} size={"large"} key={"pageListSpace"}>
                         <h1 key={"pageListHeader"}>Page List <Link to={"/pages/0/edit"}><PlusCircleFilled/></Link></h1>
                         <Button type={"primary"} onClick={publishAll}>Publish all pages</Button>
-                        <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate} />
+                        <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
                         {pageList.length > 0 && <Table
                                 dataSource={pageList.map((item, index) => ({...item, key: `row_${index}`}))}
                                 columns={columns}

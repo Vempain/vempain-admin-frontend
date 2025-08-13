@@ -6,11 +6,10 @@ import type {AclVO, UnitVO, UserVO} from "@vempain/vempain-auth-frontend";
 
 interface AclEditProps {
     acls: AclVO[];
-    onChange: (updatedAcls: AclVO[]) => void;
     parentForm: any;
 }
 
-export function AclEdit({acls, onChange, parentForm}: AclEditProps) {
+export function AclEdit({acls, parentForm}: AclEditProps) {
     const [aclForm] = Form.useForm();
     const [userList, setUserList] = useState<UserVO[]>([]);
     const [unitList, setUnitList] = useState<UnitVO[]>([]);

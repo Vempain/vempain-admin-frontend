@@ -107,10 +107,6 @@ export function GalleryEdit() {
         }
     }
 
-    function handleAclsChange(updatedAcls: AclVO[]) {
-        setAcls(updatedAcls);
-    }
-
     function filterOption(input: string, option?: { label: string; value: number }) {
         if (option && option.label) {
             return option.label.toLowerCase().includes(input.toLowerCase());
@@ -223,7 +219,7 @@ export function GalleryEdit() {
                         <Form.Item key={"gallery-acl-list"}
                                    label={"Access control"}
                         >
-                            <AclEdit acls={acls} onChange={handleAclsChange} parentForm={galleryForm}/>
+                            <AclEdit acls={acls} parentForm={galleryForm}/>
                         </Form.Item>
                         <Space direction={"horizontal"} size={12} style={{width: "100%", justifyContent: "center"}}>
                             <Button

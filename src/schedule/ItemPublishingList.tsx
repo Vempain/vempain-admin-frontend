@@ -126,4 +126,4 @@ function ItemPublishingList() {
     );
 }
 
-export { ItemPublishingList };
+export {ItemPublishingList};

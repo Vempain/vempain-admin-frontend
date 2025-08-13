@@ -107,8 +107,10 @@ export function GalleryPublish() {
                                       autoSize={true}
                             />
                             <Divider orientation={"left"}>Publish message</Divider>
-                            <TextArea key={"publishMessage"} onChange={(event) => {setPublishMessage(event.target.value);}}/>
-                            <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate} />
+                            <TextArea key={"publishMessage"} onChange={(event) => {
+                                setPublishMessage(event.target.value);
+                            }}/>
+                            <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
                             <Button key={"publishButton-top"} type={"primary"} onClick={publishGallery}>Publish gallery</Button>
                             {
                                     gallery.common_files.length > 0 &&

@@ -38,4 +38,4 @@ function MetadataForm({metadata}: MetadataFormProps) {
     );
 }
 
-export { MetadataForm };
+export {MetadataForm};

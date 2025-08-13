@@ -60,11 +60,14 @@ export function UserEditor() {
             userAPI.findById(tmpUserId, null)
                     .then((response) => {
                         setUser(response);
-                        setLoading(false);
+                        setAcls(response.acls);
                     })
                     .catch((error) => {
                         console.error("Error fetching:", error);
                         setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the user, try again later"});
+                    })
+                    .finally(() => {
+                        setLoading(false);
                     });
         } else {
             setUser(emptyUser);
@@ -72,10 +75,6 @@ export function UserEditor() {
         }
 
     }, [paramId]);
-
-    const handleAclsChange = (updatedAcls: AclVO[]) => {
-        setAcls(updatedAcls);
-    };
 
     function onFinish(values: UserVO): void {
         for (let i = 0; i < values.acls.length; i++) {
@@ -190,7 +189,7 @@ export function UserEditor() {
                     <Form.Item key={"user-acl-list"}
                                label={"Access control"}
                     >
-                        <AclEdit acls={acls} onChange={handleAclsChange} parentForm={userForm}/>
+                        <AclEdit acls={acls} parentForm={userForm}/>
                     </Form.Item>
                     <Form.Item wrapperCol={{offset: 8, span: 16,}}><Divider orientation={"left"}>Metadata</Divider></Form.Item>
                     <Form.Item name={"creator"} label={"Creator"}>

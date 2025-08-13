@@ -15,4 +15,4 @@ function BottomFooter() {
     );
 }
 
-export { BottomFooter };
+export {BottomFooter};

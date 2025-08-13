@@ -34,4 +34,4 @@ function SubmitResultHandler({submitResult, successTo, failTo}: SubmitResultHand
     }
 }
 
-export { SubmitResultHandler };
+export {SubmitResultHandler};

@@ -55,13 +55,15 @@ export function FormEditor() {
             formAPI.findById(tmpFormId, null)
                     .then((response) => {
                         setForm(response);
-                        setLoading(false);
+                        setAcls(response.acls);
+
                     })
                     .catch((error) => {
                         console.error("Error fetching:", error);
                         setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the form, try again later"});
+                    })
+                    .finally(() => {
                         setLoading(false);
-
                     });
         } else {
             setForm({
@@ -79,10 +81,6 @@ export function FormEditor() {
             setLoading(false);
         }
     }, [paramId]);
-
-    const handleAclsChange = (updatedAcls: AclVO[]) => {
-        setAcls(updatedAcls);
-    };
 
     function onFinish(values: FormVO): void {
         setLoading(true);
@@ -226,7 +224,7 @@ export function FormEditor() {
                         <Form.Item key={"form-acl-list"}
                                    label={"Access control"}
                         >
-                            <AclEdit acls={acls} onChange={handleAclsChange} parentForm={formForm}/>
+                            <AclEdit acls={acls} parentForm={formForm}/>
                         </Form.Item>
                         <Form.Item label={" "} colon={false} key={"page-metadata"}>
                             <MetadataForm metadata={{creator: form.creator, created: form.created, modifier: form.modifier, modified: form.modified}}/>

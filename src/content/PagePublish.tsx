@@ -19,7 +19,7 @@ export function PagePublish() {
     const [page, setPage] = useState<PageVO | null>(null);
     const [galleryList, setGalleryList] = useState<GalleryVO[]>([]);
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
-    const [publishDate, setPublishDate] = useState<Dayjs|null>(null);
+    const [publishDate, setPublishDate] = useState<Dayjs | null>(null);
     const [publishMessage, setPublishMessage] = useState<string>("");
 
     const galleryColumns = [
@@ -115,8 +115,10 @@ export function PagePublish() {
                                                               dataSource={galleryList}
                                                               pagination={false}/>}
                             <Divider orientation={"left"}>Publish message</Divider>
-                            <TextArea key={"publishMessage"} onChange={(event) => {setPublishMessage(event.target.value);}}/>
-                            <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate} />
+                            <TextArea key={"publishMessage"} onChange={(event) => {
+                                setPublishMessage(event.target.value);
+                            }}/>
+                            <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
                             <Button key={"publishButton"} type={"primary"} onClick={publishPage}>Publish page</Button>
                         </Space>
                     </div>}
