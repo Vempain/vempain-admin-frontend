@@ -39,7 +39,7 @@ function TopBar() {
     const screens = useBreakpoint();
 
     const menuBarItems: MenuItem[] = [
-        {
+            ...(userSession && [{
             label: "Content Management",
             key: "pageManagement",
             icon: <SnippetsOutlined/>,
@@ -141,7 +141,7 @@ function TopBar() {
                     icon: <UsergroupAddOutlined/>
                 },
             ],
-        },
+        }] || []),
         ...(userSession &&
                 [
                     {
@@ -173,31 +173,6 @@ function TopBar() {
                         icon: <UserOutlined/>
                     }
                 ])
-    ];
-
-    const userMenuItems: MenuProps["items"] = [
-        {
-            label: "Profile",
-            key: "profile",
-            icon: <InfoCircleOutlined/>,
-            children: [
-                {
-                    label: "Account",
-                    key: "account",
-                    icon: <SettingFilled/>
-                },
-                {
-                    label: "Change Password",
-                    key: "changePassword",
-                    icon: <SwapOutlined/>
-                },
-                {
-                    label: (<Link to={"/logout"}>Log out</Link>),
-                    key: "logout",
-                    icon: <LogoutOutlined/>
-                }
-            ]
-        }
     ];
 
     const onClick: MenuProps["onClick"] = (e) => {
