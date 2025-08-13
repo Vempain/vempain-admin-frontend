@@ -3,9 +3,10 @@ import {useEffect, useState} from "react";
 import {Button, Form, Input, Spin, Switch} from "antd";
 import {MetadataForm, SubmitResultHandler} from "../main";
 import {AclEdit} from "./AclEdit";
-import {type AclVO, ActionResult, type ComponentVO, type SubmitResult} from "../models";
 import {componentAPI} from "../services";
 import {aclTool, validateParamId} from "../tools";
+import {type AclVO, ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import type {ComponentVO} from "../models";
 
 export function ComponentEditor() {
     const {paramId} = useParams<{ paramId: string }>();

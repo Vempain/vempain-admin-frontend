@@ -1,6 +1,5 @@
 import {useEffect, useState} from "react";
-import {useSession} from "../session";
-import {ActionResult, type GalleryVO, PrivilegeEnum, QueryDetailEnum, type SubmitResult} from "../models";
+import {type GalleryVO, QueryDetailEnum} from "../models";
 import {fileSystemAPI, galleryAPI} from "../services";
 import type {ColumnsType} from "antd/lib/table";
 import {Button, Space, Spin, Table, type TablePaginationConfig} from "antd";
@@ -10,6 +9,7 @@ import {PlusCircleFilled} from "@ant-design/icons";
 import {SubmitResultHandler} from "../main";
 import {PublishSchedule} from "../content";
 import dayjs from "dayjs";
+import {ActionResult, PrivilegeEnum, type SubmitResult, useSession} from "@vempain/vempain-auth-frontend";
 
 interface GalleryListItem {
     id: number;

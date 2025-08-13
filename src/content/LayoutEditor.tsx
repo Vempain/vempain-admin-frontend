@@ -3,9 +3,10 @@ import {Button, Form, Input, Spin, Switch} from "antd";
 import {useParams} from "react-router-dom";
 import {AclEdit} from "./AclEdit";
 import {MetadataForm, SubmitResultHandler} from "../main";
-import {type AclVO, ActionResult, type LayoutVO, type SubmitResult} from "../models";
 import {layoutAPI} from "../services";
 import {aclTool, validateParamId} from "../tools";
+import {type AclVO, ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import type {LayoutVO} from "../models";
 
 export function LayoutEditor() {
     const {paramId} = useParams();

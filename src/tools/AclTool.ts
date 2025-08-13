@@ -1,4 +1,4 @@
-import {type AclVO, PrivilegeEnum, type UnitVO} from "../models";
+import {type AclVO, PrivilegeEnum, type UnitVO} from "@vempain/vempain-auth-frontend";
 
 class AclTool {
     public static validateAcl(item: AclVO): boolean {

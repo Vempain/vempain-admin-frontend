@@ -3,8 +3,9 @@ import {Button, Checkbox, Col, Form, Input, Row, Select, Spin, TreeSelect} from 
 import {fileImportAPI, fileSystemAPI, formAPI} from "../services";
 import TextArea from "antd/es/input/TextArea";
 import {SubmitResultHandler} from "../main";
-import {ActionResult, type DirectoryNodeResponse, QueryDetailEnum, type SubmitResult} from "../models";
+import {type DirectoryNodeResponse, QueryDetailEnum} from "../models";
 import {FileImageOutlined, LoadingOutlined} from "@ant-design/icons";
+import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
 
 interface FileImportFormProps {
     source_directory: string;

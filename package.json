@@ -26,6 +26,7 @@
     "@types/dompurify": "^3.2.0",
     "@types/node": "^22.13.5",
     "@types/react-highlight-words": "^0.20.0",
+    "@vempain/vempain-auth-frontend": "^0.9.3",
     "@vitejs/plugin-react": "^5.0.0",
     "antd": "^5.27.0",
     "axios": "^1.7.9",
@@ -88,6 +89,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Vempain/vempain-admin-frontend.git"
+    "url": "git+https://github.com/Vempain/vempain-auth-frontend.git"
   }
 }

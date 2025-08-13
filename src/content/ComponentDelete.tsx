@@ -1,10 +1,11 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {SubmitResultHandler} from "../main";
-import {ActionResult, type ComponentVO, type FormVO, type PageVO, type SubmitResult} from "../models";
+import {type ComponentVO, type FormVO, type PageVO} from "../models";
 import {componentAPI, formAPI, pageAPI} from "../services";
 import {Button, Spin} from "antd";
 import {validateParamId} from "../tools";
+import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
 
 export function ComponentDelete() {
     const {paramId} = useParams();

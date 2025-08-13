@@ -3,9 +3,9 @@ import {Button, Spin, Table, type TablePaginationConfig} from "antd";
 import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {PlusCircleFilled} from "@ant-design/icons";
-import type {UserVO} from "../models";
 import {userAPI} from "../services";
 import {getPaginationConfig} from "../tools";
+import type {UserVO} from "@vempain/vempain-auth-frontend";
 
 export function UserList() {
     const [loading, setLoading] = useState<boolean>(false);

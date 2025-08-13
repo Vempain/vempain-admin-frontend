@@ -1,7 +1,7 @@
 import {ConfigProvider, Layout, theme} from "antd";
 import {Navigate, Route, Routes} from "react-router-dom";
 import "./App.css";
-import {BottomFooter, Home, Login, Logout, TopBar} from "./main";
+import {BottomFooter, Home, TopBar} from "./main";
 import {
     ComponentDelete,
     ComponentEditor,
@@ -20,6 +20,7 @@ import {UnitEditor, UnitList, UserEditor, UserList} from "./user";
 import {LayoutDelete} from "./content/LayoutDelete";
 import {AudioList, DocumentList, FileImport, GalleryDelete, GalleryEdit, GalleryList, GalleryPublish, GalleryRefresh, ImageList, VideoList} from "./file";
 import {FileImportScheduleList, FileImportScheduleTrigger, ItemPublishingList, ItemPublishTrigger, SystemScheduleList, SystemScheduleTrigger} from "./schedule";
+import {Login, Logout} from "@vempain/vempain-auth-frontend";
 
 const {Content} = Layout;
 

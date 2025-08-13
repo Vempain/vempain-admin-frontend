@@ -4,10 +4,11 @@ import {Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
 import {AclEdit} from "./AclEdit";
 import TextArea from "antd/es/input/TextArea";
 import {MetadataForm, SubmitResultHandler} from "../main";
-import {type AclVO, ActionResult, type FormVO, type PageVO, QueryDetailEnum, type SubmitResult} from "../models";
 import {formAPI, galleryAPI, pageAPI} from "../services";
 import {aclTool, validateParamId} from "../tools";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-design/icons";
+import {type AclVO, ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import {type FormVO, type PageVO, QueryDetailEnum} from "../models";
 
 // Define the loading messages
 const spinMessages: Record<string, string> = {

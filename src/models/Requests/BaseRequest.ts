@@ -1,4 +1,4 @@
-import type {AclVO} from "../Responses";
+import type {AclVO} from "@vempain/vempain-auth-frontend";
 
 export interface BaseRequest {
     id: number;

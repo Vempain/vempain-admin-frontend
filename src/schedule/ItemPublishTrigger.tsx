@@ -4,10 +4,11 @@ import {validateParamId} from "../tools";
 import {scheduleAPI} from "../services";
 import {Button, DatePicker, Space, Spin, Table} from "antd";
 import type {PublishScheduleRequest} from "../models";
-import {ActionResult, type PublishScheduleResponse, type SubmitResult} from "../models";
+import {type PublishScheduleResponse} from "../models";
 import type {ColumnsType} from "antd/lib/table";
 import dayjs, {Dayjs} from "dayjs";
 import {SubmitResultHandler} from "../main";
+import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
 
 // Define the loading messages
 const spinMessages: Record<string, string> = {

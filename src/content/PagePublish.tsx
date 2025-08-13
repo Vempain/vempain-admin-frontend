@@ -2,13 +2,14 @@ import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {validateParamId} from "../tools";
 import type {GalleryVO, PublishItemRequest} from "../models";
-import {ActionResult, type PageVO, QueryDetailEnum, type SubmitResult} from "../models";
+import {type PageVO, QueryDetailEnum} from "../models";
 import {galleryAPI, pageAPI} from "../services";
 import {Button, Divider, Space, Spin, Table} from "antd";
 import {SubmitResultHandler} from "../main";
 import TextArea from "antd/es/input/TextArea";
 import dayjs, {Dayjs} from "dayjs";
 import {PublishSchedule} from "./PublishSchedule";
+import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
 
 export function PagePublish() {
     const {paramId} = useParams();

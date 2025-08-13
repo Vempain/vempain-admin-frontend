@@ -1,7 +1,7 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {validateParamId} from "../tools";
-import {ActionResult, type GalleryVO, type PublishItemRequest, type SubmitResult} from "../models";
+import {type GalleryVO, type PublishItemRequest} from "../models";
 import {galleryAPI} from "../services";
 import {Button, Divider, Input, Space, Spin} from "antd";
 import TextArea from "antd/es/input/TextArea";
@@ -10,6 +10,7 @@ import {CommonFileCard} from "./CommonFileCard";
 import {LoadingOutlined} from "@ant-design/icons";
 import dayjs, {Dayjs} from "dayjs";
 import {PublishSchedule} from "../content";
+import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
 
 
 export function GalleryPublish() {

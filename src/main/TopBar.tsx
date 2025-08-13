@@ -25,8 +25,8 @@ import {
     UserOutlined,
     VideoCameraOutlined
 } from "@ant-design/icons";
-import {useSession} from "../session";
 import {Link, NavLink} from "react-router-dom";
+import {useSession} from "@vempain/vempain-auth-frontend";
 
 const {Header} = Layout;
 const {useBreakpoint} = Grid;
