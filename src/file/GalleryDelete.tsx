@@ -1,13 +1,13 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {formatDateTimeWithMs, validateParamId} from "../tools";
+import {formatDateTimeWithMs} from "../tools";
 import type {CommonFileVO} from "../models";
 import {type GalleryVO} from "../models";
 import {SubmitResultHandler} from "../main";
 import {galleryAPI} from "../services";
 import {Button, Spin, Table} from "antd";
 import type {ColumnsType} from "antd/es/table";
-import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 
 export function GalleryDelete() {
     const {paramId} = useParams();

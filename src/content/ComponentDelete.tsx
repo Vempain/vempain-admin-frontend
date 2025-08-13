@@ -4,8 +4,7 @@ import {SubmitResultHandler} from "../main";
 import {type ComponentVO, type FormVO, type PageVO} from "../models";
 import {componentAPI, formAPI, pageAPI} from "../services";
 import {Button, Spin} from "antd";
-import {validateParamId} from "../tools";
-import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 
 export function ComponentDelete() {
     const {paramId} = useParams();

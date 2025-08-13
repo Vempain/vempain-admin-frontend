@@ -3,8 +3,7 @@ import {useEffect, useState} from "react";
 import {SubmitResultHandler} from "../main";
 import {Button, Spin} from "antd";
 import {formAPI, pageAPI} from "../services";
-import {validateParamId} from "../tools";
-import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 import type {FormVO, PageVO} from "../models";
 
 export function FormDelete() {

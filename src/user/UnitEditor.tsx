@@ -4,8 +4,7 @@ import {Button, Divider, Form, Input, Spin} from "antd";
 import {SubmitResultHandler} from "../main";
 import {AclEdit} from "../content";
 import {unitAPI} from "../services";
-import {aclTool, validateParamId} from "../tools";
-import {type AclVO, ActionResult, type SubmitResult, type UnitVO} from "@vempain/vempain-auth-frontend";
+import {aclTool, type AclVO, ActionResult, type SubmitResult, type UnitVO, validateParamId} from "@vempain/vempain-auth-frontend";
 
 export function UnitEditor() {
     const {paramId} = useParams();

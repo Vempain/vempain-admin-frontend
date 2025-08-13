@@ -1,13 +1,12 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {aclTool, validateParamId} from "../tools";
 import {SubmitResultHandler} from "../main";
 import {Button, Col, Form, Input, Row, Select, Space, Spin} from "antd";
 import {commonFileAPI, galleryAPI} from "../services";
 import {AclEdit} from "../content";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {type GalleryRequest, QueryDetailEnum} from "../models";
-import {type AclVO, ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 
 export function GalleryEdit() {
     const {paramId} = useParams();

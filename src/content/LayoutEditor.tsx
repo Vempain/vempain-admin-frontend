@@ -4,8 +4,7 @@ import {useParams} from "react-router-dom";
 import {AclEdit} from "./AclEdit";
 import {MetadataForm, SubmitResultHandler} from "../main";
 import {layoutAPI} from "../services";
-import {aclTool, validateParamId} from "../tools";
-import {type AclVO, ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 import type {LayoutVO} from "../models";
 
 export function LayoutEditor() {

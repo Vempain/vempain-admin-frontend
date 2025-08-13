@@ -4,9 +4,9 @@ import {Button, Space, Spin, Table, type TablePaginationConfig} from "antd";
 import {PlusCircleFilled} from "@ant-design/icons";
 import {Link} from "react-router-dom";
 import {type ComponentVO} from "../models";
-import {aclTool, getPaginationConfig} from "../tools";
+import {getPaginationConfig} from "../tools";
 import {componentAPI} from "../services";
-import {PrivilegeEnum, useSession} from "@vempain/vempain-auth-frontend";
+import {aclTool, PrivilegeEnum, useSession} from "@vempain/vempain-auth-frontend";
 
 export function ComponentList() {
     const [loading, setLoading] = useState<boolean>(false);

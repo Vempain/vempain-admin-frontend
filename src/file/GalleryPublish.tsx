@@ -1,6 +1,5 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {validateParamId} from "../tools";
 import {type GalleryVO, type PublishItemRequest} from "../models";
 import {galleryAPI} from "../services";
 import {Button, Divider, Input, Space, Spin} from "antd";
@@ -10,8 +9,7 @@ import {CommonFileCard} from "./CommonFileCard";
 import {LoadingOutlined} from "@ant-design/icons";
 import dayjs, {Dayjs} from "dayjs";
 import {PublishSchedule} from "../content";
-import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
-
+import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 
 export function GalleryPublish() {
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});

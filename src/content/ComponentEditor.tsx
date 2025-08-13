@@ -4,8 +4,7 @@ import {Button, Form, Input, Spin, Switch} from "antd";
 import {MetadataForm, SubmitResultHandler} from "../main";
 import {AclEdit} from "./AclEdit";
 import {componentAPI} from "../services";
-import {aclTool, validateParamId} from "../tools";
-import {type AclVO, ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 import type {ComponentVO} from "../models";
 
 export function ComponentEditor() {

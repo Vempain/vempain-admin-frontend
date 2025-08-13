@@ -6,8 +6,7 @@ import {MetadataForm, SubmitResultHandler} from "../main";
 import {AclEdit} from "./AclEdit";
 import {type ComponentVO, type FormVO, type LayoutVO} from "../models";
 import {componentAPI, formAPI, layoutAPI} from "../services";
-import {validateParamId} from "../tools";
-import {type AclVO, ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import {type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 
 export function FormEditor() {
     const {paramId} = useParams();

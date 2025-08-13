@@ -1,10 +1,9 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {validateParamId} from "../tools";
 import {pageAPI} from "../services";
 import {SubmitResultHandler} from "../main";
 import {Button, Spin} from "antd";
-import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 import type {PageVO} from "../models";
 
 export function PageDelete() {

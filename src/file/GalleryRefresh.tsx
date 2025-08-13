@@ -1,13 +1,12 @@
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import {validateParamId} from "../tools";
 import {type GalleryVO} from "../models";
 import {fileSystemAPI, galleryAPI} from "../services";
 import {SubmitResultHandler} from "../main";
 import {LoadingOutlined} from "@ant-design/icons";
 import {Button, Space, Spin} from "antd";
 import {CommonFileCard} from "./CommonFileCard";
-import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 
 export function GalleryRefresh() {
     const {paramId} = useParams();
