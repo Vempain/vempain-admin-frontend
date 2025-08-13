@@ -205,10 +205,13 @@ function TopBar() {
                             overflow: "hidden"
                         }}
                 >
-                    <Tooltip title={"organizationName"}>
-                        <div style={{width: 156, height: 64, marginRight: 20}}>
+                    <Tooltip title={"Vempain Admin"}>
+                        <div style={{width: 60, height: 64, marginRight: 20}}>
                             <NavLink to={"/"}>
-                                Some Logo
+                                <img
+                                        src="/logo192.png"
+                                        alt="Home"
+                                        style={{height: "50px", objectFit: "contain"}}/>
                             </NavLink>
                         </div>
                     </Tooltip>
