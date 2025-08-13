@@ -39,7 +39,7 @@ function TopBar() {
     const screens = useBreakpoint();
 
     const menuBarItems: MenuItem[] = [
-        {
+            ...(userSession && [{
             label: "Content Management",
             key: "pageManagement",
             icon: <SnippetsOutlined/>,
@@ -141,7 +141,7 @@ function TopBar() {
                     icon: <UsergroupAddOutlined/>
                 },
             ],
-        },
+        }] || []),
         ...(userSession &&
                 [
                     {
@@ -175,31 +175,6 @@ function TopBar() {
                 ])
     ];
 
-    const userMenuItems: MenuProps["items"] = [
-        {
-            label: "Profile",
-            key: "profile",
-            icon: <InfoCircleOutlined/>,
-            children: [
-                {
-                    label: "Account",
-                    key: "account",
-                    icon: <SettingFilled/>
-                },
-                {
-                    label: "Change Password",
-                    key: "changePassword",
-                    icon: <SwapOutlined/>
-                },
-                {
-                    label: (<Link to={"/logout"}>Log out</Link>),
-                    key: "logout",
-                    icon: <LogoutOutlined/>
-                }
-            ]
-        }
-    ];
-
     const onClick: MenuProps["onClick"] = (e) => {
         setCurrent(e.key);
     };
@@ -230,10 +205,13 @@ function TopBar() {
                             overflow: "hidden"
                         }}
                 >
-                    <Tooltip title={"organizationName"}>
-                        <div style={{width: 156, height: 64, marginRight: 20}}>
+                    <Tooltip title={"Vempain Admin"}>
+                        <div style={{width: 60, height: 64, marginRight: 20}}>
                             <NavLink to={"/"}>
-                                Some Logo
+                                <img
+                                        src="/logo192.png"
+                                        alt="Home"
+                                        style={{height: "50px", objectFit: "contain"}}/>
                             </NavLink>
                         </div>
                     </Tooltip>
