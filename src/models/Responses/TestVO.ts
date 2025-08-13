@@ -1,4 +1,4 @@
-import type {AclVO} from "./AclVO";
+import type {AclVO} from "@vempain/vempain-auth-frontend";
 
 export interface TestVO {
     id: number;

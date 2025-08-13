@@ -1,5 +1,5 @@
 import {Alert, Button} from "antd";
-import {ActionResult, type SubmitResult} from "../models";
+import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
 
 interface SubmitResultHandlerProps {
     submitResult: SubmitResult,
@@ -34,4 +34,4 @@ function SubmitResultHandler({submitResult, successTo, failTo}: SubmitResultHand
     }
 }
 
-export { SubmitResultHandler };
+export {SubmitResultHandler};

@@ -1,7 +1,6 @@
-import {AbstractAPI} from "./AbstractAPI";
-import type {UserVO} from "../models";
+import {AbstractAPI, type UserVO} from "@vempain/vempain-auth-frontend";
 
 class UserAPI extends AbstractAPI<UserVO, UserVO> {
 }
 
-export const userAPI = new UserAPI("/content-management/users");
+export const userAPI = new UserAPI(import.meta.env.VITE_APP_API_URL, "/content-management/users");

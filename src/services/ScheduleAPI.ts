@@ -1,12 +1,6 @@
 import Axios, {type AxiosInstance} from "axios";
-import type {
-    FileImportScheduleResponse,
-    JwtResponse,
-    PublishScheduleRequest,
-    PublishScheduleResponse,
-    ScheduleTriggerRequest,
-    ScheduleTriggerResponse
-} from "../models";
+import type {FileImportScheduleResponse, PublishScheduleRequest, PublishScheduleResponse, ScheduleTriggerRequest, ScheduleTriggerResponse} from "../models";
+import type {JwtResponse} from "@vempain/vempain-auth-frontend";
 
 class ScheduleAPI {
     protected axiosInstance: AxiosInstance;

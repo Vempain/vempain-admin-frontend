@@ -4,15 +4,15 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import {BrowserRouter} from "react-router-dom";
-import {SessionProvider} from "./session";
 import '@ant-design/v5-patch-for-react-19';
+import {SessionProvider} from "@vempain/vempain-auth-frontend";
 
 const root = ReactDOM.createRoot(
         document.getElementById("root") as HTMLElement
 );
 root.render(
         <React.StrictMode>
-            <SessionProvider>
+            <SessionProvider baseURL={`${import.meta.env.VITE_APP_API_URL}`}>
                 <BrowserRouter>
                     <App/>
                 </BrowserRouter>

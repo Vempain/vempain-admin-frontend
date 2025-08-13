@@ -1,16 +1,15 @@
 import {useEffect, useState} from "react";
 import {Button, Col, Form, Row, Select, Switch} from "antd";
 import {MinusCircleFilled, PlusCircleFilled} from "@ant-design/icons";
-import type {AclVO, UnitVO, UserVO} from "../models";
 import {unitAPI, userAPI} from "../services";
+import type {AclVO, UnitVO, UserVO} from "@vempain/vempain-auth-frontend";
 
 interface AclEditProps {
     acls: AclVO[];
-    onChange: (updatedAcls: AclVO[]) => void;
     parentForm: any;
 }
 
-export function AclEdit({acls, onChange, parentForm}: AclEditProps) {
+export function AclEdit({acls, parentForm}: AclEditProps) {
     const [aclForm] = Form.useForm();
     const [userList, setUserList] = useState<UserVO[]>([]);
     const [unitList, setUnitList] = useState<UnitVO[]>([]);
@@ -86,7 +85,7 @@ export function AclEdit({acls, onChange, parentForm}: AclEditProps) {
                                 <Col span={3}><strong>Delete</strong></Col>
                             </Row>
 
-                            <Form.List name={"acls"} key={"layout-acl-list"}>
+                            <Form.List name={"acls"} key={"layout-acl-list"} initialValue={acls}>
                                 {(acls, {add, remove}) => (
                                         <>
                                             {acls.map((field, index) => (

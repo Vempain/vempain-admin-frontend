@@ -1,6 +1,5 @@
 export {aclAPI} from './AclAPI';
 export {authHeader} from './AuthHeader';
-export {authAPI} from './AuthAPI';
 export {componentAPI} from './ComponentAPI';
 export {formAPI} from './FormAPI';
 export {layoutAPI} from './LayoutAPI';

@@ -1,6 +1,6 @@
 import {Footer} from "antd/es/layout/layout";
-import type {BuildInfo} from "../models";
 import BuildInfoData from "../buildInfo.json";
+import type {BuildInfo} from "@vempain/vempain-auth-frontend";
 
 function BottomFooter() {
     const buildInfo: BuildInfo = BuildInfoData;
@@ -15,4 +15,4 @@ function BottomFooter() {
     );
 }
 
-export { BottomFooter };
+export {BottomFooter};

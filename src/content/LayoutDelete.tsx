@@ -1,10 +1,10 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {ActionResult, type FormVO, type LayoutVO, type PageVO, type SubmitResult} from "../models";
+import {type FormVO, type LayoutVO, type PageVO} from "../models";
 import {SubmitResultHandler} from "../main";
 import {formAPI, layoutAPI, pageAPI} from "../services";
 import {Button, Spin} from "antd";
-import {validateParamId} from "../tools";
+import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 
 export function LayoutDelete() {
     const {paramId} = useParams();

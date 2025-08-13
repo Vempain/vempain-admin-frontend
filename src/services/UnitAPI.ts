@@ -1,7 +1,6 @@
-import {AbstractAPI} from "./AbstractAPI";
-import type {UnitVO} from "../models";
+import {AbstractAPI, type UnitVO} from "@vempain/vempain-auth-frontend";
 
 class UnitAPI extends AbstractAPI<UnitVO, UnitVO> {
 }
 
-export const unitAPI = new UnitAPI("/content-management/units");
+export const unitAPI = new UnitAPI(import.meta.env.VITE_APP_API_URL, "/content-management/units");

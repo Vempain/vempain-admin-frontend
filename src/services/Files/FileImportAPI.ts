@@ -1,5 +1,5 @@
 import type {AddDirectoryRequest, GalleryVO, ImportResponseVO, StringListVO} from "../../models";
-import {AbstractAPI} from "../AbstractAPI";
+import {AbstractAPI} from "@vempain/vempain-auth-frontend";
 
 class FileImportAPI extends AbstractAPI<GalleryVO, GalleryVO> {
     public async importDirectory(
@@ -80,4 +80,4 @@ class FileImportAPI extends AbstractAPI<GalleryVO, GalleryVO> {
     }
 }
 
-export const fileImportAPI = new FileImportAPI("/content-management/file");
+export const fileImportAPI = new FileImportAPI(import.meta.env.VITE_APP_API_URL, "/content-management/file");

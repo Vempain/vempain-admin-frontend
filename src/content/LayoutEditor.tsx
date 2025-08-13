@@ -3,9 +3,9 @@ import {Button, Form, Input, Spin, Switch} from "antd";
 import {useParams} from "react-router-dom";
 import {AclEdit} from "./AclEdit";
 import {MetadataForm, SubmitResultHandler} from "../main";
-import {type AclVO, ActionResult, type LayoutVO, type SubmitResult} from "../models";
 import {layoutAPI} from "../services";
-import {aclTool, validateParamId} from "../tools";
+import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import type {LayoutVO} from "../models";
 
 export function LayoutEditor() {
     const {paramId} = useParams();
@@ -34,13 +34,14 @@ export function LayoutEditor() {
             layoutAPI.findById(tmpLayoutId, null)
                     .then((response) => {
                         setLayout(response);
-                        setLoading(false);
+                        setAcls(response.acls);
                     })
                     .catch((error) => {
                         console.error("Error fetching:", error);
                         setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the layout, try again later"});
+                    })
+                    .finally(() => {
                         setLoading(false);
-
                     });
         } else {
             setLayout({
@@ -57,10 +58,6 @@ export function LayoutEditor() {
             setLoading(false);
         }
     }, [paramId]);
-
-    const handleAclsChange = (updatedAcls: AclVO[]) => {
-        setAcls(updatedAcls);
-    };
 
     function onFinish(values: LayoutVO): void {
         console.debug("onFinish", values);
@@ -135,7 +132,7 @@ export function LayoutEditor() {
                                    key={"layout-acl-list"}
                                    label={"Access control"}
                         >
-                            <AclEdit acls={acls} onChange={handleAclsChange} parentForm={layoutForm}/>
+                            <AclEdit acls={acls} parentForm={layoutForm}/>
                         </Form.Item>
                         <Form.Item label={" "} colon={false} key={"page-metadata"}>
                             <MetadataForm metadata={{creator: layout.creator, created: layout.created, modifier: layout.modifier, modified: layout.modified}}/>

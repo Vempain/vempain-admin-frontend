@@ -1,11 +1,11 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import type {ScheduleTriggerRequest, ScheduleTriggerResponse} from "../models";
-import {ActionResult, type SubmitResult} from "../models";
 import {scheduleAPI} from "../services";
 import {Button, InputNumber, Space, Spin, Table} from "antd";
 import type {ColumnsType} from "antd/lib/table";
 import {SubmitResultHandler} from "../main";
+import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
 
 function SystemScheduleTrigger() {
     const {paramName} = useParams();
@@ -91,7 +91,7 @@ function SystemScheduleTrigger() {
             <div className={"darkBody"} key={"pagePublishDiv"}>
                 <Spin spinning={loading} tip={"Fetching schedule details..."}>
                     <Space direction={"vertical"} size={"large"}>
-                        <h2>System Schedule Trigger</h2>
+                        <h2>System Schedule Trigger: {scheduleName}</h2>
                         {schedule !== null && <>
                             <Table key={"scheduleTable"}
                                    columns={columns}

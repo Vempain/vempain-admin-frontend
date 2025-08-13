@@ -1,5 +1,5 @@
 import type {DirectoryNodeResponse, RefreshResponse} from "../../models";
-import {AbstractAPI} from "../AbstractAPI";
+import {AbstractAPI} from "@vempain/vempain-auth-frontend";
 
 class FileSystemAPI extends AbstractAPI<DirectoryNodeResponse, DirectoryNodeResponse[]> {
     public async getConvertedDirectoryTree(): Promise<DirectoryNodeResponse[]> {
@@ -22,4 +22,4 @@ class FileSystemAPI extends AbstractAPI<DirectoryNodeResponse, DirectoryNodeResp
     }
 }
 
-export const fileSystemAPI = new FileSystemAPI("/content-management/file")
+export const fileSystemAPI = new FileSystemAPI(import.meta.env.VITE_APP_API_URL, "/content-management/file")

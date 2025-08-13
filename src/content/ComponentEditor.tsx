@@ -3,9 +3,9 @@ import {useEffect, useState} from "react";
 import {Button, Form, Input, Spin, Switch} from "antd";
 import {MetadataForm, SubmitResultHandler} from "../main";
 import {AclEdit} from "./AclEdit";
-import {type AclVO, ActionResult, type ComponentVO, type SubmitResult} from "../models";
 import {componentAPI} from "../services";
-import {aclTool, validateParamId} from "../tools";
+import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import type {ComponentVO} from "../models";
 
 export function ComponentEditor() {
     const {paramId} = useParams<{ paramId: string }>();
@@ -36,6 +36,7 @@ export function ComponentEditor() {
             componentAPI.findById(tmpComponentId, null)
                     .then((response) => {
                         setComponent(response);
+                        setAcls(response.acls);
                     })
                     .catch((error) => {
                         console.error("Error fetching:", error);
@@ -59,10 +60,6 @@ export function ComponentEditor() {
             setLoading(false);
         }
     }, [paramId]);
-
-    const handleAclsChange = (updatedAcls: AclVO[]) => {
-        setAcls(updatedAcls);
-    };
 
     function onFinish(values: ComponentVO): void {
         console.debug("onFinish", values);
@@ -138,7 +135,7 @@ export function ComponentEditor() {
                                    key={"component-acl-list"}
                                    label={"Access control"}
                         >
-                            <AclEdit acls={acls} onChange={handleAclsChange} parentForm={componentForm}/>
+                            <AclEdit acls={acls} parentForm={componentForm}/>
                         </Form.Item>
                         <Form.Item label={" "} colon={false} key={"page-metadata"}>
                             <MetadataForm metadata={{

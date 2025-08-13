@@ -1,10 +1,10 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {ActionResult, type FormVO, type PageVO, type SubmitResult} from "../models";
 import {SubmitResultHandler} from "../main";
 import {Button, Spin} from "antd";
 import {formAPI, pageAPI} from "../services";
-import {validateParamId} from "../tools";
+import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import type {FormVO, PageVO} from "../models";
 
 export function FormDelete() {
     const {paramId} = useParams();

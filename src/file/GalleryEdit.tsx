@@ -1,12 +1,12 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {type AclVO, ActionResult, type GalleryRequest, QueryDetailEnum, type SubmitResult} from "../models";
-import {aclTool, validateParamId} from "../tools";
 import {SubmitResultHandler} from "../main";
 import {Button, Col, Form, Input, Row, Select, Space, Spin} from "antd";
 import {commonFileAPI, galleryAPI} from "../services";
 import {AclEdit} from "../content";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
+import {type GalleryRequest, QueryDetailEnum} from "../models";
+import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 
 export function GalleryEdit() {
     const {paramId} = useParams();
@@ -104,10 +104,6 @@ export function GalleryEdit() {
                         setLoading(false);
                     });
         }
-    }
-
-    function handleAclsChange(updatedAcls: AclVO[]) {
-        setAcls(updatedAcls);
     }
 
     function filterOption(input: string, option?: { label: string; value: number }) {
@@ -222,7 +218,7 @@ export function GalleryEdit() {
                         <Form.Item key={"gallery-acl-list"}
                                    label={"Access control"}
                         >
-                            <AclEdit acls={acls} onChange={handleAclsChange} parentForm={galleryForm}/>
+                            <AclEdit acls={acls} parentForm={galleryForm}/>
                         </Form.Item>
                         <Space direction={"horizontal"} size={12} style={{width: "100%", justifyContent: "center"}}>
                             <Button

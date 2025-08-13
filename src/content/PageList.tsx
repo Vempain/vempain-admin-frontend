@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {Button, Input, type InputRef, Space, Spin, Table, type TableColumnType, type TablePaginationConfig} from "antd";
+import {Button, Input, type InputRef, notification, Space, Spin, Table, type TableColumnType, type TablePaginationConfig} from "antd";
 import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {PlusCircleFilled, SearchOutlined} from "@ant-design/icons";
@@ -30,6 +30,8 @@ export function PageList() {
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<dayjs.Dayjs | null>(null);
 
+    const [api, contextHolder] = notification.useNotification();
+
     function handleSearch(
             selectedKeys: string[],
             confirm: FilterDropdownProps["confirm"],
@@ -38,6 +40,11 @@ export function PageList() {
         confirm();
         setSearchText(selectedKeys[0]);
         setSearchedColumn(dataIndex);
+        api.info({
+            message: "Searching for '" + searchText + "' in " + searchedColumn,
+            description: `Searching for "${selectedKeys[0]}" in ${dataIndex}`,
+            duration: 2,
+        });
     }
 
     function handleReset(clearFilters: () => void) {
@@ -314,11 +321,12 @@ export function PageList() {
 
     return (
             <div className={"darkBody"} key={"pageListDiv"}>
+                {contextHolder}
                 <Spin tip={spinMessage} spinning={loading} key={"pageListSpinner"}>
                     <Space direction={"vertical"} size={"large"} key={"pageListSpace"}>
                         <h1 key={"pageListHeader"}>Page List <Link to={"/pages/0/edit"}><PlusCircleFilled/></Link></h1>
                         <Button type={"primary"} onClick={publishAll}>Publish all pages</Button>
-                        <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate} />
+                        <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
                         {pageList.length > 0 && <Table
                                 dataSource={pageList.map((item, index) => ({...item, key: `row_${index}`}))}
                                 columns={columns}

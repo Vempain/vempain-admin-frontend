@@ -1,4 +1,4 @@
-import {ActionResult} from "../../ActionResult";
+import type {ActionResult} from "@vempain/vempain-auth-frontend";
 
 export interface RefreshDetailResponse {
     result: ActionResult;

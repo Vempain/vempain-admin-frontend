@@ -23,7 +23,7 @@ export function PublishSchedule(publishScheduleProps: PublishScheduleProps) {
     return (
             <Space direction={"vertical"} size={"large"}>
 
-            <Divider orientation="left">Publish schedule</Divider>
+                <Divider orientation="left">Publish schedule</Divider>
                 <Switch
                         key="scheduleSwitch"
                         checkedChildren="Yes"
@@ -33,7 +33,7 @@ export function PublishSchedule(publishScheduleProps: PublishScheduleProps) {
                 {schedulePublish && (
                         <DatePicker
                                 key="publishDatePicker"
-                                showTime={{ format: 'HH:mm', defaultValue: dayjs() }}
+                                showTime={{format: 'HH:mm', defaultValue: dayjs()}}
                                 minuteStep={15 as 15}
                                 format="YYYY-DD-MM HH:mm"
                                 onChange={handleDatePickerChange}

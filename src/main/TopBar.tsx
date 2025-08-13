@@ -25,8 +25,8 @@ import {
     UserOutlined,
     VideoCameraOutlined
 } from "@ant-design/icons";
-import {useSession} from "../session";
 import {Link, NavLink} from "react-router-dom";
+import {useSession} from "@vempain/vempain-auth-frontend";
 
 const {Header} = Layout;
 const {useBreakpoint} = Grid;
@@ -39,7 +39,7 @@ function TopBar() {
     const screens = useBreakpoint();
 
     const menuBarItems: MenuItem[] = [
-            ...(userSession && [{
+        ...(userSession && [{
             label: "Content Management",
             key: "pageManagement",
             icon: <SnippetsOutlined/>,
@@ -66,82 +66,82 @@ function TopBar() {
                 }
             ]
         },
-        {
-            label: "File Management",
-            key: "fileManagement",
-            icon: <FileOutlined/>,
-            children: [
-                {
-                    label: (<Link to={"/audios"}>Audio</Link>),
-                    key: "audio",
-                    icon: <AudioOutlined/>
-                },
-                {
-                    label: (<Link to={"/documents"}>Document</Link>),
-                    key: "document",
-                    icon: <FileUnknownOutlined/>
-                },
-                {
-                    label: (<Link to={"/images"}>Image</Link>),
-                    key: "image",
-                    icon: <FileImageOutlined/>
-                },
-                {
-                    label: (<Link to={"/videos"}>Video</Link>),
-                    key: "video",
-                    icon: <VideoCameraOutlined/>
-                },
-                {
-                    label: (<Link to={"/galleries"}>Gallery</Link>),
-                    key: "gallery",
-                    icon: <PictureOutlined/>
-                },
-                {
-                    label: (<Link to={"/import"}>File import</Link>),
-                    key: "import",
-                    icon: <ImportOutlined/>
-                },
-            ],
-        },
-        {
-            label: "Schedule Management",
-            key: "scheduleManagement",
-            icon: <ClockCircleOutlined/>,
-            children: [
-                {
-                    label: (<Link to={"/schedule/system"}>System schedules</Link>),
-                    key: "systemSchedules",
-                    icon: <AppstoreOutlined/>
-                },
-                {
-                    label: (<Link to={"/schedule/file-imports"}>File imports</Link>),
-                    key: "fileImports",
-                    icon: <UploadOutlined/>
-                },
-                {
-                    label: (<Link to={"/schedule/publishing"}>Publishing</Link>),
-                    key: "publishing",
-                    icon: <FieldTimeOutlined/>
-                },
-            ],
-        },
-        {
-            label: "User Management",
-            key: "userManagement",
-            icon: <UserOutlined/>,
-            children: [
-                {
-                    label: (<Link to={"/users"}>Users</Link>),
-                    key: "users",
-                    icon: <UserAddOutlined/>
-                },
-                {
-                    label: (<Link to={"/units"}>Units</Link>),
-                    key: "units",
-                    icon: <UsergroupAddOutlined/>
-                },
-            ],
-        }] || []),
+            {
+                label: "File Management",
+                key: "fileManagement",
+                icon: <FileOutlined/>,
+                children: [
+                    {
+                        label: (<Link to={"/audios"}>Audio</Link>),
+                        key: "audio",
+                        icon: <AudioOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/documents"}>Document</Link>),
+                        key: "document",
+                        icon: <FileUnknownOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/images"}>Image</Link>),
+                        key: "image",
+                        icon: <FileImageOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/videos"}>Video</Link>),
+                        key: "video",
+                        icon: <VideoCameraOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/galleries"}>Gallery</Link>),
+                        key: "gallery",
+                        icon: <PictureOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/import"}>File import</Link>),
+                        key: "import",
+                        icon: <ImportOutlined/>
+                    },
+                ],
+            },
+            {
+                label: "Schedule Management",
+                key: "scheduleManagement",
+                icon: <ClockCircleOutlined/>,
+                children: [
+                    {
+                        label: (<Link to={"/schedule/system"}>System schedules</Link>),
+                        key: "systemSchedules",
+                        icon: <AppstoreOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/schedule/file-imports"}>File imports</Link>),
+                        key: "fileImports",
+                        icon: <UploadOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/schedule/publishing"}>Publishing</Link>),
+                        key: "publishing",
+                        icon: <FieldTimeOutlined/>
+                    },
+                ],
+            },
+            {
+                label: "User Management",
+                key: "userManagement",
+                icon: <UserOutlined/>,
+                children: [
+                    {
+                        label: (<Link to={"/users"}>Users</Link>),
+                        key: "users",
+                        icon: <UserAddOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/units"}>Units</Link>),
+                        key: "units",
+                        icon: <UsergroupAddOutlined/>
+                    },
+                ],
+            }] || []),
         ...(userSession &&
                 [
                     {

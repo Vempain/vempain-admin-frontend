@@ -3,9 +3,8 @@ import {useEffect, useState} from "react";
 import {Button, Divider, Form, Input, Spin} from "antd";
 import {SubmitResultHandler} from "../main";
 import {AclEdit} from "../content";
-import {type AclVO, ActionResult, type SubmitResult, type UnitVO} from "../models";
 import {unitAPI} from "../services";
-import {aclTool, validateParamId} from "../tools";
+import {aclTool, type AclVO, ActionResult, type SubmitResult, type UnitVO, validateParamId} from "@vempain/vempain-auth-frontend";
 
 export function UnitEditor() {
     const {paramId} = useParams();
@@ -37,11 +36,14 @@ export function UnitEditor() {
             unitAPI.findById(tmpUnitId, null)
                     .then((response) => {
                         setUnit(response);
-                        setLoading(false);
+                        setAcls(response.acls);
                     })
                     .catch((error) => {
                         console.error("Error fetching:", error);
                         setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the unit, try again later"});
+                    })
+                    .finally(() => {
+                        setLoading(false);
                     });
         } else {
             setUnit({
@@ -58,10 +60,6 @@ export function UnitEditor() {
             setLoading(false);
         }
     }, [paramId]);
-
-    const handleAclsChange = (updatedAcls: AclVO[]) => {
-        setAcls(updatedAcls);
-    };
 
     function onFinish(values: UnitVO): void {
         for (let i = 0; i < values.acls.length; i++) {
@@ -133,7 +131,7 @@ export function UnitEditor() {
                     <Form.Item key={"unit-acl-list"}
                                label={"Access control"}
                     >
-                        <AclEdit acls={acls} onChange={handleAclsChange} parentForm={unitForm}/>
+                        <AclEdit acls={acls} parentForm={unitForm}/>
                     </Form.Item>
                     <Form.Item wrapperCol={{offset: 8, span: 16,}}><Divider orientation={"left"}>Metadata</Divider></Form.Item>
                     <Form.Item name={"creator"} label={"Creator"}>

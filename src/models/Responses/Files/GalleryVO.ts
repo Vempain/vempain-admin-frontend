@@ -1,5 +1,5 @@
-import type {AbstractPermissionVO} from "../../AbstractPermissionVO";
 import type {CommonFileVO} from "./CommonFileVO";
+import type {AbstractPermissionVO} from "@vempain/vempain-auth-frontend";
 
 export interface GalleryVO extends AbstractPermissionVO {
     id: number;

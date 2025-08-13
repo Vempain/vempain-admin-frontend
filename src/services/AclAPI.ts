@@ -1,5 +1,4 @@
-import {AbstractAPI} from "./AbstractAPI";
-import type {AclVO} from "../models";
+import {AbstractAPI, type AclVO} from "@vempain/vempain-auth-frontend";
 
 class AclAPI extends AbstractAPI<AclVO, AclVO> {
     private static convertNullUserUnit(aclList: AclVO[]): AclVO[] {
@@ -30,4 +29,4 @@ class AclAPI extends AbstractAPI<AclVO, AclVO> {
     }
 }
 
-export const aclAPI = new AclAPI("/content-management/acls");
+export const aclAPI = new AclAPI(import.meta.env.VITE_APP_API_URL, "/content-management/acls");

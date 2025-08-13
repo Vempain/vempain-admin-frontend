@@ -1,5 +1,5 @@
-import {AbstractAPI} from "./AbstractAPI";
 import type {FormVO} from "../models";
+import {AbstractAPI} from "@vempain/vempain-auth-frontend";
 
 class FormAPI extends AbstractAPI<FormVO, FormVO> {
     public async findFormsByComponentId(componentId: number): Promise<FormVO[]> {
@@ -15,4 +15,4 @@ class FormAPI extends AbstractAPI<FormVO, FormVO> {
     }
 }
 
-export const formAPI = new FormAPI("/content-management/forms");
+export const formAPI = new FormAPI(import.meta.env.VITE_APP_API_URL, "/content-management/forms");

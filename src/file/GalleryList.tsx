@@ -1,15 +1,15 @@
 import {useEffect, useState} from "react";
-import {useSession} from "../session";
-import {ActionResult, type GalleryVO, PrivilegeEnum, QueryDetailEnum, type SubmitResult} from "../models";
+import {type GalleryVO, QueryDetailEnum} from "../models";
 import {fileSystemAPI, galleryAPI} from "../services";
 import type {ColumnsType} from "antd/lib/table";
 import {Button, Space, Spin, Table, type TablePaginationConfig} from "antd";
-import {aclTool, getPaginationConfig} from "../tools";
+import {getPaginationConfig} from "../tools";
 import {Link} from "react-router-dom";
 import {PlusCircleFilled} from "@ant-design/icons";
 import {SubmitResultHandler} from "../main";
 import {PublishSchedule} from "../content";
 import dayjs from "dayjs";
+import {aclTool, ActionResult, PrivilegeEnum, type SubmitResult, useSession} from "@vempain/vempain-auth-frontend";
 
 interface GalleryListItem {
     id: number;
@@ -119,7 +119,7 @@ export function GalleryList() {
                 modifyPrivilege: aclTool.hasPrivilege(PrivilegeEnum.MODIFY, userSession?.id, userSession?.units, gallery.acls),
                 deletePrivilege: aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, gallery.acls),
             });
-         console.log("Gallery acl:", gallery.acls);
+            console.log("Gallery acl:", gallery.acls);
         }
 
         console.log("Gallery list:", tmpGalleryList);
@@ -228,7 +228,7 @@ export function GalleryList() {
                                     key={"refreshAllButton"}
                             >Refresh all gallery files</Button>
                         </Space>
-                        <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate} />
+                        <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
 
                         {galleryList.length > 0 && <Table
                                 dataSource={galleryList}
