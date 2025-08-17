@@ -1,6 +1,6 @@
 function Home() {
     return (
-            <div className={"darkBody"}>
+            <div className={"DarkDiv"}>
                 <h1>Home</h1>
             </div>
     );

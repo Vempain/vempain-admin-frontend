@@ -5,11 +5,11 @@ import {galleryAPI} from "../services";
 import {Button, Divider, Input, Space, Spin} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import {SubmitResultHandler} from "../main";
-import {CommonFileCard} from "./CommonFileCard";
 import {LoadingOutlined} from "@ant-design/icons";
 import dayjs, {Dayjs} from "dayjs";
 import {PublishSchedule} from "../content";
 import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import {SiteFileCard} from "./SiteFileCard.tsx";
 
 export function GalleryPublish() {
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
@@ -86,7 +86,7 @@ export function GalleryPublish() {
     }
 
     return (
-            <div className={"darkBody"} key={"pagePublishDiv"}>
+            <div className={"DarkDiv"} key={"pagePublishDiv"}>
                 <Spin spinning={loading}
                       tip={loadingMessage}
                       indicator={<LoadingOutlined style={{fontSize: 24}} spin={true}/>}
@@ -111,9 +111,9 @@ export function GalleryPublish() {
                             <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
                             <Button key={"publishButton-top"} type={"primary"} onClick={publishGallery}>Publish gallery</Button>
                             {
-                                    gallery.common_files.length > 0 &&
-                                    gallery.common_files.map(commonFile => {
-                                        return (<CommonFileCard key={"commonFileCard-" + commonFile.id} commonFile={commonFile}/>);
+                                    gallery.site_files.length > 0 &&
+                                    gallery.site_files.map(siteFile => {
+                                        return (<SiteFileCard key={"siteFileCard-" + siteFile.id} siteFile={siteFile}/>);
                                     })
                             }
                             <Button key={"publishButton-bottom"} type={"primary"} onClick={publishGallery}>Publish gallery</Button>

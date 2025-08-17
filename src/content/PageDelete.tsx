@@ -69,7 +69,7 @@ export function PageDelete() {
     }
 
     return (
-            <div className={"darkBody"} key={"componentDeleteDiv"}>
+            <div className={"DarkDiv"} key={"componentDeleteDiv"}>
                 <Spin spinning={loading}>
                     <div>
                         <Button type={"primary"} danger={true} onClick={deletePage} key={"deleteButton"}>Delete page</Button>

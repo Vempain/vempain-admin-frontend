@@ -112,7 +112,7 @@ function ItemPublishingList() {
     }, []);
 
     return (
-            <div className={"darkBody"} key={"layoutListDiv"}>
+            <div className={"DarkDiv"} key={"layoutListDiv"}>
                 <Spin tip={"Loading"} spinning={loading} key={"publishScheduleListSpinner"}>
                     <h1 key={"publishScheduleListHeader"}>Publish schedule List</h1>
 

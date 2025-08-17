@@ -173,7 +173,7 @@ export function FileImport() {
     }
 
     return (
-            <div className={"darkBody"} key={"pagePublishDiv"}>
+            <div className={"DarkDiv"} key={"pagePublishDiv"}>
                 <Spin spinning={loading}
                       tip={loadingMessage}
                       indicator={<LoadingOutlined style={{fontSize: 24}} spin={true}/>}

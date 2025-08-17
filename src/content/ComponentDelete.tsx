@@ -106,7 +106,7 @@ export function ComponentDelete() {
     }
 
     return (
-            <div className={"darkBody"} key={"componentDeleteDiv"}>
+            <div className={"DarkDiv"} key={"componentDeleteDiv"}>
                 <Spin spinning={loading}>
                     <div>
                         <Button type={"primary"} danger={true} onClick={deleteComponent} key={"deleteButton"}>Delete component</Button>

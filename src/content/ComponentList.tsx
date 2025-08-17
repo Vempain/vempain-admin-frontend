@@ -87,7 +87,7 @@ export function ComponentList() {
     }, []);
 
     return (
-            <div className={"darkBody"} key={"componentListDiv"}>
+            <div className={"DarkDiv"} key={"componentListDiv"}>
                 <Spin tip={"Loading"} spinning={loading} key={"componentListSpinner"}>
                     <h1 key={"componentListHeader"}>Component List <Link to={"/components/0/edit"}><PlusCircleFilled/></Link></h1>
 

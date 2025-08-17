@@ -1,15 +1,16 @@
 import {useEffect, useRef, useState} from "react";
 import {Spin, Table, type TablePaginationConfig} from "antd";
-import type {AbstractFileVO, SortableTableParams} from "../models";
 import type {ColumnsType} from "antd/es/table";
 import type {FilterValue, SorterResult} from "antd/es/table/interface";
 
-interface Props<T extends AbstractFileVO> {
+interface Props<T extends { id: number }> {
     valueObjectColumns: ColumnsType<T>;
     api: any; // Define the type for your API
+    // New: optional extra request params to send along with the pageable request
+    requestParams?: Record<string, unknown>;
 }
 
-export function GenericFileList<T extends AbstractFileVO>({valueObjectColumns, api}: Props<T>) {
+export function GenericFileList<T extends { id: number }>({valueObjectColumns, api, requestParams}: Props<T>) {
     const [loading, setLoading] = useState<boolean>(false);
     const [valueObjectList, setValueObjectList] = useState<T[]>([]);
     const defaultFilterColumn: string = "id";
@@ -25,7 +26,7 @@ export function GenericFileList<T extends AbstractFileVO>({valueObjectColumns, a
         pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
     });
 
-    const [tableParams, setTableParams] = useState<SortableTableParams>({
+    const [tableParams, setTableParams] = useState({
         sortField: "",
         sortOrder: "",
         pagination: tablePaginationConfig,
@@ -82,7 +83,9 @@ export function GenericFileList<T extends AbstractFileVO>({valueObjectColumns, a
             page_size: tablePaginationConfig.pageSize,
             sorting: tableParams.field ? `${tableParams.field},${tableParams.order}` : null,
             filter: tableParams.filter,
-            filter_column: defaultFilterColumn
+            filter_column: defaultFilterColumn,
+            // New: include any extra params (e.g. file_type)
+            ...(requestParams ?? {})
         })
                 .then((response: any) => {
                     setValueObjectList(response.content);
@@ -93,10 +96,10 @@ export function GenericFileList<T extends AbstractFileVO>({valueObjectColumns, a
                 .finally(() => {
                     setLoading(false);
                 });
-    }, [defaultFilterColumn, tableParams, tablePaginationConfig, api]);
+    }, [defaultFilterColumn, tableParams, tablePaginationConfig, api, requestParams]);
 
     return (
-            <div className={"darkBody"}>
+            <div className={"DarkDiv"}>
                 <h4> {}</h4>
 
                 <Spin spinning={loading}>

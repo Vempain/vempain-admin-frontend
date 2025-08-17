@@ -124,7 +124,7 @@ function ItemPublishTrigger() {
     }
 
     return (
-            <div className={"darkBody"} key={"pagePublishDiv"}>
+            <div className={"DarkDiv"} key={"pagePublishDiv"}>
                 <Spin spinning={loading} tip={spinTip}>
                     <Space direction={"vertical"} size={"large"}>
                         <h2>Publish Schedule Trigger</h2>

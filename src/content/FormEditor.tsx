@@ -119,7 +119,7 @@ export function FormEditor() {
     }
 
     return (
-            <div className={"darkBody"}>
+            <div className={"DarkDiv"}>
                 <Spin tip={"Loading"} spinning={loading}>
                     {formId === 0 && <h1>Create new form</h1>}
                     {formId > 0 && <h1>Edit form {formId}</h1>}

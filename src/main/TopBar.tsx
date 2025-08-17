@@ -10,12 +10,17 @@ import {
     FileOutlined,
     FileTextOutlined,
     FileUnknownOutlined,
+    FileWordOutlined,
+    FileZipOutlined,
+    FontSizeOutlined,
     FormOutlined,
+    ForwardOutlined,
     ImportOutlined,
     InfoCircleOutlined,
     LogoutOutlined,
     MenuOutlined,
     PictureOutlined,
+    RetweetOutlined,
     SettingFilled,
     SnippetsOutlined,
     SwapOutlined,
@@ -23,6 +28,7 @@ import {
     UserAddOutlined,
     UsergroupAddOutlined,
     UserOutlined,
+    VideoCameraAddOutlined,
     VideoCameraOutlined
 } from "@ant-design/icons";
 import {Link, NavLink} from "react-router-dom";
@@ -31,7 +37,7 @@ import {useSession} from "@vempain/vempain-auth-frontend";
 const {Header} = Layout;
 const {useBreakpoint} = Grid;
 
-function TopBar() {
+export function TopBar() {
     const [current, setCurrent] = useState("mail");
     const [drawerOpen, setDrawerOpen] = useState(false);
     const {userSession} = useSession();
@@ -72,18 +78,68 @@ function TopBar() {
                 icon: <FileOutlined/>,
                 children: [
                     {
+                        label: (<Link to={"/archives"}>Archive</Link>),
+                        key: "archive",
+                        icon: <FileZipOutlined/>
+                    },
+                    {
                         label: (<Link to={"/audios"}>Audio</Link>),
                         key: "audio",
                         icon: <AudioOutlined/>
                     },
                     {
+                        label: (<Link to={"/binaries"}>Binary</Link>),
+                        key: "binary",
+                        icon: <FileUnknownOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/data"}>Data</Link>),
+                        key: "data",
+                        icon: <FileTextOutlined/>
+                    },
+                    {
                         label: (<Link to={"/documents"}>Document</Link>),
                         key: "document",
-                        icon: <FileUnknownOutlined/>
+                        icon: <FileWordOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/executables"}>Executable</Link>),
+                        key: "executable",
+                        icon: <ForwardOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/fonts"}>Font</Link>),
+                        key: "font",
+                        icon: <FontSizeOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/icons"}>Icon</Link>),
+                        key: "icon",
+                        icon: <RetweetOutlined/>
                     },
                     {
                         label: (<Link to={"/images"}>Image</Link>),
                         key: "image",
+                        icon: <FileImageOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/interactives"}>Interactive</Link>),
+                        key: "interactive",
+                        icon: <VideoCameraAddOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/thumbs"}>Thumbnail</Link>),
+                        key: "thumb",
+                        icon: <FileImageOutlined />
+                    },
+                    {
+                        label: (<Link to={"/unknowns"}>Unknown</Link>),
+                        key: "unknown",
+                        icon: <FileUnknownOutlined />
+                    },
+                    {
+                        label: (<Link to={"/vectors"}>Vector</Link>),
+                        key: "vector",
                         icon: <FileImageOutlined/>
                     },
                     {
@@ -181,6 +237,7 @@ function TopBar() {
 
     return (
             <Header
+                    className="topbar-header"
                     style={{
                         position: "fixed",
                         top: 0,
@@ -196,29 +253,18 @@ function TopBar() {
                     }}
                     key={"topBarHeader"}
             >
-                {/* Logo + (desktop) menu */}
-                <div
-                        style={{
-                            display: "flex",
-                            alignItems: "center",
-                            flex: 1,
-                            overflow: "hidden"
-                        }}
-                >
+                <div style={{display: "flex", alignItems: "center", flex: 1, overflow: "hidden"}}>
                     <Tooltip title={"Vempain Admin"}>
-                        <div style={{width: 60, height: 64, marginRight: 20}}>
+                        <div style={{width: 60, height: 60, marginRight: 20}}>
                             <NavLink to={"/"}>
-                                <img
-                                        src="/logo192.png"
-                                        alt="Home"
-                                        style={{height: "50px", objectFit: "contain"}}/>
+                                <img src="/logo192.png" alt="Home" style={{height: "55px", objectFit: "contain"}}/>
                             </NavLink>
                         </div>
                     </Tooltip>
 
-                    {/* show horizontal Menu only on ≥ md */}
                     {screens.md && (
                             <Menu
+                                    className="topbar-menu"
                                     onClick={onClick}
                                     selectedKeys={[current]}
                                     mode="horizontal"
@@ -228,7 +274,6 @@ function TopBar() {
                     )}
                 </div>
 
-                {/* Hamburger button – hidden on desktop */}
                 {!screens.md && (
                         <>
                             <Button
@@ -257,5 +302,3 @@ function TopBar() {
             </Header>
     );
 }
-
-export {TopBar};

@@ -105,7 +105,7 @@ export function ComponentEditor() {
     }
 
     return (
-            <div className={"darkBody"}>
+            <div className={"DarkDiv"}>
                 <Spin tip={"Loading"} spinning={loading}>
                     {componentId === 0 && <h1>Create new component</h1>}
                     {componentId > 0 && <h1>Edit component {componentId}</h1>}

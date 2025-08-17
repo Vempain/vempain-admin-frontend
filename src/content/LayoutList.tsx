@@ -82,7 +82,7 @@ export function LayoutList() {
     }, []);
 
     return (
-            <div className={"darkBody"} key={"layoutListDiv"}>
+            <div className={"DarkDiv"} key={"layoutListDiv"}>
                 <Spin tip={"Loading"} spinning={loading} key={"layoutListSpinner"}>
                     <h1 key={"layoutListHeader"}>Layout List <Link to={"/layouts/0/edit"}><PlusCircleFilled/></Link></h1>
 
