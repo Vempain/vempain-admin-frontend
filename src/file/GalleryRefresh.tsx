@@ -5,8 +5,8 @@ import {fileSystemAPI, galleryAPI} from "../services";
 import {SubmitResultHandler} from "../main";
 import {LoadingOutlined} from "@ant-design/icons";
 import {Button, Space, Spin} from "antd";
-import {CommonFileCard} from "./CommonFileCard";
 import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import {SiteFileCard} from "./SiteFileCard.tsx";
 
 export function GalleryRefresh() {
     const {paramId} = useParams();
@@ -78,7 +78,7 @@ export function GalleryRefresh() {
     }
 
     return (
-            <div className={"darkBody"} key={"galleryRefreshFilesDiv"}>
+            <div className={"DarkDiv"} key={"galleryRefreshFilesDiv"}>
                 <Spin spinning={loading}
                       tip={loadingMessage}
                       indicator={<LoadingOutlined style={{fontSize: 24}} spin={true}/>}
@@ -89,9 +89,9 @@ export function GalleryRefresh() {
 
                             <Button key={"refreshFilesButton-top"} type={"primary"} onClick={refreshGalleryFiles}>Refresh gallery files</Button>
                             {
-                                    gallery.common_files.length > 0 &&
-                                    gallery.common_files.map(commonFile => {
-                                        return (<CommonFileCard key={"commonFileCard-" + commonFile.id} commonFile={commonFile}/>);
+                                    gallery.site_files.length > 0 &&
+                                    gallery.site_files.map(siteFile => {
+                                        return (<SiteFileCard key={"siteFileCard-" + siteFile.id} siteFile={siteFile}/>);
                                     })
                             }
                             <Button key={"refreshFilesButton-bottom"} type={"primary"} onClick={refreshGalleryFiles}>Refresh gallery files</Button>

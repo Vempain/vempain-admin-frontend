@@ -102,7 +102,7 @@ export function LayoutEditor() {
         return (<SubmitResultHandler submitResult={submitResults} successTo={"/layouts"} failTo={"/layouts"}/>);
     }
 
-    return (<div className={"darkBody"}>
+    return (<div className={"DarkDiv"}>
                 <Spin tip={"Loading"} spinning={loading}>
                     {layoutId === 0 && <h1>Create new layout</h1>}
                     {layoutId > 0 && <h1>Edit layout {layoutId}</h1>}

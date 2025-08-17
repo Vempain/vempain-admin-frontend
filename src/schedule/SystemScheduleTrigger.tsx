@@ -88,7 +88,7 @@ function SystemScheduleTrigger() {
     }
 
     return (
-            <div className={"darkBody"} key={"pagePublishDiv"}>
+            <div className={"DarkDiv"} key={"pagePublishDiv"}>
                 <Spin spinning={loading} tip={"Fetching schedule details..."}>
                     <Space direction={"vertical"} size={"large"}>
                         <h2>System Schedule Trigger: {scheduleName}</h2>

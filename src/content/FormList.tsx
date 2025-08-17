@@ -110,7 +110,7 @@ export function FormList() {
     }, []);
 
     return (
-            <div className={"darkBody"} key={"formListDiv"}>
+            <div className={"DarkDiv"} key={"formListDiv"}>
                 <Spin tip={"Loading"} spinning={loading} key={"formListSpinner"}>
                     <h1 key={"formListHeader"}>Form List <Link to={"/forms/0/edit"}><PlusCircleFilled/></Link></h1>
 

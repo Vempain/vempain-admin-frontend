@@ -9,4 +9,5 @@ export type {ImportResponseVO} from './ImportResponseVO';
 export type {PageableImageListVO} from './PageableImageListVO';
 export type {RefreshDetailResponse} from './RefreshDetailResponse';
 export type {RefreshResponse} from './RefreshResponse';
+export type {SiteFileResponse} from './SiteFileResponse.ts';
 export type {VideoFileVO} from './VideoFileVO';

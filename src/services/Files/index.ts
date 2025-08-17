@@ -5,4 +5,5 @@ export {fileImportAPI} from './FileImportAPI';
 export {fileSystemAPI} from './FileSystemAPI';
 export {galleryAPI} from './GalleryAPI';
 export {imageFileAPI} from './ImageFileAPI';
+export {siteFileAPI} from './SiteFileAPI';
 export {videoFileAPI} from './VideoFileAPI';

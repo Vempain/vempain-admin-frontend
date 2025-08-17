@@ -91,7 +91,7 @@ function FileImportScheduleList() {
     }, []);
 
     return (
-            <div className={"darkBody"} key={"layoutListDiv"}>
+            <div className={"DarkDiv"} key={"layoutListDiv"}>
                 <Spin tip={"Loading"} spinning={loading} key={"fileImportScheduleListSpinner"}>
                     <h1 key={"fileImportScheduleListHeader"}>File import schedule List</h1>
 

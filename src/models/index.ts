@@ -1,6 +1,7 @@
 export type {SortableTableParams} from "./SortableTableParams";
 export type {StringNumber} from './StringNumber';
 // Enums
+export {FileClassEnum} from './FileClassEnum';
 export {PublishStatusEnum} from './PublishStatusEnum';
 export {QueryDetailEnum} from './QueryDetailEnum';
 

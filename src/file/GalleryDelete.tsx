@@ -1,7 +1,7 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {formatDateTimeWithMs} from "../tools";
-import type {CommonFileVO} from "../models";
+import type {SiteFileResponse} from "../models";
 import {type GalleryVO} from "../models";
 import {SubmitResultHandler} from "../main";
 import {galleryAPI} from "../services";
@@ -18,8 +18,8 @@ export function GalleryDelete() {
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     // For the list of images
-    const [commonFileList, setCommonFileList] = useState<CommonFileVO[]>([]);
-    const commonFileColumns: ColumnsType<CommonFileVO> = [
+    const [commonFileList, setCommonFileList] = useState<SiteFileResponse[]>([]);
+    const siteFileColumns: ColumnsType<SiteFileResponse> = [
         {
             title: "Creator",
             dataIndex: "common.creator",
@@ -41,11 +41,11 @@ export function GalleryDelete() {
             }
         },
         {
-            title: "Source file",
-            dataIndex: "common.converted_file",
+            title: "File name",
+            dataIndex: "common.file_name",
             key: "app_file",
             render: (_, record) => {
-                return (<>{record.converted_file}</>);
+                return (<>{record.file_name}</>);
             }
         },
 
@@ -70,7 +70,7 @@ export function GalleryDelete() {
             galleryAPI.findById(tmpGalleryId, null)
                     .then((galleryResponse) => {
                         setGallery(galleryResponse);
-                        setCommonFileList(galleryResponse.common_files);
+                        setCommonFileList(galleryResponse.site_files);
                     })
                     .catch((error) => {
                         console.error("Error fetching gallery details:", error);
@@ -104,7 +104,7 @@ export function GalleryDelete() {
     }
 
     return (
-            <div className={"darkBody"} key={"galleryDeleteDiv"}>
+            <div className={"DarkDiv"} key={"galleryDeleteDiv"}>
                 <Spin spinning={loading}>
                     {!loading && <div>
                         <div>
@@ -112,7 +112,7 @@ export function GalleryDelete() {
 
                             {commonFileList.length > 0 && <Table
                                     dataSource={commonFileList.map((item, index) => ({...item, key: `row_${index}`}))}
-                                    columns={commonFileColumns}
+                                    columns={siteFileColumns}
                             />}
                         </div>
                         <div>

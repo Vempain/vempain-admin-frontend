@@ -110,7 +110,7 @@ export function LayoutDelete() {
     }
 
     return (
-            <div className={"darkBody"} key={"componentDeleteDiv"}>
+            <div className={"DarkDiv"} key={"componentDeleteDiv"}>
                 <Spin spinning={loading}>
                     <div>
                         <Button type={"primary"} danger={true} onClick={deleteLayout} key={"deleteButton"}>Delete layout</Button>

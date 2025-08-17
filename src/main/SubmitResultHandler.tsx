@@ -11,7 +11,7 @@ function SubmitResultHandler({submitResult, successTo, failTo}: SubmitResultHand
 
     if (submitResult.status === ActionResult.OK) {
         return (
-                <div className={"darkBody"} key={"submitResultOkHandlerDiv"}>
+                <div className={"DarkDiv"} key={"submitResultOkHandlerDiv"}>
                     <Alert type={"success"}
                            showIcon
                            message={submitResult.message}
@@ -22,7 +22,7 @@ function SubmitResultHandler({submitResult, successTo, failTo}: SubmitResultHand
         );
     } else {
         return (
-                <div className={"darkBody"} key={"submitResultFailHandlerDiv"}>
+                <div className={"DarkDiv"} key={"submitResultFailHandlerDiv"}>
                     <Alert type={"error"}
                            showIcon
                            message={submitResult.message}

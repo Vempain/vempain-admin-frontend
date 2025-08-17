@@ -122,7 +122,7 @@ export function GalleryEdit() {
     }
 
     return (
-            <div className={"darkBody"} key={"gallery-edit"}>
+            <div className={"DarkDiv"} key={"gallery-edit"}>
                 <h4>{sendButtonText} Gallery {galleryId}</h4>
                 <Spin spinning={loading}>
                     {!loading && gallery != null && <Form

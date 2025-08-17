@@ -320,7 +320,7 @@ export function PageList() {
     }
 
     return (
-            <div className={"darkBody"} key={"pageListDiv"}>
+            <div className={"DarkDiv"} key={"pageListDiv"}>
                 {contextHolder}
                 <Spin tip={spinMessage} spinning={loading} key={"pageListSpinner"}>
                     <Space direction={"vertical"} size={"large"} key={"pageListSpace"}>

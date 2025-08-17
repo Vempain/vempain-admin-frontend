@@ -18,9 +18,11 @@ import {
 } from "./content";
 import {UnitEditor, UnitList, UserEditor, UserList} from "./user";
 import {LayoutDelete} from "./content/LayoutDelete";
-import {AudioList, DocumentList, FileImport, GalleryDelete, GalleryEdit, GalleryList, GalleryPublish, GalleryRefresh, ImageList, VideoList} from "./file";
+import {FileImport, GalleryDelete, GalleryEdit, GalleryList, GalleryPublish, GalleryRefresh} from "./file";
 import {FileImportScheduleList, FileImportScheduleTrigger, ItemPublishingList, ItemPublishTrigger, SystemScheduleList, SystemScheduleTrigger} from "./schedule";
 import {Login, Logout} from "@vempain/vempain-auth-frontend";
+import {FileClassEnum} from "./models";
+import {SiteFileList} from "./file/SiteFileList.tsx";
 
 const {Content} = Layout;
 
@@ -31,7 +33,7 @@ function App() {
             <ConfigProvider theme={{algorithm: darkAlgorithm}}>
                 <Layout className={"layout"}>
                     <TopBar/>
-                    <Content style={{padding: "0 50px", marginTop: '42px'}}>
+                    <Content style={{marginTop: "65px"}}>
                         <div className={"site-layout-content"}>
                             <Routes>
                                 <Route path={"*"} element={<Navigate to={"/"}/>}/>
@@ -53,16 +55,26 @@ function App() {
                                 <Route path={"/pages/:paramId/edit"} element={<PageEditor/>}/>
                                 <Route path={"/pages/:paramId/publish"} element={<PagePublish/>}/>
                                 {/* Files */}
-                                <Route path={"/audios"} element={<AudioList/>}/>
-                                <Route path={"/documents"} element={<DocumentList/>}/>
+                                <Route path={"/archives"} element={<SiteFileList fileType={FileClassEnum.ARCHIVE} title="Archive Files" />}/>
+                                <Route path={"/audios"} element={<SiteFileList fileType={FileClassEnum.AUDIO} title="Audio Files" />}/>
+                                <Route path={"/binaries"} element={<SiteFileList fileType={FileClassEnum.BINARY} title="Binary Files" />}/>
+                                <Route path={"/data"} element={<SiteFileList fileType={FileClassEnum.DATA} title="Data Files" />}/>
+                                <Route path={"/documents"} element={<SiteFileList fileType={FileClassEnum.DOCUMENT} title="Document Files" />}/>
+                                <Route path={"/executables"} element={<SiteFileList fileType={FileClassEnum.EXECUTABLE} title="Executable Files" />}/>
+                                <Route path={"/fonts"} element={<SiteFileList fileType={FileClassEnum.FONT} title="Font Files" />}/>
+                                <Route path={"/icons"} element={<SiteFileList fileType={FileClassEnum.ICON} title="Icon Files" />}/>
+                                <Route path={"/images"} element={<SiteFileList fileType={FileClassEnum.IMAGE} title="Image Files" />}/>
+                                <Route path={"/interactives"} element={<SiteFileList fileType={FileClassEnum.INTERACTIVE} title="Interactive Files" />}/>
+                                <Route path={"/thumbs"} element={<SiteFileList fileType={FileClassEnum.THUMB} title="Thumbnail Files" />}/>
+                                <Route path={"/unknowns"} element={<SiteFileList fileType={FileClassEnum.UNKNOWN} title="Unknown Files" />}/>
+                                <Route path={"/vectors"} element={<SiteFileList fileType={FileClassEnum.VECTOR} title="Vector Files" />}/>
+                                <Route path={"/videos"} element={<SiteFileList fileType={FileClassEnum.VIDEO} title="Video Files" />}/>
                                 <Route path={"/galleries"} element={<GalleryList/>}/>
                                 <Route path={"/galleries/:paramId/delete"} element={<GalleryDelete/>}/>
                                 <Route path={"/galleries/:paramId/edit"} element={<GalleryEdit/>}/>
                                 <Route path={"/galleries/:paramId/publish"} element={<GalleryPublish/>}/>
                                 <Route path={"/galleries/:paramId/refresh"} element={<GalleryRefresh/>}/>
-                                <Route path={"/images"} element={<ImageList/>}/>
                                 <Route path={"/import"} element={<FileImport/>}/>
-                                <Route path={"/videos"} element={<VideoList/>}/>
                                 {/* Schedules */}
                                 <Route path={"/schedule/system"} element={<SystemScheduleList/>}/>
                                 <Route path={"/schedule/system/:paramName/trigger"} element={<SystemScheduleTrigger/>}/>

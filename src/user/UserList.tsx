@@ -122,7 +122,7 @@ export function UserList() {
     }, []);
 
     return (
-            <div className={"darkBody"} key={"userListDiv"}>
+            <div className={"DarkDiv"} key={"userListDiv"}>
                 <Spin tip={"Loading"} spinning={loading} key={"userListSpinner"}>
                     <h1 key={"userListHeader"}>User List <Link to={"/users/0/edit"}><PlusCircleFilled/></Link></h1>
 
