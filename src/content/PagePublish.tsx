@@ -9,6 +9,7 @@ import TextArea from "antd/es/input/TextArea";
 import dayjs, {Dayjs} from "dayjs";
 import {PublishSchedule} from "./PublishSchedule";
 import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import type {ColumnsType} from "antd/lib/table";
 
 export function PagePublish() {
     const {paramId} = useParams();
@@ -21,7 +22,7 @@ export function PagePublish() {
     const [publishDate, setPublishDate] = useState<Dayjs | null>(null);
     const [publishMessage, setPublishMessage] = useState<string>("");
 
-    const galleryColumns = [
+    const galleryColumns:  ColumnsType<GalleryVO> = [
         {
             title: "Galleries that will be published with the page",
             dataIndex: "short_name",
@@ -29,9 +30,9 @@ export function PagePublish() {
         },
         {title: "Description", dataIndex: "description", key: "description"},
         {
-            title: "Files",
-            dataIndex: "common_files",
-            key: "common_files",
+            title: "Site files",
+            dataIndex: "site_files",
+            key: "site_files",
             render: (files: number[]) => files.length
         }
     ];

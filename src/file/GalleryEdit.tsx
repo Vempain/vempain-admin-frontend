@@ -2,7 +2,7 @@ import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {SubmitResultHandler} from "../main";
 import {Button, Col, Form, Input, Row, Select, Space, Spin} from "antd";
-import {commonFileAPI, galleryAPI} from "../services";
+import {galleryAPI, siteFileAPI} from "../services";
 import {AclEdit} from "../content";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import {type GalleryRequest, QueryDetailEnum} from "../models";
@@ -37,15 +37,15 @@ export function GalleryEdit() {
 
         Promise.all([
             tmpGalleryId > 0 ? galleryAPI.findById(tmpGalleryId, null) : Promise.resolve(null),
-            commonFileAPI.findAll({details: QueryDetailEnum.MINIMAL})
+            siteFileAPI.findAll({details: QueryDetailEnum.MINIMAL})
         ])
-                .then(([galleryResponse, commonFileResponse]) => {
+                .then(([galleryResponse, siteFileResponses]) => {
                     if (galleryResponse) {
                         setGallery({
                             id: galleryResponse.id,
                             short_name: galleryResponse.short_name,
                             description: galleryResponse.description,
-                            common_files_id: galleryResponse.common_files.map((item) => (item.id)),
+                            site_files_id: galleryResponse.site_files.map((item) => (item.id)),
                             acls: galleryResponse.acls
                         });
                         setAcls(galleryResponse.acls);
@@ -54,13 +54,13 @@ export function GalleryEdit() {
                             id: 0,
                             short_name: "",
                             description: "",
-                            common_files_id: [],
+                            site_files_id: [],
                             acls: []
                         });
                         setSendButtonText("Create");
                     }
 
-                    setAvailableCommonFiles(commonFileResponse.map((item) => ({label: item.converted_file, value: item.id})));
+                    setAvailableCommonFiles(siteFileResponses.map((item) => ({label: item.file_name, value: item.id})));
                 })
                 .catch((error) => {
                     console.error("Error:", error);
@@ -160,18 +160,18 @@ export function GalleryEdit() {
                             <Col span={4}><strong>Action</strong></Col>
                         </Row>
 
-                        <Form.List name="common_files_id">
-                            {(commonFiles, {add, move, remove}) => (
+                        <Form.List name="site_file_id">
+                            {(siteFiles, {add, move, remove}) => (
                                     <>
-                                        {commonFiles.map((_commonFile, index) => {
-                                            const uniqueKey = `common_file-${index}`;
+                                        {siteFiles.map((_siteFile, index) => {
+                                            const uniqueKey = `site_file-${index}`;
                                             return (
                                                     <Row gutter={16} align={"middle"} key={uniqueKey + "-row"}>
                                                         <Col span={12}>
                                                             <Form.Item
                                                                     name={[index]}
                                                                     key={uniqueKey + "-form-item"}
-                                                                    rules={[{required: true, message: "Please select a common file"}]}
+                                                                    rules={[{required: true, message: "Please select a site file"}]}
                                                             >
                                                                 <Select
                                                                         options={availableCommonFiles}
@@ -188,13 +188,13 @@ export function GalleryEdit() {
                                                                     type={"primary"}
                                                                     onClick={() => move(index, (index - 1))}
                                                                     icon={<ArrowUpOutlined/>}
-                                                                    disabled={index === 0 || commonFiles.length === 1}
+                                                                    disabled={index === 0 || siteFiles.length === 1}
                                                             />
                                                             <Button
                                                                     type={"primary"}
                                                                     onClick={() => move(index, (index + 1))}
                                                                     icon={<ArrowDownOutlined/>}
-                                                                    disabled={index === commonFiles.length - 1 || commonFiles.length === 1}
+                                                                    disabled={index === siteFiles.length - 1 || siteFiles.length === 1}
                                                             />
                                                             <Button
                                                                     type={"primary"}
