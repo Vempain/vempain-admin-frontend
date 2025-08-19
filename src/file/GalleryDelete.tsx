@@ -18,7 +18,7 @@ export function GalleryDelete() {
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     // For the list of images
-    const [commonFileList, setCommonFileList] = useState<SiteFileResponse[]>([]);
+    const [siteFileList, setSiteFileList] = useState<SiteFileResponse[]>([]);
     const siteFileColumns: ColumnsType<SiteFileResponse> = [
         {
             title: "Creator",
@@ -70,7 +70,7 @@ export function GalleryDelete() {
             galleryAPI.findById(tmpGalleryId, null)
                     .then((galleryResponse) => {
                         setGallery(galleryResponse);
-                        setCommonFileList(galleryResponse.site_files);
+                        setSiteFileList(galleryResponse.site_files);
                     })
                     .catch((error) => {
                         console.error("Error fetching gallery details:", error);
@@ -110,8 +110,8 @@ export function GalleryDelete() {
                         <div>
                             <h3>List of files associated with the gallery</h3>
 
-                            {commonFileList.length > 0 && <Table
-                                    dataSource={commonFileList.map((item, index) => ({...item, key: `row_${index}`}))}
+                            {siteFileList.length > 0 && <Table
+                                    dataSource={siteFileList.map((item, index) => ({...item, key: `row_${index}`}))}
                                     columns={siteFileColumns}
                             />}
                         </div>

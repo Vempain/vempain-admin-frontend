@@ -52,7 +52,7 @@ export function GalleryList() {
         },
         {
             title: "File count",
-            dataIndex: "common_files",
+            dataIndex: "fileCount",
             key: "fileCount",
             sorter: (a, b) => a.fileCount - b.fileCount,
             render: (_, record: GalleryListItem) => {
