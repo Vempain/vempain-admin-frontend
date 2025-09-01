@@ -10,6 +10,7 @@
     "prebuild": "node generateBuildInfo.js",
     "prestart": "node generateBuildInfo.js",
     "start": "env-cmd -f .env.local vite",
+    "start-combined": "env-cmd -f .env.combined vite --port 4000",
     "build": "yarn prebuild && tsc && env-cmd -f .env.prod vite build",
     "test": "jest",
     "test:watch": "jest --watch",
