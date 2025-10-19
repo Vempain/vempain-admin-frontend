@@ -11,11 +11,6 @@ server {
         index index.html index.htm;
         try_files $uri $uri/ /index.html;
     }
-
-    location /api/ {
-        proxy_pass http://vempain-admin-backend:8080/api/;
-        proxy_redirect http://vempain-admin-backend:8080/api/ http://localhost:8080;
-    }
 }
 EOL
 
