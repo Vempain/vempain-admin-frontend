@@ -31,13 +31,13 @@ jobs:
           yarn build
           yarn test --passWithNoTests --watchAll=false
         env:
-          GITHUB_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
+          VEMPAIN_ACTION_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
 
       - name: Coverage
         run: |
           yarn test:coverage
         env:
-          GITHUB_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
+          VEMPAIN_ACTION_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
 
   version-and-upload:
     runs-on: ubuntu-latest
@@ -87,14 +87,14 @@ jobs:
           yarn version --immediate ${newVersion}
         env:
           newVersion: ${{ steps.newVer.outputs.newVersion }}
-          GITHUB_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
+          VEMPAIN_ACTION_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
 
       - name: Build production package
         run: |
           yarn install
           yarn build:production
         env:
-          GITHUB_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
+          VEMPAIN_ACTION_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
 
       - name: Upload package to GitHub
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
