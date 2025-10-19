@@ -22,6 +22,8 @@ jobs:
         uses: actions/setup-node@v4.4.0
         with:
           node-version: '22'
+        env:
+          VEMPAIN_ACTION_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
 
       - name: Test
         run: |
@@ -48,6 +50,8 @@ jobs:
         uses: actions/setup-node@v4.4.0
         with:
           node-version: '22'
+        env:
+          VEMPAIN_ACTION_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
 
       - name: Get main and base version
         id: basemain
