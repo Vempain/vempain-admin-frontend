@@ -2,6 +2,7 @@ export type {ComponentVO} from './ComponentVO';
 export type {FileImportScheduleResponse} from './FileImportScheduleResponse';
 export type {FormVO} from './FormVO';
 export type {LayoutVO} from './LayoutVO';
+export type {LocationResponse} from './LocationResponse';
 export type {PageableVO} from './PageableVO';
 export type {PageVO} from './PageVO';
 export type {PublishScheduleResponse} from './PublishScheduleResponse';

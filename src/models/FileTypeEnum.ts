@@ -1,4 +1,4 @@
-export const FileClassEnum = {
+export const FileTypeEnum = {
     ARCHIVE:     'ARCHIVE',
     AUDIO:       'AUDIO',
     BINARY:      'BINARY',
@@ -15,4 +15,4 @@ export const FileClassEnum = {
     VIDEO:       'VIDEO',
 } as const;
 
-export type FileClassEnum = typeof FileClassEnum[keyof typeof FileClassEnum];
+export type FileTypeEnum = typeof FileTypeEnum[keyof typeof FileTypeEnum];
