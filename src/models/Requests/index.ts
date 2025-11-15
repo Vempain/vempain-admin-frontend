@@ -4,3 +4,5 @@ export type {GalleryRequest} from './GalleryRequest';
 export type {PublishItemRequest} from './PublishItemRequest';
 export type {PublishScheduleRequest} from './PublishScheduleRequest';
 export type {ScheduleTriggerRequest} from './ScheduleTriggerRequest';
+export type {WebSiteAclRequest} from './WebSiteAclRequest';
+export type {WebSiteUserRequest} from './WebSiteUserRequest';

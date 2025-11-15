@@ -9,5 +9,9 @@ export type {PublishScheduleResponse} from './PublishScheduleResponse';
 export type {ScheduleTriggerResponse} from './ScheduleTriggerResponse';
 export type {StringListVO} from './StringListVO';
 export type {TestVO} from './TestVO';
+export type {WebSiteAclResponse} from './WebSiteAclResponse';
+export type {WebSiteAclUsersResponse} from './WebSiteAclUsersResponse';
+export type {WebSiteUserResourcesResponse} from './WebSiteUserResourcesResponse';
+export type {WebSiteUserResponse} from './WebSiteUserResponse';
 
 export * from './Files';

@@ -1,8 +1,15 @@
+import {type JwtResponse} from "@vempain/vempain-auth-frontend";
 import Axios, {type AxiosInstance} from "axios";
-import type {FileImportScheduleResponse, PublishScheduleRequest, PublishScheduleResponse, ScheduleTriggerRequest, ScheduleTriggerResponse} from "../models";
-import type {JwtResponse} from "@vempain/vempain-auth-frontend";
+import {
+    type WebSiteAclRequest,
+    type WebSiteAclResponse,
+    type WebSiteAclUsersResponse,
+    type WebSiteUserRequest,
+    type WebSiteUserResourcesResponse,
+    type WebSiteUserResponse
+} from "../models";
 
-class ScheduleAPI {
+class SiteWebAccessAPI {
     protected axiosInstance: AxiosInstance;
 
     constructor(baseURL: string, member: string) {
@@ -24,61 +31,71 @@ class ScheduleAPI {
         }
     }
 
-    public async getSystemSchedules(): Promise<ScheduleTriggerResponse[]> {
+    async getAllWebUsers(): Promise<WebSiteUserResponse[]> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.get<ScheduleTriggerResponse[]>("/system-schedules");
+        const response = await this.axiosInstance.get<WebSiteUserResponse[]>("/users");
         return response.data;
     }
 
-    public async getSystemSchedule(scheduleName: string): Promise<ScheduleTriggerResponse> {
+    async getWebUserById(userId: number): Promise<WebSiteUserResponse> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.get<ScheduleTriggerResponse>("/system-schedules/" + scheduleName);
+        const response = await this.axiosInstance.get<WebSiteUserResponse>(`/users/${userId}`);
         return response.data;
     }
 
-    public async triggerSystemSchedule(triggerRequest: ScheduleTriggerRequest): Promise<ScheduleTriggerResponse> {
+    async createWebUser(request: WebSiteUserRequest): Promise<WebSiteUserResponse> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.post<ScheduleTriggerResponse>("/system-schedules", triggerRequest);
+        const response = await this.axiosInstance.post<WebSiteUserResponse>("/users", request);
         return response.data;
     }
 
-    public async getPublishSchedules(): Promise<PublishScheduleResponse[]> {
+    async updateWebUser(userId: number, request: WebSiteUserRequest): Promise<WebSiteUserResponse> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.get<PublishScheduleResponse[]>("/publishing");
+        const response = await this.axiosInstance.put<WebSiteUserResponse>(`/users/${userId}`, request);
         return response.data;
     }
 
-    public async getPublishSchedule(publishScheduleId: number): Promise<PublishScheduleResponse> {
+    async deleteWebUser(userId: number): Promise<void> {
+        this.setAuthorizationHeader();
+        await this.axiosInstance.delete(`/users/${userId}`);
+    }
+
+    async getAllWebAcls(): Promise<WebSiteAclResponse[]> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.get<PublishScheduleResponse>("/publishing/" + publishScheduleId);
+        const response = await this.axiosInstance.get<WebSiteAclResponse[]>("/acls");
         return response.data;
     }
 
-    public async triggerPublishSchedule(publishScheduleRequest: PublishScheduleRequest): Promise<ScheduleTriggerResponse> {
+    async getWebUsersByWebAclId(aclId: number): Promise<WebSiteAclUsersResponse> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.post<ScheduleTriggerResponse>("/publishing", publishScheduleRequest);
+        const response = await this.axiosInstance.get<WebSiteAclUsersResponse>(`/acls/${aclId}/users`);
         return response.data;
     }
 
-    public async getFileImportSchedules(): Promise<FileImportScheduleResponse[]> {
+    async getResourcesByWebUserId(userId: number): Promise<WebSiteUserResourcesResponse> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.get<FileImportScheduleResponse[]>("/file-imports");
+        const response = await this.axiosInstance.get<WebSiteUserResourcesResponse>(`/users/${userId}/resources`);
         return response.data;
     }
 
-    public async getFileImportScheduleByName(scheduleName: string): Promise<FileImportScheduleResponse[]> {
+    async createWebAcl(request: WebSiteAclRequest): Promise<WebSiteAclResponse> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.get<FileImportScheduleResponse[]>("/file-imports/" + scheduleName);
+        const response = await this.axiosInstance.post<WebSiteAclResponse>("/acls", request);
         return response.data;
+    }
+
+    async deleteWebAcl(id: number): Promise<void> {
+        this.setAuthorizationHeader();
+        await this.axiosInstance.delete(`/acls/${id}`);
     }
 }
 
-export const scheduleAPI = new ScheduleAPI(import.meta.env.VITE_APP_API_URL, "/schedule-management");
+export const siteWebAccessApi = new SiteWebAccessAPI(import.meta.env.VITE_APP_API_URL, "/admin-management/site-access");
