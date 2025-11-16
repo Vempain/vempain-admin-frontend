@@ -16,7 +16,7 @@ import {
     PageList,
     PagePublish
 } from "./content";
-import {UnitEditor, UnitList, UserEditor, UserList} from "./user";
+import {UnitEditor, UnitList, UserEditor, UserList, WebUserList} from "./user";
 import {LayoutDelete} from "./content/LayoutDelete";
 import {FileImport, GalleryDelete, GalleryEdit, GalleryList, GalleryPublish, GalleryRefresh} from "./file";
 import {FileImportScheduleList, FileImportScheduleTrigger, ItemPublishingList, ItemPublishTrigger, SystemScheduleList, SystemScheduleTrigger} from "./schedule";
@@ -87,6 +87,8 @@ function App() {
                                 <Route path={"/units/:paramId/edit"} element={<UnitEditor/>}/>
                                 <Route path={"/users"} element={<UserList/>}/>
                                 <Route path={"/users/:paramId/edit"} element={<UserEditor/>}/>
+                                {/* Administration */}
+                                <Route path={"/administration/web-users"} element={<WebUserList/>}/>
                             </Routes>
                         </div>
                         <BottomFooter/>

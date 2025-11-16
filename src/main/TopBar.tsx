@@ -192,10 +192,15 @@ export function TopBar() {
                         icon: <UserAddOutlined/>
                     },
                     {
+                        label: (<Link to={"/administration/web-users"}>Web users</Link>),
+                        key: "web-users",
+                        icon: <UsergroupAddOutlined/>
+                    },
+                    {
                         label: (<Link to={"/units"}>Units</Link>),
                         key: "units",
                         icon: <UsergroupAddOutlined/>
-                    },
+                    }
                 ],
             }] || []),
         ...(userSession &&

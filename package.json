@@ -34,6 +34,7 @@
     "dayjs": "^1.11.19",
     "dompurify": "^3.3.0",
     "env-cmd": "^11.0.0",
+    "rc-virtual-list": "^3.19.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-highlight-words": "^0.21.0",

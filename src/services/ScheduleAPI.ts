@@ -5,9 +5,9 @@ import type {JwtResponse} from "@vempain/vempain-auth-frontend";
 class ScheduleAPI {
     protected axiosInstance: AxiosInstance;
 
-    constructor(member: string) {
+    constructor(baseURL: string, member: string) {
         this.axiosInstance = Axios.create({
-            baseURL: `${import.meta.env.VITE_APP_API_URL}` + member
+            baseURL: baseURL + member
         });
     }
 
@@ -81,4 +81,4 @@ class ScheduleAPI {
     }
 }
 
-export const scheduleAPI = new ScheduleAPI("/schedule-management");
+export const scheduleAPI = new ScheduleAPI(import.meta.env.VITE_APP_API_URL, "/schedule-management");
