@@ -1,7 +1,7 @@
-export const QueryDetailEnum = {
+export const WebSiteResourceTypeEnum = {
     GALLERY: 'GALLERY',
-    FILE: 'FILE',
+    SITE_FILE: 'SITE_FILE',
     PAGE: 'PAGE'
 } as const;
 
-export type WebSiteResourceTypeEnum = typeof QueryDetailEnum[keyof typeof QueryDetailEnum];
+export type WebSiteResourceTypeEnum = typeof WebSiteResourceTypeEnum[keyof typeof WebSiteResourceTypeEnum];

@@ -5,4 +5,3 @@ export interface WebSiteUserResourcesResponse {
     username: string;
     resources: WebSiteResourceAccess[];
 }
-

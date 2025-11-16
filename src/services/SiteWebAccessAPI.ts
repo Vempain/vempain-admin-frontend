@@ -4,10 +4,13 @@ import {
     type WebSiteAclRequest,
     type WebSiteAclResponse,
     type WebSiteAclUsersResponse,
+    type WebSiteResourcePageResponse,
+    type WebSiteResourceQueryParams,
     type WebSiteUserRequest,
     type WebSiteUserResourcesResponse,
     type WebSiteUserResponse
 } from "../models";
+import {buildResourceQuery} from "../tools";
 
 class SiteWebAccessAPI {
     protected axiosInstance: AxiosInstance;
@@ -95,6 +98,14 @@ class SiteWebAccessAPI {
     async deleteWebAcl(id: number): Promise<void> {
         this.setAuthorizationHeader();
         await this.axiosInstance.delete(`/acls/${id}`);
+    }
+
+    async getResources(params: WebSiteResourceQueryParams): Promise<WebSiteResourcePageResponse> {
+        this.setAuthorizationHeader();
+        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
+        const queryString = buildResourceQuery(params);
+        const response = await this.axiosInstance.get<WebSiteResourcePageResponse>(`/resources?${queryString}`);
+        return response.data;
     }
 }
 
