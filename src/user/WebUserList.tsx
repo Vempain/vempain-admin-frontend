@@ -388,7 +388,7 @@ export function WebUserList() {
                 onOk={handleSubmit}
                 onCancel={closeModal}
                 confirmLoading={submitting}
-                width={940}
+                width={"95%"}
             >
                 <Form form={form} layout="vertical" preserve={false}>
                     <Form.Item
@@ -461,7 +461,7 @@ export function WebUserList() {
                         titles={["Available", "Assigned"]}
                         locale={{itemUnit: "resource", itemsUnit: "resources"}}
                         oneWay
-                        showSelectAll={false}
+                        showSelectAll={true}
                         loading={resourcesLoading}
                     >
                         {({onItemSelect, selectedKeys, filteredItems}) => (
