@@ -28,9 +28,21 @@ const {Content} = Layout;
 
 function App() {
     const {darkAlgorithm} = theme;
+    const darkThemeTokens = {
+        colorBgBase: "#050505",
+        colorBgLayout: "#121212",
+        colorTextBase: "#E0E0E0",
+        colorTextSecondary: "#B0B0B0",
+        colorPrimary: "#50B0ff",
+        colorLink: "#888888",
+        colorMenuItemHoverBg: "#333333",
+        colorMenuBackground: "#121212",
+        colorMenuItemText: "#E0E0E0",
+        colorMenuItemActiveBg: "#444444",
+    };
 
     return (
-            <ConfigProvider theme={{algorithm: darkAlgorithm}}>
+            <ConfigProvider theme={{algorithm: darkAlgorithm, token: darkThemeTokens}}>
                 <Layout className={"layout"}>
                     <TopBar/>
                     <Content style={{marginTop: "65px"}}>
