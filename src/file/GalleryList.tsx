@@ -211,9 +211,9 @@ export function GalleryList() {
     return (
             <div className={"DarkDiv"} key={"galleryListDiv"}>
                 <Spin tip={"Loading"} spinning={loading} key={"galleryListSpinner"}>
-                    <Space direction={"vertical"} size={"large"} key={"pageListSpace"}>
+                    <Space vertical={true} size={"large"} key={"pageListSpace"}>
                         <h1 key={"pageListHeader"}>Gallery List <Link to={"/galleries/0/edit"} key={"galleryAddLink"}><PlusCircleFilled/></Link></h1>
-                        <Space direction={"horizontal"}
+                        <Space vertical={false}
                                size={12}
                                style={{width: "100%", justifyContent: "left", margin: 0}}
                                key={"pageListSpaceMainButtonSpace"}

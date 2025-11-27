@@ -84,7 +84,7 @@ export function GalleryRefresh() {
                       indicator={<LoadingOutlined style={{fontSize: 24}} spin={true}/>}
                 >
                     {gallery !== null && gallery?.id !== undefined && <div>
-                        <Space direction={"vertical"} size={"large"}>
+                        <Space vertical={true} size={"large"}>
                             <h4>Refreshing '{gallery.short_name}' gallery files</h4>
 
                             <Button key={"refreshFilesButton-top"} type={"primary"} onClick={refreshGalleryFiles}>Refresh gallery files</Button>

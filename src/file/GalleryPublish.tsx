@@ -92,7 +92,7 @@ export function GalleryPublish() {
                       indicator={<LoadingOutlined style={{fontSize: 24}} spin={true}/>}
                 >
                     {gallery !== null && gallery?.id !== undefined && <div>
-                        <Space direction={"vertical"} size={"large"}>
+                        <Space vertical={true} size={"large"}>
                             <Input key={"galleryShortname"}
                                    value={gallery.short_name}
                                    style={{width: 800}}
@@ -104,7 +104,7 @@ export function GalleryPublish() {
                                       disabled={true}
                                       autoSize={true}
                             />
-                            <Divider orientation={"left"}>Publish message</Divider>
+                            <Divider orientation={"horizontal"}>Publish message</Divider>
                             <TextArea key={"publishMessage"} onChange={(event) => {
                                 setPublishMessage(event.target.value);
                             }}/>

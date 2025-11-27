@@ -21,7 +21,7 @@ export function PublishSchedule(publishScheduleProps: PublishScheduleProps) {
     }
 
     return (
-            <Space direction={"vertical"} size={"large"}>
+            <Space vertical={true} size={"large"}>
 
                 <Divider orientation="left">Publish schedule</Divider>
                 <Switch

@@ -104,7 +104,7 @@ export function PagePublish() {
             <div className={"DarkDiv"} key={"pagePublishDiv"}>
                 <Spin spinning={loading} tip={"Uploading page and files..."}>
                     {page !== null && page.body !== undefined && <div>
-                        <Space direction={"vertical"} size={"large"}>
+                        <Space vertical={true} size={"large"}>
                             <TextArea key={"pageBody"}
                                       value={page.body}
                                       style={{width: 800, height: "100%"}}
