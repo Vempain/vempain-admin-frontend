@@ -41,7 +41,7 @@ export function PageList() {
         setSearchText(selectedKeys[0]);
         setSearchedColumn(dataIndex);
         api.info({
-            message: "Searching for '" + searchText + "' in " + searchedColumn,
+            title: "Searching for '" + searchText + "' in " + searchedColumn,
             description: `Searching for "${selectedKeys[0]}" in ${dataIndex}`,
             duration: 2,
         });
@@ -323,7 +323,7 @@ export function PageList() {
             <div className={"DarkDiv"} key={"pageListDiv"}>
                 {contextHolder}
                 <Spin tip={spinMessage} spinning={loading} key={"pageListSpinner"}>
-                    <Space direction={"vertical"} size={"large"} key={"pageListSpace"}>
+                    <Space vertical={true} size={"large"} key={"pageListSpace"}>
                         <h1 key={"pageListHeader"}>Page List <Link to={"/pages/0/edit"}><PlusCircleFilled/></Link></h1>
                         <Button type={"primary"} onClick={publishAll}>Publish all pages</Button>
                         <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>

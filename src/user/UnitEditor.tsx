@@ -133,7 +133,7 @@ export function UnitEditor() {
                     >
                         <AclEdit acls={acls} parentForm={unitForm}/>
                     </Form.Item>
-                    <Form.Item wrapperCol={{offset: 8, span: 16,}}><Divider orientation={"left"}>Metadata</Divider></Form.Item>
+                    <Form.Item wrapperCol={{offset: 8, span: 16,}}><Divider orientation={"horizontal"}>Metadata</Divider></Form.Item>
                     <Form.Item name={"creator"} label={"Creator"}>
                         <Input disabled={true}/>
                     </Form.Item>

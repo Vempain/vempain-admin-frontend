@@ -220,7 +220,7 @@ export function GalleryEdit() {
                         >
                             <AclEdit acls={acls} parentForm={galleryForm}/>
                         </Form.Item>
-                        <Space direction={"horizontal"} size={12} style={{width: "100%", justifyContent: "center"}}>
+                        <Space vertical={false} size={12} style={{width: "100%", justifyContent: "center"}}>
                             <Button
                                     type={"primary"}
                                     htmlType={"submit"}

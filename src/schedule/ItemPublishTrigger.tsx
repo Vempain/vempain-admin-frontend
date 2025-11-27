@@ -126,7 +126,7 @@ function ItemPublishTrigger() {
     return (
             <div className={"DarkDiv"} key={"pagePublishDiv"}>
                 <Spin spinning={loading} tip={spinTip}>
-                    <Space direction={"vertical"} size={"large"}>
+                    <Space vertical={true} size={"large"}>
                         <h2>Publish Schedule Trigger</h2>
                         {publishSchedule !== null && <>
                             <Table key={"scheduleTable"}

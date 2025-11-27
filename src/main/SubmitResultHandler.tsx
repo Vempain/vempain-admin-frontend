@@ -14,7 +14,7 @@ function SubmitResultHandler({submitResult, successTo, failTo}: SubmitResultHand
                 <div className={"DarkDiv"} key={"submitResultOkHandlerDiv"}>
                     <Alert type={"success"}
                            showIcon
-                           message={submitResult.message}
+                           title={submitResult.message}
                            action={<Button type={"primary"} href={successTo}>Back</Button>}
                            key={"submitResultHandlerSuccessAlert"}
                     />
@@ -25,7 +25,7 @@ function SubmitResultHandler({submitResult, successTo, failTo}: SubmitResultHand
                 <div className={"DarkDiv"} key={"submitResultFailHandlerDiv"}>
                     <Alert type={"error"}
                            showIcon
-                           message={submitResult.message}
+                           title={submitResult.message}
                            action={<Button type={"primary"} href={failTo}>Back</Button>}
                            key={"submitResultHandlerErrorAlert"}
                     />
