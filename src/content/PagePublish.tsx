@@ -114,7 +114,7 @@ export function PagePublish() {
                                                               columns={galleryColumns}
                                                               dataSource={galleryList}
                                                               pagination={false}/>}
-                            <Divider orientation={"left"}>Publish message</Divider>
+                            <Divider orientation={"horizontal"}>Publish message</Divider>
                             <TextArea key={"publishMessage"} onChange={(event) => {
                                 setPublishMessage(event.target.value);
                             }}/>

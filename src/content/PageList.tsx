@@ -41,7 +41,7 @@ export function PageList() {
         setSearchText(selectedKeys[0]);
         setSearchedColumn(dataIndex);
         api.info({
-            message: "Searching for '" + searchText + "' in " + searchedColumn,
+            title: "Searching for '" + searchText + "' in " + searchedColumn,
             description: `Searching for "${selectedKeys[0]}" in ${dataIndex}`,
             duration: 2,
         });
