@@ -27,6 +27,12 @@ class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryVO> {
         const response = await this.axiosInstance.get<ActionVO>("/publish", {params: params});
         return response.data;
     }
+
+    public async searchGalleries(params: Record<string, any>) {
+        this.setAuthorizationHeader();
+        const response = await this.axiosInstance.get<GalleryVO[]>("/search", {params: params});
+        return response.data;
+    }
 }
 
 export const galleryAPI = new GalleryAPI(import.meta.env.VITE_APP_API_URL, "/content-management/galleries");

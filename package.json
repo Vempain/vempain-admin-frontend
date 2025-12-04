@@ -27,7 +27,7 @@
     "@types/dompurify": "^3.2.0",
     "@types/node": "^22.13.5",
     "@types/react-highlight-words": "^0.20.0",
-    "@vempain/vempain-auth-frontend": "^0.9.17",
+    "@vempain/vempain-auth-frontend": "^0.9.20",
     "@vitejs/plugin-react": "^5.1.0",
     "antd": "^6.0.1",
     "axios": "^1.13.2",
