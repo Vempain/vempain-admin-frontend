@@ -97,17 +97,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ant-design/v5-patch-for-react-19@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "@ant-design/v5-patch-for-react-19@npm:1.0.3"
-  peerDependencies:
-    antd: ">=5.22.6"
-    react: ">=19.0.0"
-    react-dom: ">=19.0.0"
-  checksum: 10c0/e3848c929b01a0a29a41e2886f489932e54d9665dd990c60c4b505e21740da2ef0db0d08f4dc7591651fa1f21b15227e7bb40f40280742225b4da74fd18cc899
-  languageName: node
-  linkType: hard
-
 "@asamuzakjp/css-color@npm:^3.2.0":
   version: 3.2.0
   resolution: "@asamuzakjp/css-color@npm:3.2.0"
@@ -1741,8 +1730,8 @@ __metadata:
   linkType: hard
 
 "@rc-component/select@npm:~1.2.0, @rc-component/select@npm:~1.2.4":
-  version: 1.2.5
-  resolution: "@rc-component/select@npm:1.2.5"
+  version: 1.2.7
+  resolution: "@rc-component/select@npm:1.2.7"
   dependencies:
     "@rc-component/trigger": "npm:^3.0.0"
     "@rc-component/util": "npm:^1.3.0"
@@ -1752,7 +1741,7 @@ __metadata:
   peerDependencies:
     react: "*"
     react-dom: "*"
-  checksum: 10c0/eaaa567b9d6cda4db685fa76f11a05fa563d1252544e597cb983227efd213b83837b9dc6643514b09e2e46b4b5947d95d92e90625cfb6317cee79af12239092c
+  checksum: 10c0/c684f47c9253134df17fe9cea65b885aae67ea55e2487807ee56b4ef3c2f86198308acabcce8d902205289815c037e6086459c353e0c54b7faf9b7027675cdfe
   languageName: node
   linkType: hard
 
@@ -2789,7 +2778,6 @@ __metadata:
   resolution: "@vempain/vempain-admin-frontend@workspace:."
   dependencies:
     "@ant-design/icons": "npm:^6.1.0"
-    "@ant-design/v5-patch-for-react-19": "npm:^1.0.3"
     "@eslint/js": "npm:^9.39.0"
     "@testing-library/jest-dom": "npm:^6.9.1"
     "@testing-library/react": "npm:^16.2.0"
@@ -3173,11 +3161,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.9.0":
-  version: 2.9.2
-  resolution: "baseline-browser-mapping@npm:2.9.2"
+  version: 2.9.3
+  resolution: "baseline-browser-mapping@npm:2.9.3"
   bin:
     baseline-browser-mapping: dist/cli.js
-  checksum: 10c0/4f9be09e20261ed26f19e9b95454dcb8d8371b87983c57cd9f70b9572e9b3053577f0d8d6d91297bdb605337747680686e22f62522a6e57ae2488fcacf641188
+  checksum: 10c0/5d17ae997e41036756b32c22df74ed222c2f31c1e6970d0bfe7912a6f00dc2b4a45c2ac68740ce9de7d0ee9ae049a5d22683b3ba692bdb981880189795ccb8b5
   languageName: node
   linkType: hard
 
@@ -3608,9 +3596,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.263":
-  version: 1.5.264
-  resolution: "electron-to-chromium@npm:1.5.264"
-  checksum: 10c0/d62cfc6ed02856de59b0e7baf5bb7995b611ba4df14355a0943301a56628bd0fad98287c0becdcf55509ff5ed38d7f01a33b9f962820c8aa8cbc90292035275c
+  version: 1.5.266
+  resolution: "electron-to-chromium@npm:1.5.266"
+  checksum: 10c0/74ada92ada1ace76ec5b7da8a9cc2d7f03db122a64ac8e12ae30eba3e358ffec443c0c5265bc6edcdeebfa73f449b21c361080c064eb1eec437db2d71fc03248
   languageName: node
   linkType: hard
 

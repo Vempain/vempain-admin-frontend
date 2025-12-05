@@ -4,7 +4,6 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import {BrowserRouter} from "react-router-dom";
-import '@ant-design/v5-patch-for-react-19';
 import {SessionProvider} from "@vempain/vempain-auth-frontend";
 
 const root = ReactDOM.createRoot(
