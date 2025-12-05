@@ -1,6 +1,6 @@
-import type {AbstractPermissionVO} from "@vempain/vempain-auth-frontend";
+import type {AbstractResponse} from "@vempain/vempain-auth-frontend";
 
-export interface CommonFileVO extends AbstractPermissionVO {
+export interface CommonFileVO extends AbstractResponse {
     comment: string;
     file_class_id: number;
     id: number;

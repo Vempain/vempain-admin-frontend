@@ -1,5 +1,7 @@
 import {type GalleryRequest, type GalleryVO, type PublishItemRequest, QueryDetailEnum} from "../../models";
 import {AbstractAPI, type ActionVO} from "@vempain/vempain-auth-frontend";
+import type GalleryPageResponse from "../../models/Responses/Files/GalleryPageResponse.ts";
+import type {GalleryPublishRequest} from "../../models/Requests/Files";
 
 class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryVO> {
     public async findAllByPage(params: { details: QueryDetailEnum }, pageId: number) {
@@ -25,6 +27,18 @@ class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryVO> {
     public async publishAll(params?: Record<string, any>): Promise<ActionVO> {
         this.setAuthorizationHeader();
         const response = await this.axiosInstance.get<ActionVO>("/publish", {params: params});
+        return response.data;
+    }
+
+    public async searchGalleries(params: Record<string, any>): Promise<GalleryPageResponse> {
+        this.setAuthorizationHeader();
+        const response = await this.axiosInstance.get<GalleryPageResponse>("/search", {params: params});
+        return response.data;
+    }
+
+    public async publishSelectedGalleries(galleryIdList: GalleryPublishRequest): Promise<ActionVO> {
+        this.setAuthorizationHeader();
+        const response = await this.axiosInstance.post<ActionVO>("/publish-selected", galleryIdList);
         return response.data;
     }
 }

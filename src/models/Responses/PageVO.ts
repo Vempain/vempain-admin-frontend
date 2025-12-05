@@ -1,6 +1,6 @@
-import type {AbstractPermissionVO} from "@vempain/vempain-auth-frontend";
+import type {AbstractResponse} from "@vempain/vempain-auth-frontend";
 
-export interface PageVO extends AbstractPermissionVO {
+export interface PageVO extends AbstractResponse {
     id: number;
     parent_id: number;
     form_id: number;

@@ -1582,15 +1582,15 @@ __metadata:
   linkType: hard
 
 "@rc-component/motion@npm:^1.0.0, @rc-component/motion@npm:^1.1.3, @rc-component/motion@npm:^1.1.4, @rc-component/motion@npm:~1.1.5":
-  version: 1.1.5
-  resolution: "@rc-component/motion@npm:1.1.5"
+  version: 1.1.6
+  resolution: "@rc-component/motion@npm:1.1.6"
   dependencies:
     "@rc-component/util": "npm:^1.2.0"
     clsx: "npm:^2.1.1"
   peerDependencies:
     react: ">=16.9.0"
     react-dom: ">=16.9.0"
-  checksum: 10c0/b051f6a38b584360fd865c31272b9a8f54d29b0fbbfe5e08196887432ceb50a7ee89aa91b0320fad60229244393621ce15ab5cec262c07d982b141075ea8cecc
+  checksum: 10c0/f4bf999d1f622784b609e3c900049b1d0664d22bf4b6af819c604152484a8a9266290d4db513704ea2c9ef18b006fb36abc91c06683a167e27f92ee410b32616
   languageName: node
   linkType: hard
 
@@ -2800,7 +2800,7 @@ __metadata:
     "@types/react": "npm:^19.1.9"
     "@types/react-dom": "npm:^19.1.6"
     "@types/react-highlight-words": "npm:^0.20.0"
-    "@vempain/vempain-auth-frontend": "npm:^0.9.17"
+    "@vempain/vempain-auth-frontend": "npm:^0.9.24"
     "@vitejs/plugin-react": "npm:^5.1.0"
     "@vitejs/plugin-react-swc": "npm:^4.2.1"
     antd: "npm:^6.0.1"
@@ -2828,9 +2828,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@vempain/vempain-auth-frontend@npm:^0.9.17":
-  version: 0.9.17
-  resolution: "@vempain/vempain-auth-frontend@npm:0.9.17::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-auth-frontend%2F0.9.17%2Fc35a5ea664e176192f1d17da1598c165da493e64"
+"@vempain/vempain-auth-frontend@npm:^0.9.24":
+  version: 0.9.24
+  resolution: "@vempain/vempain-auth-frontend@npm:0.9.24::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-auth-frontend%2F0.9.24%2Ffa44f4c5ef6d133100b10154d0d062e3d818432d"
   dependencies:
     antd: "npm:^6.0.0"
     dayjs: "npm:^1.11.19"
@@ -2843,7 +2843,7 @@ __metadata:
     axios: ^1.13.2
     react: ^19.2.0
     react-dom: ^19.2.0
-  checksum: 10c0/c4d1d069625eeab3132969a845a5c19404d107e80031e21bd4f2ba5f5bb89c3d762706756a7fc5ae7d201e6ab03ad54bf7eb43549854d7920d69d79ff045d2fc
+  checksum: 10c0/bbdc195a95f865a95ea7981d5f5c9077a7457a657851c07c1818e390a9569ae9b674f440955ba705a2bbaf74327fcb43a1db3cb0050e8431a400b63ae22d83cf
   languageName: node
   linkType: hard
 
@@ -3172,12 +3172,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"baseline-browser-mapping@npm:^2.8.25":
-  version: 2.8.32
-  resolution: "baseline-browser-mapping@npm:2.8.32"
+"baseline-browser-mapping@npm:^2.9.0":
+  version: 2.9.2
+  resolution: "baseline-browser-mapping@npm:2.9.2"
   bin:
     baseline-browser-mapping: dist/cli.js
-  checksum: 10c0/6c4aa0338ad177e946a27412de11769fb6474389a59cc03e13e0538d7285a94052a11525d46bb605ddb913a0c8a1180292d6f05cd4d6bc05bbf597c26bf5ce66
+  checksum: 10c0/4f9be09e20261ed26f19e9b95454dcb8d8371b87983c57cd9f70b9572e9b3053577f0d8d6d91297bdb605337747680686e22f62522a6e57ae2488fcacf641188
   languageName: node
   linkType: hard
 
@@ -3210,17 +3210,17 @@ __metadata:
   linkType: hard
 
 "browserslist@npm:^4.24.0":
-  version: 4.28.0
-  resolution: "browserslist@npm:4.28.0"
+  version: 4.28.1
+  resolution: "browserslist@npm:4.28.1"
   dependencies:
-    baseline-browser-mapping: "npm:^2.8.25"
-    caniuse-lite: "npm:^1.0.30001754"
-    electron-to-chromium: "npm:^1.5.249"
+    baseline-browser-mapping: "npm:^2.9.0"
+    caniuse-lite: "npm:^1.0.30001759"
+    electron-to-chromium: "npm:^1.5.263"
     node-releases: "npm:^2.0.27"
-    update-browserslist-db: "npm:^1.1.4"
+    update-browserslist-db: "npm:^1.2.0"
   bin:
     browserslist: cli.js
-  checksum: 10c0/4284fd568f7d40a496963083860d488cb2a89fb055b6affd316bebc59441fec938e090b3e62c0ee065eb0bc88cd1bc145f4300a16c75f3f565621c5823715ae1
+  checksum: 10c0/545a5fa9d7234e3777a7177ec1e9134bb2ba60a69e6b95683f6982b1473aad347c77c1264ccf2ac5dea609a9731fbfbda6b85782bdca70f80f86e28a402504bd
   languageName: node
   linkType: hard
 
@@ -3306,7 +3306,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.30001754":
+"caniuse-lite@npm:^1.0.30001759":
   version: 1.0.30001759
   resolution: "caniuse-lite@npm:1.0.30001759"
   checksum: 10c0/b0f415960ba34995cda18e0d25c4e602f6917b9179290a76bdd0311423505b78cc93e558a90c98a22a1cc6b1781ab720ef6beea24ec7e29a1c1164ca72eac3a2
@@ -3607,10 +3607,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-to-chromium@npm:^1.5.249":
-  version: 1.5.263
-  resolution: "electron-to-chromium@npm:1.5.263"
-  checksum: 10c0/d9ba38c5e87f4f1c78e64c7dcc2a32f764664cdbab3c576f23cb3d66a1c3ca1836ecfa00768ab4cd921a0832d09f65555f86eadb926f2cfd3fe93d6c57b8f583
+"electron-to-chromium@npm:^1.5.263":
+  version: 1.5.264
+  resolution: "electron-to-chromium@npm:1.5.264"
+  checksum: 10c0/d62cfc6ed02856de59b0e7baf5bb7995b611ba4df14355a0943301a56628bd0fad98287c0becdcf55509ff5ed38d7f01a33b9f962820c8aa8cbc90292035275c
   languageName: node
   linkType: hard
 
@@ -5282,10 +5282,10 @@ __metadata:
   linkType: hard
 
 "jsonwebtoken@npm:^9.0.0":
-  version: 9.0.2
-  resolution: "jsonwebtoken@npm:9.0.2"
+  version: 9.0.3
+  resolution: "jsonwebtoken@npm:9.0.3"
   dependencies:
-    jws: "npm:^3.2.2"
+    jws: "npm:^4.0.1"
     lodash.includes: "npm:^4.3.0"
     lodash.isboolean: "npm:^3.0.3"
     lodash.isinteger: "npm:^4.0.4"
@@ -5295,28 +5295,28 @@ __metadata:
     lodash.once: "npm:^4.0.0"
     ms: "npm:^2.1.1"
     semver: "npm:^7.5.4"
-  checksum: 10c0/d287a29814895e866db2e5a0209ce730cbc158441a0e5a70d5e940eb0d28ab7498c6bf45029cc8b479639bca94056e9a7f254e2cdb92a2f5750c7f358657a131
+  checksum: 10c0/6ca7f1e54886ea3bde7146a5a22b53847c46e25453c7f7307a69818b9a6ad48c390b2e59d5690fcfd03c529b01960060cc4bb0c686991d6edae2285dfd30f4ba
   languageName: node
   linkType: hard
 
-"jwa@npm:^1.4.1":
-  version: 1.4.2
-  resolution: "jwa@npm:1.4.2"
+"jwa@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "jwa@npm:2.0.1"
   dependencies:
     buffer-equal-constant-time: "npm:^1.0.1"
     ecdsa-sig-formatter: "npm:1.0.11"
     safe-buffer: "npm:^5.0.1"
-  checksum: 10c0/210a544a42ca22203e8fc538835205155ba3af6a027753109f9258bdead33086bac3c25295af48ac1981f87f9c5f941bc8f70303670f54ea7dcaafb53993d92c
+  checksum: 10c0/ab3ebc6598e10dc11419d4ed675c9ca714a387481466b10e8a6f3f65d8d9c9237e2826f2505280a739cf4cbcf511cb288eeec22b5c9c63286fc5a2e4f97e78cf
   languageName: node
   linkType: hard
 
-"jws@npm:^3.2.2":
-  version: 3.2.2
-  resolution: "jws@npm:3.2.2"
+"jws@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "jws@npm:4.0.1"
   dependencies:
-    jwa: "npm:^1.4.1"
+    jwa: "npm:^2.0.1"
     safe-buffer: "npm:^5.0.1"
-  checksum: 10c0/e770704533d92df358adad7d1261fdecad4d7b66fa153ba80d047e03ca0f1f73007ce5ed3fbc04d2eba09ba6e7e6e645f351e08e5ab51614df1b0aa4f384dfff
+  checksum: 10c0/6be1ed93023aef570ccc5ea8d162b065840f3ef12f0d1bb3114cade844de7a357d5dc558201d9a65101e70885a6fa56b17462f520e6b0d426195510618a154d0
   languageName: node
   linkType: hard
 
@@ -6109,13 +6109,13 @@ __metadata:
   linkType: hard
 
 "react-dom@npm:^19.2.0":
-  version: 19.2.0
-  resolution: "react-dom@npm:19.2.0"
+  version: 19.2.1
+  resolution: "react-dom@npm:19.2.1"
   dependencies:
     scheduler: "npm:^0.27.0"
   peerDependencies:
-    react: ^19.2.0
-  checksum: 10c0/fa2cae05248d01288e91523b590ce4e7635b1e13f1344e225f850d722a8da037bf0782f63b1c1d46353334e0c696909b82e582f8cad607948fde6f7646cc18d9
+    react: ^19.2.1
+  checksum: 10c0/e56b6b3d72314df580ca800b70a69a21c6372703c8f45d9b5451ca6519faefb2496d76ffa9c5adb94136d2bbf2fd303d0dfc208a2cd77ede3132877471af9470
   languageName: node
   linkType: hard
 
@@ -6146,20 +6146,20 @@ __metadata:
   linkType: hard
 
 "react-router-dom@npm:^7.10.0, react-router-dom@npm:^7.9.6":
-  version: 7.10.0
-  resolution: "react-router-dom@npm:7.10.0"
+  version: 7.10.1
+  resolution: "react-router-dom@npm:7.10.1"
   dependencies:
-    react-router: "npm:7.10.0"
+    react-router: "npm:7.10.1"
   peerDependencies:
     react: ">=18"
     react-dom: ">=18"
-  checksum: 10c0/049f7fa29236f5dc5bcbd606ed140bc061d93b0f6988c5f21f06a363bd27bbc378e36a0b9875535bfb5f333d483cddfa6187b6966b9fad99a0b7ee2b1b8aafa8
+  checksum: 10c0/e0d0f8176974567321ae6eda319064e4207339b930422cc5efb4e39214e065a698f3c706a9fdb41a4e6e0a1f79c91fe1122a5a960eb30430aaed34a658e336ed
   languageName: node
   linkType: hard
 
-"react-router@npm:7.10.0, react-router@npm:^7.9.6":
-  version: 7.10.0
-  resolution: "react-router@npm:7.10.0"
+"react-router@npm:7.10.1, react-router@npm:^7.9.6":
+  version: 7.10.1
+  resolution: "react-router@npm:7.10.1"
   dependencies:
     cookie: "npm:^1.0.1"
     set-cookie-parser: "npm:^2.6.0"
@@ -6169,14 +6169,14 @@ __metadata:
   peerDependenciesMeta:
     react-dom:
       optional: true
-  checksum: 10c0/233fb721f6297ae62557b26fc07d43087a8b4921f53cf2ac9e9971686b2853c0c49b5f8acb0160a49c815d5657b764dc2809d0131d062c3a634b5060e52c3d73
+  checksum: 10c0/e114a319603ccf0394f616f954ee3f53bec04636a2f13383b1e941b8fa6c1c64b71b60527e3db8e7f971dcfaaeb9a82bd7c2ddd884a718694e589403e6975d52
   languageName: node
   linkType: hard
 
 "react@npm:^19.2.0":
-  version: 19.2.0
-  resolution: "react@npm:19.2.0"
-  checksum: 10c0/1b6d64eacb9324725bfe1e7860cb7a6b8a34bc89a482920765ebff5c10578eb487e6b46b2f0df263bd27a25edbdae2c45e5ea5d81ae61404301c1a7192c38330
+  version: 19.2.1
+  resolution: "react@npm:19.2.1"
+  checksum: 10c0/2b5eaf407abb3db84090434c20d6c5a8e447ab7abcd8fe9eaf1ddc299babcf31284ee9db7ea5671d21c85ac5298bd632fa1a7da1ed78d5b368a537f5e1cd5d62
   languageName: node
   linkType: hard
 
@@ -6964,9 +6964,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"update-browserslist-db@npm:^1.1.4":
-  version: 1.1.4
-  resolution: "update-browserslist-db@npm:1.1.4"
+"update-browserslist-db@npm:^1.2.0":
+  version: 1.2.2
+  resolution: "update-browserslist-db@npm:1.2.2"
   dependencies:
     escalade: "npm:^3.2.0"
     picocolors: "npm:^1.1.1"
@@ -6974,7 +6974,7 @@ __metadata:
     browserslist: ">= 4.21.0"
   bin:
     update-browserslist-db: cli.js
-  checksum: 10c0/db0c9aaecf1258a6acda5e937fc27a7996ccca7a7580a1b4aa8bba6a9b0e283e5e65c49ebbd74ec29288ef083f1b88d4da13e3d4d326c1e5fc55bf72d7390702
+  checksum: 10c0/39c3ea08b397ffc8dc3a1c517f5c6ed5cc4179b5e185383dab9bf745879623c12062a2e6bf4f9427cc59389c7bfa0010e86858b923c1e349e32fdddd9b043bb2
   languageName: node
   linkType: hard
 
