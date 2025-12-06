@@ -1,4 +1,4 @@
-import {PlusOutlined, SearchOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined} from "@ant-design/icons";
 import {Button, Form, Input, message, Modal, Select, Space, Table, Transfer, Typography} from "antd";
 import type {ColumnsType} from "antd/es/table";
 import type {TransferProps} from "antd/es/transfer";
@@ -344,8 +344,8 @@ export function WebUserList() {
             key: "actions",
             render: (_, record) => (
                 <Space>
-                    <Button size="small" onClick={() => openEditModal(record)}>Edit</Button>
-                    <Button size="small" danger onClick={() => handleDelete(record)}>Delete</Button>
+                    <Button size="small" onClick={() => openEditModal(record)}><EditOutlined/></Button>
+                    <Button size="small" danger onClick={() => handleDelete(record)}><DeleteOutlined/></Button>
                 </Space>
             )
         }

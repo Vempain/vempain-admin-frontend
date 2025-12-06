@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {Button, Space, Spin, Table, type TablePaginationConfig} from "antd";
 import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
-import {PlusCircleFilled} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {type LayoutVO} from "../models";
 import {getPaginationConfig} from "../tools";
 import {layoutAPI} from "../services";
@@ -58,9 +58,9 @@ export function LayoutList() {
             key: "action",
             render: (_text: any, record: any) => (
                     <Space>
-                        <Button type={"primary"} href={`/layouts/${record.id}/edit`}>Edit</Button>
+                        <Button type={"primary"} href={`/layouts/${record.id}/edit`}><EditOutlined/></Button>
                         {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&
-                                <Button type={"primary"} danger href={`/layouts/${record.id}/delete`}>Delete</Button>}
+                                <Button type={"primary"} danger href={`/layouts/${record.id}/delete`}><DeleteOutlined/></Button>}
                     </Space>
             )
         }

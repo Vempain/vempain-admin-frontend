@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {Button, Spin, Table, type TablePaginationConfig} from "antd";
 import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
-import {PlusCircleFilled} from "@ant-design/icons";
+import {EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {unitAPI} from "../services";
 import {getPaginationConfig} from "../tools";
 import type {UnitVO} from "@vempain/vempain-auth-frontend";
@@ -59,7 +59,7 @@ export function UnitList() {
             title: "Action",
             key: "action",
             render: (_text: any, record: UnitVO) => (
-                    <Button type="primary" href={`/units/${record.id}/edit`}>Edit</Button>
+                    <Button type="primary" href={`/units/${record.id}/edit`}><EditOutlined/></Button>
             ),
         },
     ];

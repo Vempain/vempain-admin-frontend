@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {Button, Spin, Table, type TablePaginationConfig} from "antd";
 import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
-import {PlusCircleFilled} from "@ant-design/icons";
+import {EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {userAPI} from "../services";
 import {getPaginationConfig} from "../tools";
 import type {UserVO} from "@vempain/vempain-auth-frontend";
@@ -101,7 +101,7 @@ export function UserList() {
             title: "Action",
             key: "action",
             render: (_text: any, record: UserVO) => (
-                    <Button type="primary" href={`/users/${record.id}/edit`}>Edit</Button>
+                    <Button type="primary" href={`/users/${record.id}/edit`}><EditOutlined/></Button>
             ),
         },
     ];

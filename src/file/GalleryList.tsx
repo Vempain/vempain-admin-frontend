@@ -5,7 +5,7 @@ import {type GalleryVO} from "../models";
 import type {GalleryPublishRequest} from "../models/Requests/Files";
 import {fileSystemAPI, galleryAPI} from "../services";
 import {Link} from "react-router-dom";
-import {PlusCircleFilled} from "@ant-design/icons";
+import {EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {SubmitResultHandler} from "../main";
 import {PublishSchedule} from "../content";
 import {aclTool, ActionResult, PrivilegeEnum, type SubmitResult, useSession} from "@vempain/vempain-auth-frontend";
@@ -78,7 +78,7 @@ export function GalleryList() {
                                 key={`${record.id}-editButton`}
                                 href={`/galleries/${record.id}/edit`}
                         >
-                            Edit
+                            <EditOutlined/>
                         </Button>
                         {record.deletePrivilege && (
                                 <Button
