@@ -23,6 +23,8 @@ export function GalleryPublish() {
     const [publishDate, setPublishDate] = useState<Dayjs | null>(null);
     const [publishMessage, setPublishMessage] = useState<string>("");
 
+    const sortedSiteFiles = gallery?.site_files ? [...gallery.site_files].sort((a, b) => a.id - b.id) : [];
+
     useEffect(() => {
         setLoadingMessage("Loading directories");
         let tmpGalleryId: number = validateParamId(paramId);
@@ -111,8 +113,8 @@ export function GalleryPublish() {
                             <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
                             <Button key={"publishButton-top"} type={"primary"} onClick={publishGallery}>Publish gallery</Button>
                             {
-                                    gallery.site_files.length > 0 &&
-                                    gallery.site_files.map(siteFile => {
+                                    sortedSiteFiles.length > 0 &&
+                                    sortedSiteFiles.map(siteFile => {
                                         return (<SiteFileCard key={"siteFileCard-" + siteFile.id} siteFile={siteFile}/>);
                                     })
                             }
