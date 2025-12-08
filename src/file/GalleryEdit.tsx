@@ -5,7 +5,7 @@ import {Button, Col, Form, Input, Row, Select, Space, Spin} from "antd";
 import {galleryAPI, siteFileAPI} from "../services";
 import {AclEdit} from "../content";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
-import {type GalleryRequest, QueryDetailEnum} from "../models";
+import {FileTypeEnum, type GalleryRequest} from "../models";
 import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 
 export function GalleryEdit() {
@@ -37,7 +37,11 @@ export function GalleryEdit() {
 
         Promise.all([
             tmpGalleryId > 0 ? galleryAPI.findById(tmpGalleryId, null) : Promise.resolve(null),
-            siteFileAPI.findAll({details: QueryDetailEnum.MINIMAL})
+            siteFileAPI.findAll({
+                file_type: FileTypeEnum.IMAGE,
+                page_number: 0,
+                page_size: 25
+            })
         ])
                 .then(([galleryResponse, siteFileResponses]) => {
                     if (galleryResponse) {

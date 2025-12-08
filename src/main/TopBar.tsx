@@ -206,7 +206,7 @@ export function TopBar() {
         ...(userSession &&
                 [
                     {
-                        label: "Profile",
+                        label: "Profile (" + userSession.nickname + ")",
                         key: "profile",
                         icon: <InfoCircleOutlined/>,
                         children: [

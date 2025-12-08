@@ -411,7 +411,7 @@ export function WebUserList() {
                         Filter resources by type, optional site file subtype, or search text and move selected items to the right.
                     </Typography.Paragraph>
 
-                    <Space direction="vertical" style={{width: "100%", marginBottom: 16}}>
+                    <Space orientation={"vertical"} style={{width: "100%", marginBottom: 16}}>
                         <Space.Compact style={{width: "100%"}}>
                             <Select<ResourceType | undefined>
                                 placeholder="Resource type"
@@ -457,12 +457,11 @@ export function WebUserList() {
                         onChange={handleTransferChange}
                         render={renderTransferItem}
                         showSearch
-                        listStyle={{width: 420}}
+                        style={{width: "100%"}}
                         titles={["Available", "Assigned"]}
                         locale={{itemUnit: "resource", itemsUnit: "resources"}}
                         oneWay
                         showSelectAll={true}
-                        loading={resourcesLoading}
                     >
                         {({onItemSelect, selectedKeys, filteredItems}) => (
                             <VirtualList
