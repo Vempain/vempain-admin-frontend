@@ -252,16 +252,9 @@ export function PageEditor() {
                         <Form.Item name={"parent_id"} label={"Parent Page"}>
                             <Select
                                     placeholder={"Select a parent page"}
-                                    showSearch={true}
-                            >
-                                <Select.Option value={0} key={"emptyPage"}>None</Select.Option>
-                                {pageList.map(parentPage => {
-                                    return (
-                                            <Select.Option key={parentPage.id} value={parentPage.id}>
-                                                {parentPage.path}
-                                            </Select.Option>);
-                                })}
-                            </Select>
+                                    showSearch={{optionFilterProp: 'label', filterOption: filterOption}}
+                                    options={[{label: 'None', value: 0}, ...pageList.map(p => ({label: p.path, value: p.id}))]}
+                            />
                         </Form.Item>
                         <Form.Item name={"title"} label={"Title"}>
                             <Input/>
