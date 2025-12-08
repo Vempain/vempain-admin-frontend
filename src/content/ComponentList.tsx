@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import type {ColumnsType} from "antd/lib/table";
 import {Button, Space, Spin, Table, type TablePaginationConfig} from "antd";
-import {PlusCircleFilled} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {Link} from "react-router-dom";
 import {type ComponentVO} from "../models";
 import {getPaginationConfig} from "../tools";
@@ -62,11 +62,10 @@ export function ComponentList() {
             key: "action",
             render: (_text: any, record: ComponentVO) => (
                     <Space>
-                        <Button type="primary" href={`/components/${record.id}/edit`}>Edit</Button>
+                        <Button type="primary" href={`/components/${record.id}/edit`}><EditOutlined/></Button>
                         {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&
-                                <Button type={"primary"} danger href={`/components/${record.id}/delete`}>Delete</Button>}
+                                <Button type={"primary"} danger href={`/components/${record.id}/delete`}><DeleteOutlined/></Button>}
                     </Space>
-
             ),
         },
     ];

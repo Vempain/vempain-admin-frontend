@@ -5,7 +5,7 @@ import {type GalleryVO} from "../models";
 import type {GalleryPublishRequest} from "../models/Requests/Files";
 import {fileSystemAPI, galleryAPI} from "../services";
 import {Link} from "react-router-dom";
-import {PlusCircleFilled} from "@ant-design/icons";
+import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, ReloadOutlined} from "@ant-design/icons";
 import {SubmitResultHandler} from "../main";
 import {PublishSchedule} from "../content";
 import {aclTool, ActionResult, PrivilegeEnum, type SubmitResult, useSession} from "@vempain/vempain-auth-frontend";
@@ -78,7 +78,7 @@ export function GalleryList() {
                                 key={`${record.id}-editButton`}
                                 href={`/galleries/${record.id}/edit`}
                         >
-                            Edit
+                            <EditOutlined/>
                         </Button>
                         {record.deletePrivilege && (
                                 <Button
@@ -87,7 +87,7 @@ export function GalleryList() {
                                         key={`${record.id}-deleteButton`}
                                         href={`/galleries/${record.id}/delete`}
                                 >
-                                    Delete
+                                    <DeleteOutlined/>
                                 </Button>
                         )}
                         {record.createPrivilege && (
@@ -97,7 +97,7 @@ export function GalleryList() {
                                         key={`${record.id}-publishButton`}
                                         href={`/galleries/${record.id}/publish`}
                                 >
-                                    Publish
+                                    <CloudUploadOutlined/>
                                 </Button>
                         )}
                         {record.modifyPrivilege && (
@@ -107,7 +107,7 @@ export function GalleryList() {
                                         key={`${record.id}-refreshButton`}
                                         href={`/galleries/${record.id}/refresh`}
                                 >
-                                    Refresh files
+                                    <ReloadOutlined/>
                                 </Button>
                         )}
                     </Space>
@@ -132,15 +132,18 @@ export function GalleryList() {
     };
 
     function convertResponseToGalleryListItems(response: GalleryVO[]) {
-        const tmpGalleryList: GalleryListItem[] = response.map((gallery) => ({
-            id: gallery.id,
-            name: gallery.short_name,
-            description: gallery.description,
-            fileCount: gallery.site_files.length,
-            createPrivilege: aclTool.hasPrivilege(PrivilegeEnum.CREATE, userSession?.id, userSession?.units, gallery.acls),
-            modifyPrivilege: aclTool.hasPrivilege(PrivilegeEnum.MODIFY, userSession?.id, userSession?.units, gallery.acls),
-            deletePrivilege: aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, gallery.acls),
-        }));
+        const tmpGalleryList: GalleryListItem[] = response.map((gallery) => {
+                    return {
+                        id: gallery.id,
+                        name: gallery.short_name,
+                        description: gallery.description,
+                        fileCount: gallery.site_files.length,
+                        createPrivilege: aclTool.hasPrivilege(PrivilegeEnum.CREATE, userSession?.id, userSession?.units, gallery.acls),
+                        modifyPrivilege: aclTool.hasPrivilege(PrivilegeEnum.MODIFY, userSession?.id, userSession?.units, gallery.acls),
+                        deletePrivilege: aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, gallery.acls),
+                    };
+                }
+        );
         setGalleryList(tmpGalleryList);
     }
 

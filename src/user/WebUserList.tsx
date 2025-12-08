@@ -1,4 +1,4 @@
-import {PlusOutlined, SearchOutlined} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined} from "@ant-design/icons";
 import {Button, Form, Input, message, Modal, Select, Space, Table, Transfer, Typography} from "antd";
 import type {ColumnsType} from "antd/es/table";
 import type {TransferProps} from "antd/es/transfer";
@@ -344,8 +344,8 @@ export function WebUserList() {
             key: "actions",
             render: (_, record) => (
                 <Space>
-                    <Button size="small" onClick={() => openEditModal(record)}>Edit</Button>
-                    <Button size="small" danger onClick={() => handleDelete(record)}>Delete</Button>
+                    <Button size="small" onClick={() => openEditModal(record)}><EditOutlined/></Button>
+                    <Button size="small" danger onClick={() => handleDelete(record)}><DeleteOutlined/></Button>
                 </Space>
             )
         }
@@ -411,7 +411,7 @@ export function WebUserList() {
                         Filter resources by type, optional site file subtype, or search text and move selected items to the right.
                     </Typography.Paragraph>
 
-                    <Space direction="vertical" style={{width: "100%", marginBottom: 16}}>
+                    <Space orientation={"vertical"} style={{width: "100%", marginBottom: 16}}>
                         <Space.Compact style={{width: "100%"}}>
                             <Select<ResourceType | undefined>
                                 placeholder="Resource type"
@@ -457,12 +457,11 @@ export function WebUserList() {
                         onChange={handleTransferChange}
                         render={renderTransferItem}
                         showSearch
-                        listStyle={{width: 420}}
+                        style={{width: "100%"}}
                         titles={["Available", "Assigned"]}
                         locale={{itemUnit: "resource", itemsUnit: "resources"}}
                         oneWay
                         showSelectAll={true}
-                        loading={resourcesLoading}
                     >
                         {({onItemSelect, selectedKeys, filteredItems}) => (
                             <VirtualList

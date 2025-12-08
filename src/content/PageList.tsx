@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from "react";
 import {Button, Input, type InputRef, notification, Space, Spin, Table, type TableColumnType, type TablePaginationConfig} from "antd";
 import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
-import {PlusCircleFilled, SearchOutlined} from "@ant-design/icons";
+import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, SearchOutlined} from "@ant-design/icons";
 import {type PageVO, QueryDetailEnum} from "../models";
 import {pageAPI} from "../services";
 import dayjs from "dayjs";
@@ -254,9 +254,9 @@ export function PageList() {
             key: "action",
             render: (_text: any, record: PageVO) => (
                     <Space>
-                        <Button type="primary" href={`/pages/${record.id}/edit`}>Edit</Button>
-                        <Button type={"primary"} danger href={`/pages/${record.id}/delete`}>Delete</Button>
-                        <Button type={"primary"} style={{background: "green"}} href={`/pages/${record.id}/publish`}>Publish</Button>
+                        <Button type="primary" href={`/pages/${record.id}/edit`}><EditOutlined/></Button>
+                        <Button type={"primary"} danger href={`/pages/${record.id}/delete`}><DeleteOutlined/></Button>
+                        <Button type={"primary"} style={{background: "green"}} href={`/pages/${record.id}/publish`}><CloudUploadOutlined/></Button>
                     </Space>
             ),
         },
