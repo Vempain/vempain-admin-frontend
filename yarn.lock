@@ -2788,7 +2788,7 @@ __metadata:
     "@types/react": "npm:^19.1.9"
     "@types/react-dom": "npm:^19.1.6"
     "@types/react-highlight-words": "npm:^0.20.0"
-    "@vempain/vempain-auth-frontend": "npm:^0.9.24"
+    "@vempain/vempain-auth-frontend": "npm:^0.9.29"
     "@vitejs/plugin-react": "npm:^5.1.0"
     "@vitejs/plugin-react-swc": "npm:^4.2.1"
     antd: "npm:^6.0.1"
@@ -2810,15 +2810,15 @@ __metadata:
     ts-jest: "npm:^29.4.6"
     typescript: "npm:~5.9.3"
     typescript-eslint: "npm:^8.48.1"
-    vite: "npm:^7.2.6"
+    vite: "npm:^7.2.7"
     vite-tsconfig-paths: "npm:^5.1.4"
     web-vitals: "npm:^5.0.1"
   languageName: unknown
   linkType: soft
 
-"@vempain/vempain-auth-frontend@npm:^0.9.24":
-  version: 0.9.24
-  resolution: "@vempain/vempain-auth-frontend@npm:0.9.24::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-auth-frontend%2F0.9.24%2Ffa44f4c5ef6d133100b10154d0d062e3d818432d"
+"@vempain/vempain-auth-frontend@npm:^0.9.29":
+  version: 0.9.29
+  resolution: "@vempain/vempain-auth-frontend@npm:0.9.29::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-auth-frontend%2F0.9.29%2F3eab0da6f0f9b2ad7d1a13b0e12aa85bf57b8acc"
   dependencies:
     antd: "npm:^6.0.0"
     dayjs: "npm:^1.11.19"
@@ -2831,7 +2831,7 @@ __metadata:
     axios: ^1.13.2
     react: ^19.2.0
     react-dom: ^19.2.0
-  checksum: 10c0/bbdc195a95f865a95ea7981d5f5c9077a7457a657851c07c1818e390a9569ae9b674f440955ba705a2bbaf74327fcb43a1db3cb0050e8431a400b63ae22d83cf
+  checksum: 10c0/9ecbdb96f4ce5424026985a4c3c0f818fb8ebcf20b2556f8add4d84eb93bf88f63cafe77d8f3fef0af8689fc6661de7b6a8ad0eabbad79273c1f2ee3b2e2e91e
   languageName: node
   linkType: hard
 
@@ -7002,9 +7002,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^7.2.6":
-  version: 7.2.6
-  resolution: "vite@npm:7.2.6"
+"vite@npm:^7.2.7":
+  version: 7.2.7
+  resolution: "vite@npm:7.2.7"
   dependencies:
     esbuild: "npm:^0.25.0"
     fdir: "npm:^6.5.0"
@@ -7053,7 +7053,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10c0/d444a159ab8f0f854d596d1938f201b449d59ed4d336e587be9dc89005467214d85848c212c2495f76a8421372ffe4d061d023d659600f1aaa3ba5ac13e804f7
+  checksum: 10c0/0c502d9eb898d9c05061dbd8fd199f280b524bbb4c12ab5f88c7b12779947386684a269e4dd0aa424aa35bcd857f1aa44aadb9ea764702a5043af433052455b5
   languageName: node
   linkType: hard
 
