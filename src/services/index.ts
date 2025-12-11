@@ -7,5 +7,6 @@ export {pageAPI} from './PageAPI';
 export {scheduleAPI} from './ScheduleAPI';
 export {unitAPI} from './UnitAPI';
 export {userAPI} from './UserAPI';
+export {webSiteManagementAPI} from './WebSiteManagementAPI';
 
 export * from './Files';
