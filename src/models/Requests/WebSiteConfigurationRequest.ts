@@ -1,4 +1,4 @@
-import type {WebSiteConfigurationResponse} from "../Responses";
-
-export interface WebSiteConfigurationRequest extends WebSiteConfigurationResponse {
+export interface WebSiteConfigurationRequest {
+    id: string;
+    config_value: string;
 }
