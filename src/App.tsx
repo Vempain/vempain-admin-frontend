@@ -16,13 +16,14 @@ import {
     PageList,
     PagePublish
 } from "./content";
-import {UnitEditor, UnitList, UserEditor, UserList, WebUserList} from "./user";
+import {UnitEditor, UnitList, UserEditor, UserList} from "./user";
 import {LayoutDelete} from "./content/LayoutDelete";
 import {FileImport, GalleryDelete, GalleryEdit, GalleryList, GalleryPublish, GalleryRefresh} from "./file";
 import {FileImportScheduleList, FileImportScheduleTrigger, ItemPublishingList, ItemPublishTrigger, SystemScheduleList, SystemScheduleTrigger} from "./schedule";
 import {Login, Logout} from "@vempain/vempain-auth-frontend";
 import {FileTypeEnum} from "./models";
 import {SiteFileList} from "./file/SiteFileList.tsx";
+import {WebSiteConfiguration, WebSiteUserList} from "./website";
 
 const {Content} = Layout;
 
@@ -100,7 +101,8 @@ function App() {
                                 <Route path={"/users"} element={<UserList/>}/>
                                 <Route path={"/users/:paramId/edit"} element={<UserEditor/>}/>
                                 {/* Administration */}
-                                <Route path={"/administration/web-users"} element={<WebUserList/>}/>
+                                <Route path={"/administration/web-users"} element={<WebSiteUserList/>}/>
+                                <Route path={"/administration/web-site-configuration"} element={<WebSiteConfiguration/>}/>
                             </Routes>
                         </div>
                         <BottomFooter/>

@@ -1,4 +1,4 @@
-export interface SiteWebAccessApiError {
+export interface WebSiteManagementApiError {
     status: number;
     message: string;
     timestamp?: string;

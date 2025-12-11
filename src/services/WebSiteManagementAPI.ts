@@ -4,6 +4,8 @@ import {
     type WebSiteAclRequest,
     type WebSiteAclResponse,
     type WebSiteAclUsersResponse,
+    type WebSiteConfigurationRequest,
+    type WebSiteConfigurationResponse,
     type WebSiteResourcePageResponse,
     type WebSiteResourceQueryParams,
     type WebSiteUserRequest,
@@ -12,7 +14,7 @@ import {
 } from "../models";
 import {buildResourceQuery} from "../tools";
 
-class SiteWebAccessAPI {
+class WebSiteManagementAPI {
     protected axiosInstance: AxiosInstance;
 
     constructor(baseURL: string, member: string) {
@@ -34,6 +36,7 @@ class SiteWebAccessAPI {
         }
     }
 
+    // Web site user Management
     async getAllWebUsers(): Promise<WebSiteUserResponse[]> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
@@ -100,6 +103,7 @@ class SiteWebAccessAPI {
         await this.axiosInstance.delete(`/acls/${id}`);
     }
 
+    // Web site resource Management
     async getResources(params: WebSiteResourceQueryParams): Promise<WebSiteResourcePageResponse> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
@@ -107,6 +111,31 @@ class SiteWebAccessAPI {
         const response = await this.axiosInstance.get<WebSiteResourcePageResponse>(`/resources?${queryString}`);
         return response.data;
     }
+
+    // Web site configuration management
+
+    async getAllConfigurations(): Promise<WebSiteConfigurationResponse[]> {
+        this.setAuthorizationHeader();
+        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
+        const response = await this.axiosInstance.get<WebSiteConfigurationResponse[]>("/config");
+        return response.data;
+    }
+
+    async getConfiguration(id: number): Promise<WebSiteConfigurationResponse> {
+        this.setAuthorizationHeader();
+        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
+        const response = await this.axiosInstance.get<WebSiteConfigurationResponse>("/config/" + id);
+        return response.data;
+    }
+
+
+    async updateConfiguration(request: WebSiteConfigurationRequest): Promise<WebSiteConfigurationResponse> {
+        this.setAuthorizationHeader();
+        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
+        const response = await this.axiosInstance.put<WebSiteConfigurationResponse>("/config", request);
+        return response.data;
+    }
+
 }
 
-export const siteWebAccessApi = new SiteWebAccessAPI(import.meta.env.VITE_APP_API_URL, "/admin-management/site-access");
+export const webSiteManagementAPI = new WebSiteManagementAPI(import.meta.env.VITE_APP_API_URL, "/admin-management/site");

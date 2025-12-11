@@ -182,6 +182,23 @@ export function TopBar() {
                 ],
             },
             {
+                label: "Web Site Management",
+                key: "webSiteManagement",
+                icon: <UserOutlined/>,
+                children: [
+                    {
+                        label: (<Link to={"/administration/web-site-configuration"}>Web site configuration</Link>),
+                        key: "users",
+                        icon: <UserAddOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/administration/web-users"}>Web users</Link>),
+                        key: "web-users",
+                        icon: <UsergroupAddOutlined/>
+                    }
+                ],
+            },
+            {
                 label: "User Management",
                 key: "userManagement",
                 icon: <UserOutlined/>,
@@ -190,11 +207,6 @@ export function TopBar() {
                         label: (<Link to={"/users"}>Users</Link>),
                         key: "users",
                         icon: <UserAddOutlined/>
-                    },
-                    {
-                        label: (<Link to={"/administration/web-users"}>Web users</Link>),
-                        key: "web-users",
-                        icon: <UsergroupAddOutlined/>
                     },
                     {
                         label: (<Link to={"/units"}>Units</Link>),

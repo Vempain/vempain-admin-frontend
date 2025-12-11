@@ -13,8 +13,8 @@ import {
     type WebSiteUserResponse
 } from "../models";
 import {WebSiteResourceTypeEnum as WebSiteResourceTypeValues} from "../models/WebSiteResourceTypeEnum";
-import {siteWebAccessApi} from "../services/SiteWebAccessAPI";
 import VirtualList from "rc-virtual-list";
+import {webSiteManagementAPI} from "../services";
 
 const PAGE_SIZE = 100;
 
@@ -64,7 +64,7 @@ const resourceTypeOptions: ResourceType[] = Object.values(WebSiteResourceTypeVal
 
 const fileTypeOptions: FileType[] = Object.values(FileTypeEnum);
 
-export function WebUserList() {
+export function WebSiteUserList() {
     const [users, setUsers] = useState<WebSiteUserResponse[]>([]);
     const [loading, setLoading] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
@@ -98,7 +98,7 @@ export function WebUserList() {
     const loadUsers = useCallback(async () => {
         setLoading(true);
         try {
-            const data = await siteWebAccessApi.getAllWebUsers();
+            const data = await webSiteManagementAPI.getAllWebUsers();
             setUsers(data);
         } catch (err) {
             console.error(err);
@@ -128,7 +128,7 @@ export function WebUserList() {
             if (searchQuery.trim().length > 0) {
                 params.query = searchQuery.trim();
             }
-            const response = await siteWebAccessApi.getResources(params);
+            const response = await webSiteManagementAPI.getResources(params);
             const mapped = response.items.map(mapResourceResponseToOption);
             setResourceOptions((prev) => (append ? mergeResourceLists(prev, mapped) : mapped));
             setCurrentPage(response.page_number);
@@ -144,7 +144,7 @@ export function WebUserList() {
 
     const loadUserResources = useCallback(async (userId: number) => {
         try {
-            const userResources = await siteWebAccessApi.getResourcesByWebUserId(userId);
+            const userResources = await webSiteManagementAPI.getResourcesByWebUserId(userId);
             const mapped = userResources.resources.map(mapUserResourceToOption);
             const aclIds = mapped.map((item) => item.acl_id);
             setSelectedAclIds(aclIds);
@@ -246,7 +246,7 @@ export function WebUserList() {
 
         if (toAdd.length > 0) {
             try {
-                await Promise.all(toAdd.map((aclId) => siteWebAccessApi.createWebAcl({acl_id: aclId, user_id: userId})));
+                await Promise.all(toAdd.map((aclId) => webSiteManagementAPI.createWebAcl({acl_id: aclId, user_id: userId})));
             } catch (err) {
                 console.error(err);
                 message.error("Failed to add new resource assignments");
@@ -255,9 +255,9 @@ export function WebUserList() {
 
         if (toRemove.length > 0) {
             try {
-                const allAcls = await siteWebAccessApi.getAllWebAcls();
+                const allAcls = await webSiteManagementAPI.getAllWebAcls();
                 const deletableAcls = allAcls.filter((acl) => acl.user_id === userId && toRemove.includes(acl.acl_id));
-                await Promise.all(deletableAcls.map((acl) => siteWebAccessApi.deleteWebAcl(acl.id)));
+                await Promise.all(deletableAcls.map((acl) => webSiteManagementAPI.deleteWebAcl(acl.id)));
             } catch (err) {
                 console.error(err);
                 message.error("Failed to remove resource assignments");
@@ -277,9 +277,9 @@ export function WebUserList() {
                     message.error("Missing user identifier");
                     return;
                 }
-                await siteWebAccessApi.updateWebUser(userId, values);
+                await webSiteManagementAPI.updateWebUser(userId, values);
             } else {
-                const createdUser = await siteWebAccessApi.createWebUser(values);
+                const createdUser = await webSiteManagementAPI.createWebUser(values);
                 userId = resolveUserId(createdUser);
             }
 
@@ -318,7 +318,7 @@ export function WebUserList() {
             okType: "danger",
             onOk: async () => {
                 try {
-                    await siteWebAccessApi.deleteWebUser(userId);
+                    await webSiteManagementAPI.deleteWebUser(userId);
                     message.success("Web user deleted");
                     await loadUsers();
                 } catch (error) {
