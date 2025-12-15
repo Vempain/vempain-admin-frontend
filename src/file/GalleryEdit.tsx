@@ -1,5 +1,5 @@
 import {useParams} from "react-router-dom";
-import {type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {type ChangeEvent, type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {SubmitResultHandler} from "../main";
 import {Button, Form, Input, Select, Space, Spin, Switch, Transfer, Typography} from "antd";
 import type {TransferProps} from "antd/es/transfer";
@@ -57,7 +57,7 @@ export function GalleryEdit() {
     const selectedSiteFileIdsRef = useRef<number[]>([]);
 
     const searchAndFilterOptions = [
-        {label: "File name", value: "filename"},
+        {label: "File name", value: "fileName"},
         {label: "File path", value: "filepath"},
         {label: "Mime type", value: "mimetype"},
         {label: "Created", value: "created"},
@@ -212,7 +212,7 @@ export function GalleryEdit() {
             <div style={{display: "flex", flexDirection: "column"}}>
                 <Typography.Text strong>{item.file.file_name}</Typography.Text>
                 <Typography.Text type="secondary" style={{fontSize: 12}}>
-                    ID: {item.file.id} · {item.file.file_type} · {formatFileSize(item.file.size)}
+                    ID: {item.file.id} · {item.file.file_path} · {item.file.original_date_time} · {formatFileSize(item.file.size)}
                 </Typography.Text>
             </div>
     );
@@ -228,6 +228,11 @@ export function GalleryEdit() {
 
     const handleSearchSubmit = (value: string) => {
         setSiteFilesFilter(value.trim());
+    };
+    const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+        }
     };
 
     const handleSortByChange = (value: string) => {
@@ -319,104 +324,118 @@ export function GalleryEdit() {
                         </Form.Item>
 
                         <Form.Item label="Site Files">
-                            <Space wrap style={{marginBottom: 12}}>
-                                <Input.Search
-                                        value={siteFilesSearchInput}
-                                        allowClear
-                                        onChange={handleSearchInputChange}
-                                        onSearch={handleSearchSubmit}
-                                        style={{width: 240}}
-                                        placeholder="Search site files"
-                                />
-                                <Select
-                                        value={siteFilesSortBy}
-                                        onChange={handleSortByChange}
-                                        style={{width: 180}}
-                                        options={searchAndFilterOptions}
-                                        placeholder="Sort by"
-                                />
-                                <Select
-                                        value={siteFilesFilterColumn}
-                                        onChange={handleSearchColumnChange}
-                                        style={{width: 160}}
-                                        options={searchAndFilterOptions}
-                                        placeholder="Filter column"
-                                />
-                                <Select
-                                        value={selectedFileType}
-                                        onChange={handleFileTypeChange}
-                                        style={{width: 160}}
-                                        options={siteFileTypeOptions}
-                                        placeholder="File type"
-                                />
-                                <Select
-                                        value={siteFilesSortDirection}
-                                        onChange={handleDirectionChange}
-                                        style={{width: 160}}
-                                        options={[
-                                            {label: "Ascending", value: SortDirectionEnum.ASC},
-                                            {label: "Descending", value: SortDirectionEnum.DESC}
-                                        ]}
-                                        placeholder="Sort direction"
-                                />
-                                <Space>
-                                    <Typography.Text>Case sensitive</Typography.Text>
-                                    <Switch checked={siteFilesCaseSensitive} onChange={handleCaseSensitiveChange}/>
+                            <Space direction="vertical" style={{width: "100%"}}>
+                                <Space wrap style={{width: "100%"}}>
+                                    <div style={{display: "flex", flexDirection: "column", minWidth: 240}}>
+                                        <Typography.Text strong>Search site files</Typography.Text>
+                                        <Input.Search
+                                                value={siteFilesSearchInput}
+                                                allowClear
+                                                onChange={handleSearchInputChange}
+                                                onSearch={handleSearchSubmit}
+                                                onKeyDown={handleSearchKeyDown}
+                                                style={{width: 240}}
+                                                placeholder="Search site files"
+                                        />
+                                    </div>
+                                    <div style={{display: "flex", flexDirection: "column", minWidth: 180}}>
+                                        <Typography.Text strong>Sort by</Typography.Text>
+                                        <Select
+                                                value={siteFilesSortBy}
+                                                onChange={handleSortByChange}
+                                                style={{width: 180}}
+                                                options={searchAndFilterOptions}
+                                        />
+                                    </div>
+                                    <div style={{display: "flex", flexDirection: "column", minWidth: 160}}>
+                                        <Typography.Text strong>Filter column</Typography.Text>
+                                        <Select
+                                                value={siteFilesFilterColumn}
+                                                onChange={handleSearchColumnChange}
+                                                style={{width: 160}}
+                                                options={searchAndFilterOptions}
+                                        />
+                                    </div>
+                                    <div style={{display: "flex", flexDirection: "column", minWidth: 160}}>
+                                        <Typography.Text strong>File type</Typography.Text>
+                                        <Select
+                                                value={selectedFileType}
+                                                onChange={handleFileTypeChange}
+                                                style={{width: 160}}
+                                                options={siteFileTypeOptions}
+                                        />
+                                    </div>
+                                    <div style={{display: "flex", flexDirection: "column", minWidth: 160}}>
+                                        <Typography.Text strong>Sort direction</Typography.Text>
+                                        <Select
+                                                value={siteFilesSortDirection}
+                                                onChange={handleDirectionChange}
+                                                style={{width: 160}}
+                                                options={[
+                                                    {label: "Ascending", value: SortDirectionEnum.ASC},
+                                                    {label: "Descending", value: SortDirectionEnum.DESC}
+                                                ]}
+                                        />
+                                    </div>
+                                    <div style={{display: "flex", flexDirection: "column", minWidth: 120}}>
+                                        <Typography.Text strong>Case sensitive</Typography.Text>
+                                        <Switch checked={siteFilesCaseSensitive} onChange={handleCaseSensitiveChange}/>
+                                    </div>
                                 </Space>
-                            </Space>
-                            <Spin spinning={siteFilesLoading}>
-                                <Transfer<SiteFileTransferItem>
-                                        dataSource={transferDataSource}
-                                        targetKeys={transferTargetKeys}
-                                        onChange={handleTransferChange}
-                                        showSearch={true}
-                                        showSelectAll={true}
-                                        oneWay={selectedSiteFileIds.length === 0}
-                                        filterOption={transferFilter}
-                                        render={(item) => item.file.file_name}
-                                        titles={["Available files", "Assigned files"]}
-                                        style={{width: "100%", backgroundColor: "#303030"}}
-                                        locale={{itemUnit: "file", itemsUnit: "files"}}
-                                >
-                                    {({onItemSelect, selectedKeys, filteredItems}) => (
-                                            <VirtualList
-                                                    data={filteredItems}
-                                                    height={420}
-                                                    itemHeight={56}
-                                                    itemKey="key"
-                                                    style={{height: 420, overflow: "auto"}}
-                                            >
-                                                {(item) => {
-                                                    const checked = selectedKeys.includes(item.key);
-                                                    return (
-                                                            <div
-                                                                    key={item.key}
-                                                                    className="virtual-transfer-item"
-                                                                    style={{padding: 12, cursor: "pointer", display: "flex", alignItems: "center"}}
-                                                                    onClick={() => onItemSelect(item.key, !checked)}
-                                                                    role="option"
-                                                                    aria-selected={checked}
-                                                            >
-                                                                <input type="checkbox" readOnly checked={checked} style={{marginRight: 12}}/>
-                                                                {renderTransferItem(item)}
-                                                            </div>
-                                                    );
-                                                }}
-                                            </VirtualList>
+                                <Spin spinning={siteFilesLoading}>
+                                    <Transfer<SiteFileTransferItem>
+                                            dataSource={transferDataSource}
+                                            targetKeys={transferTargetKeys}
+                                            onChange={handleTransferChange}
+                                            showSearch={true}
+                                            showSelectAll={true}
+                                            oneWay={selectedSiteFileIds.length === 0}
+                                            filterOption={transferFilter}
+                                            render={(item) => item.file.file_name}
+                                            titles={["Available files", "Assigned files"]}
+                                            style={{width: "100%", backgroundColor: "#303030"}}
+                                            locale={{itemUnit: "file", itemsUnit: "files"}}
+                                    >
+                                        {({onItemSelect, selectedKeys, filteredItems}) => (
+                                                <VirtualList
+                                                        data={filteredItems}
+                                                        height={420}
+                                                        itemHeight={56}
+                                                        itemKey="key"
+                                                        style={{height: 420, overflow: "auto"}}
+                                                >
+                                                    {(item) => {
+                                                        const checked = selectedKeys.includes(item.key);
+                                                        return (
+                                                                <div
+                                                                        key={item.key}
+                                                                        className="virtual-transfer-item"
+                                                                        style={{padding: 12, cursor: "pointer", display: "flex", alignItems: "center"}}
+                                                                        onClick={() => onItemSelect(item.key, !checked)}
+                                                                        role="option"
+                                                                        aria-selected={checked}
+                                                                >
+                                                                    <input type="checkbox" readOnly checked={checked} style={{marginRight: 12}}/>
+                                                                    {renderTransferItem(item)}
+                                                                </div>
+                                                        );
+                                                    }}
+                                                </VirtualList>
+                                        )}
+                                    </Transfer>
+                                </Spin>
+                                <Space wrap style={{marginTop: 12}}>
+                                    {currentPage + 1 < totalPages && (
+                                            <Button onClick={handleLoadMoreResources} loading={siteFilesLoading}>
+                                                Load more resources (next page {currentPage + 2} of {totalPages}, total {totalElements})
+                                            </Button>
                                     )}
-                                </Transfer>
-                            </Spin>
-                            <Space wrap style={{marginTop: 12}}>
-                                {currentPage + 1 < totalPages && (
-                                        <Button onClick={handleLoadMoreResources} loading={siteFilesLoading}>
-                                            Load more resources (next page {currentPage + 2} of {totalPages}, total {totalElements})
-                                        </Button>
-                                )}
-                                <Typography.Text
-                                        type={selectedSiteFileIds.length === 0 ? "warning" : "secondary"}
-                                >
-                                    {selectedSiteFileIds.length} resource{selectedSiteFileIds.length === 1 ? "" : "s"} selected
-                                </Typography.Text>
+                                    <Typography.Text
+                                            type={selectedSiteFileIds.length === 0 ? "warning" : "secondary"}
+                                    >
+                                        {selectedSiteFileIds.length} resource{selectedSiteFileIds.length === 1 ? "" : "s"} selected
+                                    </Typography.Text>
+                                </Space>
                             </Space>
                         </Form.Item>
                         <Form.Item name="site_files_id" hidden>
