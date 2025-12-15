@@ -1,14 +1,14 @@
 import {useParams} from "react-router-dom";
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {SubmitResultHandler} from "../main";
-import {Button, Form, Input, Space, Spin, Transfer, Typography} from "antd";
+import {Button, Form, Input, Select, Space, Spin, Switch, Transfer, Typography} from "antd";
 import type {TransferProps} from "antd/es/transfer";
 import VirtualList from "rc-virtual-list";
 import {galleryAPI, siteFileAPI} from "../services";
 import {AclEdit} from "../content";
 import type {SiteFileResponse} from "../models";
 import {FileTypeEnum, type GalleryRequest, type GalleryVO} from "../models";
-import {aclTool, type AclVO, ActionResult, type SubmitResult, useSession, validateParamId} from "@vempain/vempain-auth-frontend";
+import {aclTool, type AclVO, ActionResult, SortDirectionEnum, type SubmitResult, useSession, validateParamId} from "@vempain/vempain-auth-frontend";
 import dayjs from "dayjs";
 
 const PAGE_SIZE = 50;
@@ -42,12 +42,39 @@ export function GalleryEdit() {
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
     const [siteFilesLoading, setSiteFilesLoading] = useState(false);
+    const [siteFilesSearchInput, setSiteFilesSearchInput] = useState("");
+    const [siteFilesFilter, setSiteFilesFilter] = useState("");
+    const [siteFilesFilterColumn, setSiteFilesFilterColumn] = useState("");
+    const [selectedFileType, setSelectedFileType] = useState<FileTypeEnum>(FileTypeEnum.IMAGE);
+    const [siteFilesSortBy, setSiteFilesSortBy] = useState("id");
+    const [siteFilesSortDirection, setSiteFilesSortDirection] = useState<SortDirectionEnum>(SortDirectionEnum.ASC);
+    const [siteFilesCaseSensitive, setSiteFilesCaseSensitive] = useState(false);
 
     const [galleryForm] = Form.useForm();
 
     const [siteFileMap, setSiteFileMap] = useState<Map<number, SiteFileResponse>>(() => new Map());
     const [selectedSiteFileIds, setSelectedSiteFileIds] = useState<number[]>([]);
     const selectedSiteFileIdsRef = useRef<number[]>([]);
+
+    const searchAndFilterOptions = [
+        {label: "File name", value: "filename"},
+        {label: "File path", value: "filepath"},
+        {label: "Mime type", value: "mimetype"},
+        {label: "Created", value: "created"},
+        {label: "Modified", value: "modified"},
+        {label: "Subject", value: "subject"},
+        {label: "Size", value: "size"}
+    ];
+
+    // Loop through all FileTypeEnum values to create options
+
+    const siteFileTypeOptions = useMemo(() => {
+        const options = [];
+        for (const value in FileTypeEnum) {
+            options.push({label: value.charAt(0) + value.slice(1).toLowerCase(), value: FileTypeEnum[value as keyof typeof FileTypeEnum]});
+        }
+        return options;
+    }, []);
 
     const hydrateSiteFiles = useCallback((files: SiteFileResponse[]) => {
         if (files.length === 0) {
@@ -60,14 +87,28 @@ export function GalleryEdit() {
         });
     }, []);
 
-    const fetchSiteFiles = useCallback(async (page = 0, append = false) => {
-        setSiteFilesLoading(true);
+    const applySelectedSiteFiles = useCallback((files: SiteFileResponse[]) => {
+        const ids = files.map((file) => file.id);
+        setSelectedSiteFileIds(ids);
+        selectedSiteFileIdsRef.current = ids;
+        galleryForm.setFieldsValue({site_files_id: ids});
+        hydrateSiteFiles(files);
+    }, [galleryForm, hydrateSiteFiles]);
 
-        siteFileAPI.getPagedSiteFiles({
-            file_type: FileTypeEnum.IMAGE,
+    const fetchSiteFiles = useCallback((page = 0, append = false) => {
+        setSiteFilesLoading(true);
+        const params = {
+            page_size: PAGE_SIZE,
             page_number: page,
-            page_size: PAGE_SIZE
-        })
+            sort_by: siteFilesSortBy,
+            direction: siteFilesSortDirection,
+            filter: siteFilesFilter || undefined,
+            filter_column: siteFilesFilterColumn,
+            case_sensitive: siteFilesCaseSensitive,
+            file_type: selectedFileType
+        };
+
+        siteFileAPI.getPagedSiteFiles(params)
                 .then((response) => {
                     setCurrentPage(response.page);
                     setTotalPages(response.total_pages);
@@ -87,7 +128,7 @@ export function GalleryEdit() {
                         return next;
                     });
 
-                    if (!append && response.empty) {
+                    if (!append && response.empty && siteFilesFilter.length === 0) {
                         setLoadResults({status: ActionResult.FAIL, message: "No site files found, cannot proceed"});
                     }
                 })
@@ -97,21 +138,11 @@ export function GalleryEdit() {
                 .finally(() => {
                     setSiteFilesLoading(false);
                 });
-    }, []);
+    }, [siteFilesSortBy, siteFilesSortDirection, siteFilesFilter, siteFilesCaseSensitive, selectedFileType]);
 
-    function handleLoadMoreResources() {
-        if (currentPage + 1 < totalPages) {
-            void fetchSiteFiles(currentPage + 1, true);
-        }
-    }
-
-    const applySelectedSiteFiles = useCallback((files: SiteFileResponse[]) => {
-        const ids = files.map((file) => file.id);
-        setSelectedSiteFileIds(ids);
-        selectedSiteFileIdsRef.current = ids;
-        galleryForm.setFieldsValue({site_files_id: ids});
-        hydrateSiteFiles(files);
-    }, [galleryForm, hydrateSiteFiles]);
+    useEffect(() => {
+        void fetchSiteFiles(0, false);
+    }, [fetchSiteFiles]);
 
     useEffect(() => {
         let userId = userSession?.id ?? 0;
@@ -157,9 +188,7 @@ export function GalleryEdit() {
         }).finally(() => {
             setLoading(false);
         });
-
-        void fetchSiteFiles(0, false);
-    }, [paramId, userSession?.id, fetchSiteFiles, applySelectedSiteFiles]);
+    }, [paramId, userSession?.id, applySelectedSiteFiles]);
 
     const transferDataSource = useMemo(() => Array.from(siteFileMap.values()).map((file) => ({
         key: String(file.id),
@@ -187,6 +216,46 @@ export function GalleryEdit() {
                 </Typography.Text>
             </div>
     );
+
+    const handleSearchInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const {value} = event.target;
+        setSiteFilesSearchInput(value);
+
+        if (value === "") {
+            setSiteFilesFilter("");
+        }
+    };
+
+    const handleSearchSubmit = (value: string) => {
+        setSiteFilesFilter(value.trim());
+    };
+
+    const handleSortByChange = (value: string) => {
+        setSiteFilesSortBy(value);
+    };
+
+    const handleFileTypeChange = (value: string) => {
+        const filetype = FileTypeEnum[value as keyof typeof FileTypeEnum];
+        setSelectedFileType(filetype);
+    };
+
+    const handleSearchColumnChange = (value: string) => {
+        setSiteFilesFilterColumn(value);
+    };
+
+    const handleDirectionChange = (value: SortDirectionEnum) => {
+        setSiteFilesSortDirection(value);
+    };
+
+    const handleCaseSensitiveChange = (checked: boolean) => {
+        setSiteFilesCaseSensitive(checked);
+    };
+
+    function handleLoadMoreResources() {
+        if (!siteFilesLoading && currentPage + 1 < totalPages) {
+            void fetchSiteFiles(currentPage + 1, true);
+        }
+    }
 
     function onFinish(values: GalleryRequest) {
         for (let i = 0; i < values.acls.length; i++) {
@@ -250,6 +319,51 @@ export function GalleryEdit() {
                         </Form.Item>
 
                         <Form.Item label="Site Files">
+                            <Space wrap style={{marginBottom: 12}}>
+                                <Input.Search
+                                        value={siteFilesSearchInput}
+                                        allowClear
+                                        onChange={handleSearchInputChange}
+                                        onSearch={handleSearchSubmit}
+                                        style={{width: 240}}
+                                        placeholder="Search site files"
+                                />
+                                <Select
+                                        value={siteFilesSortBy}
+                                        onChange={handleSortByChange}
+                                        style={{width: 180}}
+                                        options={searchAndFilterOptions}
+                                        placeholder="Sort by"
+                                />
+                                <Select
+                                        value={siteFilesFilterColumn}
+                                        onChange={handleSearchColumnChange}
+                                        style={{width: 160}}
+                                        options={searchAndFilterOptions}
+                                        placeholder="Filter column"
+                                />
+                                <Select
+                                        value={selectedFileType}
+                                        onChange={handleFileTypeChange}
+                                        style={{width: 160}}
+                                        options={siteFileTypeOptions}
+                                        placeholder="File type"
+                                />
+                                <Select
+                                        value={siteFilesSortDirection}
+                                        onChange={handleDirectionChange}
+                                        style={{width: 160}}
+                                        options={[
+                                            {label: "Ascending", value: SortDirectionEnum.ASC},
+                                            {label: "Descending", value: SortDirectionEnum.DESC}
+                                        ]}
+                                        placeholder="Sort direction"
+                                />
+                                <Space>
+                                    <Typography.Text>Case sensitive</Typography.Text>
+                                    <Switch checked={siteFilesCaseSensitive} onChange={handleCaseSensitiveChange}/>
+                                </Space>
+                            </Space>
                             <Spin spinning={siteFilesLoading}>
                                 <Transfer<SiteFileTransferItem>
                                         dataSource={transferDataSource}
@@ -270,6 +384,7 @@ export function GalleryEdit() {
                                                     height={420}
                                                     itemHeight={56}
                                                     itemKey="key"
+                                                    style={{height: 420, overflow: "auto"}}
                                             >
                                                 {(item) => {
                                                     const checked = selectedKeys.includes(item.key);
@@ -293,12 +408,13 @@ export function GalleryEdit() {
                             </Spin>
                             <Space wrap style={{marginTop: 12}}>
                                 {currentPage + 1 < totalPages && (
-                                        <Button style={{marginTop: 12}} onClick={handleLoadMoreResources} loading={siteFilesLoading}>
-                                            Load more resources (page {currentPage + 2} of {totalPages} and {totalElements})
+                                        <Button onClick={handleLoadMoreResources} loading={siteFilesLoading}>
+                                            Load more resources (next page {currentPage + 2} of {totalPages}, total {totalElements})
                                         </Button>
                                 )}
-
-                                <Typography.Text type={selectedSiteFileIds.length === 0 ? "warning" : "secondary"} style={{display: "block", marginTop: 12}}>
+                                <Typography.Text
+                                        type={selectedSiteFileIds.length === 0 ? "warning" : "secondary"}
+                                >
                                     {selectedSiteFileIds.length} resource{selectedSiteFileIds.length === 1 ? "" : "s"} selected
                                 </Typography.Text>
                             </Space>
