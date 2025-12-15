@@ -1,6 +1,7 @@
 import {Button, Drawer, Grid, Layout, Menu, type MenuProps, Tooltip} from "antd";
 import {useState} from "react";
 import {
+    ApartmentOutlined,
     AppstoreOutlined,
     AudioOutlined,
     ClockCircleOutlined,
@@ -22,6 +23,7 @@ import {
     PictureOutlined,
     RetweetOutlined,
     SettingFilled,
+    SettingOutlined,
     SnippetsOutlined,
     SwapOutlined,
     UploadOutlined,
@@ -184,12 +186,12 @@ export function TopBar() {
             {
                 label: "Web Site Management",
                 key: "webSiteManagement",
-                icon: <UserOutlined/>,
+                icon: <ApartmentOutlined/>,
                 children: [
                     {
                         label: (<Link to={"/administration/web-site-configuration"}>Web site configuration</Link>),
-                        key: "users",
-                        icon: <UserAddOutlined/>
+                        key: "web-site-configuration",
+                        icon: <SettingOutlined/>
                     },
                     {
                         label: (<Link to={"/administration/web-users"}>Web users</Link>),
@@ -304,7 +306,7 @@ export function TopBar() {
                                     onClose={() => setDrawerOpen(false)}
                                     open={drawerOpen}
                                     styles={{body: {padding: "0"}}}
-                                    width={260}
+                                    size={260}
                             >
                                 <Menu
                                         onClick={onClick}

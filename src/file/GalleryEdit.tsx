@@ -1,132 +1,225 @@
 import {useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {SubmitResultHandler} from "../main";
-import {Button, Col, Form, Input, Row, Select, Space, Spin} from "antd";
+import {Button, Form, Input, Space, Spin, Transfer, Typography} from "antd";
+import type {TransferProps} from "antd/es/transfer";
+import VirtualList from "rc-virtual-list";
 import {galleryAPI, siteFileAPI} from "../services";
 import {AclEdit} from "../content";
-import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
-import {FileTypeEnum, type GalleryRequest} from "../models";
-import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import type {SiteFileResponse} from "../models";
+import {FileTypeEnum, type GalleryRequest, type GalleryVO} from "../models";
+import {aclTool, type AclVO, ActionResult, type SubmitResult, useSession, validateParamId} from "@vempain/vempain-auth-frontend";
+import dayjs from "dayjs";
+
+const PAGE_SIZE = 50;
+
+interface SiteFileTransferItem {
+    key: string;
+    file: SiteFileResponse;
+}
+
+const formatFileSize = (bytes: number): string => {
+    if (bytes >= 1024 * 1024) {
+        return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+    }
+    if (bytes >= 1024) {
+        return `${(bytes / 1024).toFixed(2)} KB`;
+    }
+    return `${bytes} B`;
+};
 
 export function GalleryEdit() {
+    const {userSession} = useSession();
     const {paramId} = useParams();
     const [galleryId, setGalleryId] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
-    const [gallery, setGallery] = useState<GalleryRequest>();
+    const [gallery, setGallery] = useState<GalleryVO>();
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [sendButtonText, setSendButtonText] = useState<string>("Update");
     const [acls, setAcls] = useState<AclVO[]>([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [siteFilesLoading, setSiteFilesLoading] = useState(false);
 
     const [galleryForm] = Form.useForm();
 
-    const [availableCommonFiles, setAvailableCommonFiles] = useState<{ label: string, value: number }[]>([]);
+    const [siteFileMap, setSiteFileMap] = useState<Map<number, SiteFileResponse>>(() => new Map());
+    const [selectedSiteFileIds, setSelectedSiteFileIds] = useState<number[]>([]);
+    const selectedSiteFileIdsRef = useRef<number[]>([]);
+
+    const hydrateSiteFiles = useCallback((files: SiteFileResponse[]) => {
+        if (files.length === 0) {
+            return;
+        }
+        setSiteFileMap((prev) => {
+            const next = new Map(prev);
+            files.forEach((file) => next.set(file.id, file));
+            return next;
+        });
+    }, []);
+
+    const fetchSiteFiles = useCallback(async (page = 0, append = false) => {
+        setSiteFilesLoading(true);
+
+        siteFileAPI.getPagedSiteFiles({
+            file_type: FileTypeEnum.IMAGE,
+            page_number: page,
+            page_size: PAGE_SIZE
+        })
+                .then((response) => {
+                    setCurrentPage(response.page);
+                    setTotalPages(response.total_pages);
+                    setTotalElements(response.total_elements);
+
+                    setSiteFileMap((prev) => {
+                        const next = append ? new Map(prev) : new Map();
+                        response.content.forEach((file) => next.set(file.id, file));
+                        if (!append) {
+                            selectedSiteFileIdsRef.current.forEach((id) => {
+                                const cached = prev.get(id);
+                                if (cached) {
+                                    next.set(id, cached);
+                                }
+                            });
+                        }
+                        return next;
+                    });
+
+                    if (!append && response.empty) {
+                        setLoadResults({status: ActionResult.FAIL, message: "No site files found, cannot proceed"});
+                    }
+                })
+                .catch((error) => {
+                    console.error("Failed to fetch site files page info:", error);
+                })
+                .finally(() => {
+                    setSiteFilesLoading(false);
+                });
+    }, []);
+
+    function handleLoadMoreResources() {
+        if (currentPage + 1 < totalPages) {
+            void fetchSiteFiles(currentPage + 1, true);
+        }
+    }
+
+    const applySelectedSiteFiles = useCallback((files: SiteFileResponse[]) => {
+        const ids = files.map((file) => file.id);
+        setSelectedSiteFileIds(ids);
+        selectedSiteFileIdsRef.current = ids;
+        galleryForm.setFieldsValue({site_files_id: ids});
+        hydrateSiteFiles(files);
+    }, [galleryForm, hydrateSiteFiles]);
 
     useEffect(() => {
-        let tmpGalleryId: number = validateParamId(paramId);
+        let userId = userSession?.id ?? 0;
+        const tmpGalleryId = validateParamId(paramId);
 
         if (tmpGalleryId < 0) {
-            setLoadResults({
-                status: ActionResult.FAIL,
-                message: "Called with invalid parameter"
-            });
+            setLoadResults({status: ActionResult.FAIL, message: "Called with invalid parameter"});
+            setLoading(false);
             return;
         }
 
         setGalleryId(tmpGalleryId);
+        setLoading(true);
+        setSiteFileMap(new Map());
 
-        Promise.all([
-            tmpGalleryId > 0 ? galleryAPI.findById(tmpGalleryId, null) : Promise.resolve(null),
-            siteFileAPI.findAll({
-                file_type: FileTypeEnum.IMAGE,
-                page_number: 0,
-                page_size: 25
-            })
-        ])
-                .then(([galleryResponse, siteFileResponses]) => {
-                    if (galleryResponse) {
-                        setGallery({
-                            id: galleryResponse.id,
-                            short_name: galleryResponse.short_name,
-                            description: galleryResponse.description,
-                            site_files_id: galleryResponse.site_files.map((item) => (item.id)),
-                            acls: galleryResponse.acls
-                        });
-                        setAcls(galleryResponse.acls);
-                    } else {
-                        setGallery({
-                            id: 0,
-                            short_name: "",
-                            description: "",
-                            site_files_id: [],
-                            acls: []
-                        });
-                        setSendButtonText("Create");
-                    }
+        const galleryPromise = tmpGalleryId > 0 ? galleryAPI.findById(tmpGalleryId, null) : Promise.resolve(null);
 
-                    setAvailableCommonFiles(siteFileResponses.map((item) => ({label: item.file_name, value: item.id})));
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    setLoadResults({status: ActionResult.FAIL, message: "Failed to fetch data, try again later"});
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-    }, [paramId]);
+        galleryPromise.then((galleryResponse) => {
+            if (galleryResponse) {
+                setGallery(galleryResponse);
+                setAcls(galleryResponse.acls);
+                applySelectedSiteFiles(galleryResponse.site_files);
+            } else {
+                const base: GalleryVO = {
+                    id: 0,
+                    acls: [],
+                    locked: false,
+                    creator: userId,
+                    created: dayjs(),
+                    modifier: null,
+                    modified: null,
+                    short_name: "",
+                    description: "",
+                    site_files: []
+                };
+                setGallery(base);
+                setSendButtonText("Create");
+                applySelectedSiteFiles([]);
+            }
+        }).catch((error) => {
+            console.error("Failed to load gallery:", error);
+            setLoadResults({status: ActionResult.FAIL, message: "Failed to fetch gallery"});
+        }).finally(() => {
+            setLoading(false);
+        });
+
+        void fetchSiteFiles(0, false);
+    }, [paramId, userSession?.id, fetchSiteFiles, applySelectedSiteFiles]);
+
+    const transferDataSource = useMemo(() => Array.from(siteFileMap.values()).map((file) => ({
+        key: String(file.id),
+        file
+    })), [siteFileMap]);
+
+    const transferTargetKeys = useMemo(() => selectedSiteFileIds.map((id) => String(id)), [selectedSiteFileIds]);
+
+    const handleTransferChange: TransferProps<SiteFileTransferItem>["onChange"] = (nextTargetKeys) => {
+        const ids = nextTargetKeys.map((value) => Number(value));
+        setSelectedSiteFileIds(ids);
+        selectedSiteFileIdsRef.current = ids;
+        galleryForm.setFieldsValue({site_files_id: ids});
+    };
+
+    const transferFilter = (_input: string, item: SiteFileTransferItem) => {
+        return item.file.file_name.toLowerCase().includes(_input.toLowerCase());
+    };
+
+    const renderTransferItem = (item: SiteFileTransferItem) => (
+            <div style={{display: "flex", flexDirection: "column"}}>
+                <Typography.Text strong>{item.file.file_name}</Typography.Text>
+                <Typography.Text type="secondary" style={{fontSize: 12}}>
+                    ID: {item.file.id} · {item.file.file_type} · {formatFileSize(item.file.size)}
+                </Typography.Text>
+            </div>
+    );
 
     function onFinish(values: GalleryRequest) {
-        // Go through the list of ACLs and set the undefined permission fields to false
         for (let i = 0; i < values.acls.length; i++) {
             aclTool.fillPermission(values.acls[i]);
         }
+        const payload: GalleryRequest = {
+            ...values,
+            site_files_id: selectedSiteFileIds
+        };
 
         setLoading(true);
 
-        if (galleryId > 0) {
-            galleryAPI.update(values)
-                    .then(() => {
-                        setSubmitResults({status: ActionResult.OK, message: "Gallery updated"});
-                    })
-                    .catch((error) => {
-                        console.error("Failed to update gallery:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to update gallery"});
-                    })
-                    .finally(() => {
-                        setLoading(false);
-                    });
-        } else {
-            galleryAPI.create(values)
-                    .then(() => {
-                        setSubmitResults({status: ActionResult.OK, message: "Gallery created"});
-                    })
-                    .catch((error) => {
-                        console.error("Failed to create gallery:", error);
-                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to create gallery"});
-                    })
-                    .finally(() => {
-                        setLoading(false);
-                    });
-        }
-    }
-
-    function filterOption(input: string, option?: { label: string; value: number }) {
-        if (option && option.label) {
-            return option.label.toLowerCase().includes(input.toLowerCase());
-        }
-        return false; // Return false for options without a label
+        const operation = galleryId > 0 ? galleryAPI.update(payload) : galleryAPI.create(payload);
+        operation.then(() => {
+            setSubmitResults({status: ActionResult.OK, message: galleryId > 0 ? "Gallery updated" : "Gallery created"});
+        }).catch((error) => {
+            console.error("Failed to save gallery:", error);
+            setSubmitResults({status: ActionResult.FAIL, message: galleryId > 0 ? "Failed to update gallery" : "Failed to create gallery"});
+        }).finally(() => {
+            setLoading(false);
+        });
     }
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={loadResults} successTo={"/galleries"} failTo={"/galleries"}/>);
+        return (<SubmitResultHandler submitResult={loadResults} successTo="/galleries" failTo="/galleries"/>);
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={"/galleries"} failTo={"/galleries"}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo="/galleries" failTo="/galleries"/>);
     }
 
     return (
-            <div className={"DarkDiv"} key={"gallery-edit"}>
+            <div className="DarkDiv" key="gallery-edit">
                 <h4>{sendButtonText} Gallery {galleryId}</h4>
                 <Spin spinning={loading}>
                     {!loading && gallery != null && <Form
@@ -134,16 +227,12 @@ export function GalleryEdit() {
                             initialValues={gallery}
                             labelCol={{span: 8}}
                             wrapperCol={{span: 22}}
-                            style={{maxWidth: 1800}}
-                            layout={"vertical"}
+                            style={{maxWidth: 1800, padding: 20}}
+                            layout="vertical"
                             onFinish={onFinish}
                     >
-                        <Form.Item
-                                name={"id"}
-                                label={"ID"}
-                                hidden={true}
-                        >
-                            <Input type={"text"} disabled={true}/>
+                        <Form.Item name="id" label="ID" hidden>
+                            <Input type="text" disabled/>
                         </Form.Item>
                         <Form.Item
                                 name="short_name"
@@ -159,82 +248,80 @@ export function GalleryEdit() {
                         >
                             <Input.TextArea/>
                         </Form.Item>
-                        <Row gutter={16} align="middle">
-                            <Col span={12}><strong>File</strong></Col>
-                            <Col span={4}><strong>Action</strong></Col>
-                        </Row>
 
-                        <Form.List name="site_file_id">
-                            {(siteFiles, {add, move, remove}) => (
-                                    <>
-                                        {siteFiles.map((_siteFile, index) => {
-                                            const uniqueKey = `site_file-${index}`;
-                                            return (
-                                                    <Row gutter={16} align={"middle"} key={uniqueKey + "-row"}>
-                                                        <Col span={12}>
-                                                            <Form.Item
-                                                                    name={[index]}
-                                                                    key={uniqueKey + "-form-item"}
-                                                                    rules={[{required: true, message: "Please select a site file"}]}
+                        <Form.Item label="Site Files">
+                            <Spin spinning={siteFilesLoading}>
+                                <Transfer<SiteFileTransferItem>
+                                        dataSource={transferDataSource}
+                                        targetKeys={transferTargetKeys}
+                                        onChange={handleTransferChange}
+                                        showSearch={true}
+                                        showSelectAll={true}
+                                        oneWay={selectedSiteFileIds.length === 0}
+                                        filterOption={transferFilter}
+                                        render={(item) => item.file.file_name}
+                                        titles={["Available files", "Assigned files"]}
+                                        style={{width: "100%", backgroundColor: "#303030"}}
+                                        locale={{itemUnit: "file", itemsUnit: "files"}}
+                                >
+                                    {({onItemSelect, selectedKeys, filteredItems}) => (
+                                            <VirtualList
+                                                    data={filteredItems}
+                                                    height={420}
+                                                    itemHeight={56}
+                                                    itemKey="key"
+                                            >
+                                                {(item) => {
+                                                    const checked = selectedKeys.includes(item.key);
+                                                    return (
+                                                            <div
+                                                                    key={item.key}
+                                                                    className="virtual-transfer-item"
+                                                                    style={{padding: 12, cursor: "pointer", display: "flex", alignItems: "center"}}
+                                                                    onClick={() => onItemSelect(item.key, !checked)}
+                                                                    role="option"
+                                                                    aria-selected={checked}
                                                             >
-                                                                <Select
-                                                                        options={availableCommonFiles}
-                                                                        labelInValue={false}
-                                                                        showSearch={true}
-                                                                        key={uniqueKey + "-select"}
-                                                                        filterOption={filterOption}
-                                                                        placeholder={"Select a file"}
-                                                                />
-                                                            </Form.Item>
-                                                        </Col>
-                                                        <Col span={4}>
-                                                            <Button
-                                                                    type={"primary"}
-                                                                    onClick={() => move(index, (index - 1))}
-                                                                    icon={<ArrowUpOutlined/>}
-                                                                    disabled={index === 0 || siteFiles.length === 1}
-                                                            />
-                                                            <Button
-                                                                    type={"primary"}
-                                                                    onClick={() => move(index, (index + 1))}
-                                                                    icon={<ArrowDownOutlined/>}
-                                                                    disabled={index === siteFiles.length - 1 || siteFiles.length === 1}
-                                                            />
-                                                            <Button
-                                                                    type={"primary"}
-                                                                    danger={true}
-                                                                    onClick={() => remove(index)}
-                                                                    icon={<MinusCircleOutlined/>}
-                                                            >
-                                                                Remove
-                                                            </Button>
-                                                        </Col>
-                                                    </Row>);
-                                        })}
-                                        <Form.Item>
-                                            <Button type="dashed" onClick={() => add()} icon={<PlusOutlined/>} style={{width: "100%"}}>
-                                                Add file
-                                            </Button>
-                                        </Form.Item>
-                                    </>
-                            )}
-                        </Form.List>
-                        <Form.Item key={"gallery-acl-list"}
-                                   label={"Access control"}
-                        >
+                                                                <input type="checkbox" readOnly checked={checked} style={{marginRight: 12}}/>
+                                                                {renderTransferItem(item)}
+                                                            </div>
+                                                    );
+                                                }}
+                                            </VirtualList>
+                                    )}
+                                </Transfer>
+                            </Spin>
+                            <Space wrap style={{marginTop: 12}}>
+                                {currentPage + 1 < totalPages && (
+                                        <Button style={{marginTop: 12}} onClick={handleLoadMoreResources} loading={siteFilesLoading}>
+                                            Load more resources (page {currentPage + 2} of {totalPages} and {totalElements})
+                                        </Button>
+                                )}
+
+                                <Typography.Text type={selectedSiteFileIds.length === 0 ? "warning" : "secondary"} style={{display: "block", marginTop: 12}}>
+                                    {selectedSiteFileIds.length} resource{selectedSiteFileIds.length === 1 ? "" : "s"} selected
+                                </Typography.Text>
+                            </Space>
+                        </Form.Item>
+                        <Form.Item name="site_files_id" hidden>
+                            <Input type="hidden"/>
+                        </Form.Item>
+
+                        <Form.Item key="gallery-acl-list" label="Access control">
                             <AclEdit acls={acls} parentForm={galleryForm}/>
                         </Form.Item>
-                        <Space vertical={false} size={12} style={{width: "100%", justifyContent: "center"}}>
-                            <Button
-                                    type={"primary"}
-                                    htmlType={"submit"}
-                                    disabled={loading}
-                            >{sendButtonText}</Button>
-                            <Button
-                                    type={"default"}
-                                    htmlType={"reset"}
-                                    disabled={loading}
-                            >{"Reset"}</Button>
+                        <Space size={12} style={{width: "100%", justifyContent: "center"}}>
+                            <Button type="primary" htmlType="submit" disabled={loading}>
+                                {sendButtonText}
+                            </Button>
+                            <Button type="default" htmlType="reset" disabled={loading} onClick={() => {
+                                if (gallery) {
+                                    galleryForm.setFieldsValue(gallery);
+                                    applySelectedSiteFiles(gallery.site_files);
+                                }
+                            }}>
+                                Reset
+                            </Button>
                         </Space>
                     </Form>}
                 </Spin>

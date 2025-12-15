@@ -460,7 +460,7 @@ export function WebSiteUserList() {
                         style={{width: "100%"}}
                         titles={["Available", "Assigned"]}
                         locale={{itemUnit: "resource", itemsUnit: "resources"}}
-                        oneWay
+                        oneWay={selectedAclIds.length === 0}
                         showSelectAll={true}
                     >
                         {({onItemSelect, selectedKeys, filteredItems}) => (
@@ -503,7 +503,7 @@ export function WebSiteUserList() {
 
                     {currentPage + 1 < totalPages && (
                         <Button style={{marginTop: 12}} onClick={handleLoadMoreResources} loading={resourcesLoading}>
-                            Load more resources (page {currentPage + 2} of {totalPages})
+                            Load more resources (page {currentPage + 2} of {totalPages}, {totalElements} total)
                         </Button>
                     )}
 
