@@ -3,6 +3,7 @@ import type {SiteFileResponse} from "../../models";
 import type {SiteFileRequest} from "../../models/Requests/Files";
 
 export class SiteFileAPI extends AbstractAPI<SiteFileResponse, SiteFileRequest> {
+
     public async getPagedSiteFiles(params: Record<string, any>): Promise<PagedResponse<SiteFileResponse>> {
         this.setAuthorizationHeader();
         const response = await this.axiosInstance.get<PagedResponse<SiteFileResponse>>("", {params: params});
