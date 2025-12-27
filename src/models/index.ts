@@ -1,7 +1,6 @@
 export type {SortableTableParams} from "./SortableTableParams";
 export type {StringNumber} from './StringNumber';
 export type {WebSiteManagementApiError} from './WebSiteManagementApiError.ts';
-export type {WebSiteResourceAccess} from './WebSiteResourceAccess';
 export type {WebSiteUserSummary} from './WebSiteUserSummary';
 
 // Enums

@@ -14,7 +14,6 @@ export type {WebSiteAclUsersResponse} from './WebSiteAclUsersResponse';
 export type {WebSiteResourcePageResponse} from './WebSiteResourcePageResponse';
 export type {WebSiteResourceQueryParams} from './WebSiteResourceQueryParams';
 export type {WebSiteResourceResponse} from './WebSiteResourceResponse';
-export type {WebSiteUserResourcesResponse} from './WebSiteUserResourcesResponse';
 export type {WebSiteUserResponse} from './WebSiteUserResponse';
 export type {WebSiteConfigurationResponse} from './WebSiteConfigurationResponse';
 
