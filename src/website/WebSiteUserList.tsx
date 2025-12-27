@@ -14,6 +14,7 @@ import {
 import {WebSiteResourceTypeEnum as WebSiteResourceTypeValues} from "../models/WebSiteResourceTypeEnum";
 import VirtualList from "rc-virtual-list";
 import {webSiteManagementAPI} from "../services";
+import {formatDateTime} from "../tools";
 
 const PAGE_SIZE = 100;
 
@@ -337,6 +338,24 @@ export function WebSiteUserList() {
         {
             title: "Username",
             dataIndex: "username"
+        },
+        {
+            title: "Creator",
+            dataIndex: "creator"
+        },
+        {
+            title: "Created",
+            dataIndex: "created",
+            render: (_, record) => formatDateTime(record.created)
+        },
+        {
+            title: "Modifier",
+            dataIndex: "modifier"
+        },
+        {
+            title: "Modified",
+            dataIndex: "modified",
+            render: (_, record) => (record.modified === null || record.modified === undefined || record.modified.length === 0) ? "-" : formatDateTime(record.modified)
         },
         {
             title: "Actions",
