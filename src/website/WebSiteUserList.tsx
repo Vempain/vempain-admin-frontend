@@ -5,7 +5,6 @@ import type {TransferProps} from "antd/es/transfer";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {
     FileTypeEnum,
-    type WebSiteResourceAccess,
     type WebSiteResourceQueryParams,
     type WebSiteResourceResponse,
     type WebSiteResourceTypeEnum,
@@ -43,11 +42,11 @@ const mapResourceResponseToOption = (resource: WebSiteResourceResponse): Resourc
     file_type: resource.file_type
 });
 
-const mapUserResourceToOption = (resource: WebSiteResourceAccess): ResourceOption => ({
+const mapUserResourceToOption = (resource: WebSiteResourceResponse): ResourceOption => ({
     acl_id: resource.acl_id,
     resource_type: resource.resource_type,
     resource_id: resource.resource_id,
-    name: resource.resource_name ?? `Resource ${resource.resource_id}`
+    name: resource.name ?? `Resource ${resource.resource_id}`
 });
 
 const mergeResourceLists = (primary: ResourceOption[], secondary: ResourceOption[] = []): ResourceOption[] => {

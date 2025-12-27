@@ -100,7 +100,7 @@ function App() {
                                 <Route path={"/units/:paramId/edit"} element={<UnitEditor/>}/>
                                 <Route path={"/users"} element={<UserList/>}/>
                                 <Route path={"/users/:paramId/edit"} element={<UserEditor/>}/>
-                                {/* Administration */}
+                                {/* Web site Administration */}
                                 <Route path={"/administration/web-users"} element={<WebSiteUserList/>}/>
                                 <Route path={"/administration/web-site-configuration"} element={<WebSiteConfiguration/>}/>
                             </Routes>

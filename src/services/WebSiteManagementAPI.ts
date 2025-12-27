@@ -9,7 +9,6 @@ import {
     type WebSiteResourcePageResponse,
     type WebSiteResourceQueryParams,
     type WebSiteUserRequest,
-    type WebSiteUserResourcesResponse,
     type WebSiteUserResponse
 } from "../models";
 import {buildResourceQuery} from "../tools";
@@ -84,10 +83,10 @@ class WebSiteManagementAPI {
         return response.data;
     }
 
-    async getResourcesByWebUserId(userId: number): Promise<WebSiteUserResourcesResponse> {
+    async getResourcesByWebUserId(userId: number): Promise<WebSiteUserResponse> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.get<WebSiteUserResourcesResponse>(`/users/${userId}/resources`);
+        const response = await this.axiosInstance.get<WebSiteUserResponse>(`/users/${userId}/resources`);
         return response.data;
     }
 
