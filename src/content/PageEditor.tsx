@@ -7,7 +7,7 @@ import {MetadataForm, SubmitResultHandler} from "../main";
 import {formAPI, galleryAPI, pageAPI} from "../services";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-design/icons";
 import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
-import {type FormVO, type PageVO, QueryDetailEnum} from "../models";
+import {type FormVO, type PageResponse, QueryDetailEnum} from "../models";
 
 // Define the loading messages
 const spinMessages: Record<string, string> = {
@@ -33,12 +33,12 @@ export function PageEditor() {
     const [acls, setAcls] = useState<AclVO[]>([]);
     const [spinTip, setSpinTip] = useState<string>(spinMessages.loadingPageData);
 
-    const [page, setPage] = useState<PageVO | null>(null);
+    const [page, setPage] = useState<PageResponse | null>(null);
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     const [formList, setFormList] = useState<FormVO[]>([]);
-    const [pageList, setPageList] = useState<PageVO[]>([]);
+    const [pageList, setPageList] = useState<PageResponse[]>([]);
     const [selectedGalleries, setSelectedGalleries] = useState<GalleryList>({galleries: []});
     const [galleryList, setGalleryList] = useState<{ label: string, value: number }[]>([]);
 
@@ -91,7 +91,7 @@ export function PageEditor() {
                             id: 0,
                             parent_id: 0,
                             form_id: 0,
-                            path: "",
+                            page_path: "",
                             secure: false,
                             index_list: false,
                             title: "",
@@ -116,7 +116,7 @@ export function PageEditor() {
                 });
     }, [paramId]);
 
-    function onFinish(values: PageVO): void {
+    function onFinish(values: PageResponse): void {
         console.debug("onFinish", values);
 
         for (let i = 0; i < values.acls.length; i++) {
@@ -253,7 +253,7 @@ export function PageEditor() {
                             <Select
                                     placeholder={"Select a parent page"}
                                     showSearch={{optionFilterProp: 'label', filterOption: filterOption}}
-                                    options={[{label: 'None', value: 0}, ...pageList.map(p => ({label: p.path, value: p.id}))]}
+                                    options={[{label: 'None', value: 0}, ...pageList.map(p => ({label: p.page_path, value: p.id}))]}
                             />
                         </Form.Item>
                         <Form.Item name={"title"} label={"Title"}>

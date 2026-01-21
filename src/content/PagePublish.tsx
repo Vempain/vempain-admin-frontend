@@ -1,7 +1,7 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import type {GalleryVO, PublishItemRequest} from "../models";
-import {type PageVO, QueryDetailEnum} from "../models";
+import {type PageResponse, QueryDetailEnum} from "../models";
 import {galleryAPI, pageAPI} from "../services";
 import {Button, Divider, Space, Spin, Table} from "antd";
 import {SubmitResultHandler} from "../main";
@@ -16,7 +16,7 @@ export function PagePublish() {
     const [loading, setLoading] = useState<boolean>(true);
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
-    const [page, setPage] = useState<PageVO | null>(null);
+    const [page, setPage] = useState<PageResponse | null>(null);
     const [galleryList, setGalleryList] = useState<GalleryVO[]>([]);
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<Dayjs | null>(null);

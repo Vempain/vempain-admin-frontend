@@ -1,7 +1,7 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {SubmitResultHandler} from "../main";
-import {type ComponentVO, type FormVO, type PageVO} from "../models";
+import {type ComponentVO, type FormVO, type PageResponse} from "../models";
 import {componentAPI, formAPI, pageAPI} from "../services";
 import {Button, Spin} from "antd";
 import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
@@ -14,7 +14,7 @@ export function ComponentDelete() {
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [component, setComponent] = useState<ComponentVO | null>(null);
     const [forms, setForms] = useState<FormVO[] | null>(null);
-    const [pages, setPages] = useState<PageVO[]>([]);
+    const [pages, setPages] = useState<PageResponse[]>([]);
 
     useEffect(() => {
         let tmpComponentId: number = validateParamId(paramId);
@@ -38,7 +38,7 @@ export function ComponentDelete() {
             componentAPI.findById(tmpComponentId, null)
                     .then((response) => {
                         setComponent(response);
-                        let tmpPageList: PageVO[] = [];
+                        let tmpPageList: PageResponse[] = [];
 
                         formAPI.findFormsByComponentId(response.id)
                                 .then((formResponse) => {

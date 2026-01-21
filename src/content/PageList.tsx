@@ -3,7 +3,7 @@ import {Button, Input, type InputRef, notification, Space, Spin, Table, type Tab
 import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, SearchOutlined} from "@ant-design/icons";
-import {type PageVO, QueryDetailEnum} from "../models";
+import {type PageResponse, QueryDetailEnum} from "../models";
 import {pageAPI} from "../services";
 import dayjs from "dayjs";
 import {getPaginationConfig} from "../tools";
@@ -18,14 +18,14 @@ const spinMessages: Record<string, string> = {
 
 export function PageList() {
     const [loading, setLoading] = useState<boolean>(false);
-    const [pageList, setPageList] = useState<PageVO[]>([]);
+    const [pageList, setPageList] = useState<PageResponse[]>([]);
     const [spinMessage, setSpinMessage] = useState<string>(spinMessages.loading);
     const [pagination, setPagination] = useState<TablePaginationConfig>({});
 
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
     const searchInput = useRef<InputRef>(null);
-    type DataIndex = keyof PageVO;
+    type DataIndex = keyof PageResponse;
 
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<dayjs.Dayjs | null>(null);
@@ -52,7 +52,7 @@ export function PageList() {
         setSearchText("");
     }
 
-    const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<PageVO> => ({
+    const getColumnSearchProps = (dataIndex: DataIndex): TableColumnType<PageResponse> => ({
         filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters, close}) => (
                 <div style={{padding: 8}} onKeyDown={(e) => e.stopPropagation()}>
                     <Input
@@ -124,20 +124,9 @@ export function PageList() {
                 }
             }
         },
-        // render: (text) =>
-        //         searchedColumn === dataIndex ? (
-        //                 <Highlighter
-        //                         highlightStyle={{backgroundColor: "#ffc069", padding: 0}}
-        //                         searchWords={[searchText]}
-        //                         autoEscape
-        //                         textToHighlight={text ? text.toString() : ""}
-        //                 />
-        //         ) : (
-        //                 text
-        //         ),
     });
 
-    const columns: ColumnsType<PageVO> = [
+    const columns: ColumnsType<PageResponse> = [
         {
             title: "ID",
             dataIndex: "id",
@@ -158,10 +147,10 @@ export function PageList() {
         },
         {
             title: "Path",
-            dataIndex: "path",
-            key: "path",
-            sorter: (a, b) => a.path.localeCompare(b.path),
-            ...getColumnSearchProps("path")
+            dataIndex: "page_path",
+            key: "page_path",
+            sorter: (a, b) => a.page_path.localeCompare(b.page_path),
+            ...getColumnSearchProps("page_path")
         },
         {
             title: "Secure",
@@ -198,8 +187,8 @@ export function PageList() {
             title: "Created",
             dataIndex: "created",
             key: "created",
-            sorter: (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime(),
-            render: (_text: string, record: PageVO) => {
+            sorter: (a, b) => dayjs(a.created).unix() - dayjs(b.created).unix(),
+            render: (_text: string, record: PageResponse) => {
                 return (<>{dayjs(record.created).format("YYYY.MM.DD HH:mm")}</>);
             }
         },
@@ -207,14 +196,14 @@ export function PageList() {
             title: "Modifier",
             dataIndex: "modifier",
             key: "modifier",
-            sorter: (a, b) => a.modifier - b.modifier,
+            sorter: (a, b) => a.modifier !== null && b.modifier !== null ? a.modifier - b.modifier : (a.modifier === null ? -1 : 1),
         },
         {
             title: "Modified",
             dataIndex: "modified",
             key: "modified",
-            sorter: (a, b) => new Date(a.modified).getTime() - new Date(b.modified).getTime(),
-            render: (_text: string, record: PageVO) => {
+            sorter: (a, b) => a.modified !== null && b.modified !== null ? (dayjs(a.modified).unix() - dayjs(b.modified).unix()) : (a.modified === null ? -1 : 1),
+            render: (_text: string, record: PageResponse) => {
                 if (record.modified === null) {
                     return (<>-</>);
                 }
@@ -241,7 +230,7 @@ export function PageList() {
 
                 return (new Date(a.published).getTime() - new Date(b.published).getTime());
             },
-            render: (_text: string, record: PageVO) => {
+            render: (_text: string, record: PageResponse) => {
                 if (record.published === null) {
                     return (<>-</>);
                 }
@@ -252,7 +241,7 @@ export function PageList() {
         {
             title: "Action",
             key: "action",
-            render: (_text: any, record: PageVO) => (
+            render: (_text: any, record: PageResponse) => (
                     <Space>
                         <Button type="primary" href={`/pages/${record.id}/edit`}><EditOutlined/></Button>
                         <Button type={"primary"} danger href={`/pages/${record.id}/delete`}><DeleteOutlined/></Button>

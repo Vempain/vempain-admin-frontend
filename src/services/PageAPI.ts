@@ -1,10 +1,10 @@
-import type {PageVO, PublishItemRequest} from "../models";
+import type {PageResponse, PublishItemRequest} from "../models";
 import {AbstractAPI, type ActionVO} from "@vempain/vempain-auth-frontend";
 
-class PageAPI extends AbstractAPI<PageVO, PageVO> {
-    public async findPagesByFormId(formId: number): Promise<PageVO[]> {
+class PageAPI extends AbstractAPI<PageResponse, PageResponse> {
+    public async findPagesByFormId(formId: number): Promise<PageResponse[]> {
         this.setAuthorizationHeader();
-        const response = await this.axiosInstance.get<PageVO[]>("/by-form/" + formId);
+        const response = await this.axiosInstance.get<PageResponse[]>("/by-form/" + formId);
         return response.data;
     }
 
