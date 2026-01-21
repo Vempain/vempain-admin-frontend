@@ -4,7 +4,7 @@ import {SubmitResultHandler} from "../main";
 import {Button, Spin} from "antd";
 import {formAPI, pageAPI} from "../services";
 import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
-import type {FormVO, PageVO} from "../models";
+import type {FormVO, PageResponse} from "../models";
 
 export function FormDelete() {
     const {paramId} = useParams();
@@ -13,7 +13,7 @@ export function FormDelete() {
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [form, setForm] = useState<FormVO | null>(null);
-    const [pages, setPages] = useState<PageVO[]>([]);
+    const [pages, setPages] = useState<PageResponse[]>([]);
 
     useEffect(() => {
         let tmpFormId: number = validateParamId(paramId);

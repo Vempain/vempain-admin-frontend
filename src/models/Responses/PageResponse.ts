@@ -1,10 +1,10 @@
 import type {AbstractResponse} from "@vempain/vempain-auth-frontend";
 
-export interface PageVO extends AbstractResponse {
+export interface PageResponse extends AbstractResponse {
     id: number;
     parent_id: number;
     form_id: number;
-    path: string;
+    page_path: string;
     secure: boolean;
     index_list: boolean;
     title: string;

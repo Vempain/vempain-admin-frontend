@@ -32,6 +32,7 @@ interface ResourceOption {
 
 interface TransferItem extends ResourceOption {
     key: string;
+    title: string;
 }
 
 const mapResourceResponseToOption = (resource: WebSiteResourceResponse): ResourceOption => ({
@@ -91,7 +92,7 @@ export function WebSiteUserList() {
         if (!user) {
             return null;
         }
-        const enriched = user as WebSiteUserResponse & {id?: number; user_id?: number};
+        const enriched = user as WebSiteUserResponse & { id?: number; user_id?: number };
         return enriched.id ?? enriched.user_id ?? null;
     };
 
@@ -216,11 +217,17 @@ export function WebSiteUserList() {
         }
     };
 
+    const describeResource = (item: ResourceOption): string => {
+        const descriptors = [item.resource_type, item.name, item.path, item.file_type].filter(Boolean);
+        return descriptors.join(" · ");
+    };
+
     const transferDataSource: TransferItem[] = useMemo(() => (
-        mergeResourceLists(resourceOptions, userResourceOptions).map((item) => ({
-            ...item,
-            key: String(item.acl_id)
-        }))
+            mergeResourceLists(resourceOptions, userResourceOptions).map((item) => ({
+                ...item,
+                key: String(item.acl_id),
+                title: describeResource(item)
+            }))
     ), [resourceOptions, userResourceOptions]);
 
     const transferTargetKeys = useMemo(() => selectedAclIds.map((id) => String(id)), [selectedAclIds]);
@@ -361,175 +368,168 @@ export function WebSiteUserList() {
             title: "Actions",
             key: "actions",
             render: (_, record) => (
-                <Space>
-                    <Button size="small" onClick={() => openEditModal(record)}><EditOutlined/></Button>
-                    <Button size="small" danger onClick={() => handleDelete(record)}><DeleteOutlined/></Button>
-                </Space>
+                    <Space>
+                        <Button size="small" onClick={() => openEditModal(record)}><EditOutlined/></Button>
+                        <Button size="small" danger onClick={() => handleDelete(record)}><DeleteOutlined/></Button>
+                    </Space>
             )
         }
     ], []);
 
-    const renderTransferItem = (item: TransferItem) => {
-        const descriptors = [item.resource_type];
-        if (item.name) {
-            descriptors.push(item.name);
-        }
-        if (item.path) {
-            descriptors.push(item.path);
-        }
-        if (item.file_type) {
-            descriptors.push(item.file_type);
-        }
-        return (
-            <span>{descriptors.filter(Boolean).join(" · ")}</span>
-        );
-    };
+    const renderTransferItem = (item: TransferItem) => (
+            <span>{item.title}</span>
+    );
 
     return (
-        <>
-            <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16}}>
-                <Typography.Title level={3} style={{margin: 0}}>Web Users</Typography.Title>
-                <Button type="primary" shape="circle" icon={<PlusOutlined />} onClick={openCreateModal} />
-            </div>
+            <>
+                <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16}}>
+                    <Typography.Title level={3} style={{margin: 0}}>
+                        <Space orientation={"horizontal"} size={16}>
+                            Web Users
+                            <Button type="primary" shape="circle" icon={<PlusOutlined/>} onClick={openCreateModal}/>
+                        </Space>
+                    </Typography.Title>
+                </div>
 
-            <Table<WebSiteUserResponse>
-                rowKey={(record) => String(resolveUserId(record) ?? record.username)}
-                columns={columns}
-                dataSource={users}
-                loading={loading}
-                pagination={false}
-            />
+                <Table<WebSiteUserResponse>
+                        rowKey={(record) => String(resolveUserId(record) ?? record.username)}
+                        columns={columns}
+                        dataSource={users}
+                        loading={loading}
+                        pagination={false}
+                />
 
-            <Modal
-                open={modalOpen}
-                title={editingUser ? `Edit ${editingUser.username}` : "Create Web User"}
-                onOk={handleSubmit}
-                onCancel={closeModal}
-                confirmLoading={submitting}
-                width={"95%"}
-            >
-                <Form form={form} layout="vertical" preserve={false}>
-                    <Form.Item
-                        label="Username"
-                        name="username"
-                        rules={[{required: true, message: "Username is required"}]}
-                    >
-                        <Input autoFocus />
-                    </Form.Item>
-                    <Form.Item
-                        label="Password"
-                        name="password"
-                        rules={editingUser ? [] : [{required: true, message: "Password is required"}]}
-                    >
-                        <Input.Password placeholder={editingUser ? "Leave blank to keep current password" : ""} />
-                    </Form.Item>
+                <Modal
+                        open={modalOpen}
+                        title={editingUser ? `Edit ${editingUser.username}` : "Create Web User"}
+                        onOk={handleSubmit}
+                        onCancel={closeModal}
+                        confirmLoading={submitting}
+                        width={"95%"}
+                >
+                    <Form form={form} layout="vertical" preserve={false}>
+                        <Form.Item
+                                label="Username"
+                                name="username"
+                                rules={[{required: true, message: "Username is required"}]}
+                        >
+                            <Input autoFocus/>
+                        </Form.Item>
+                        <Form.Item
+                                label="Password"
+                                name="password"
+                                rules={editingUser ? [] : [{required: true, message: "Password is required"}]}
+                        >
+                            <Input.Password placeholder={editingUser ? "Leave blank to keep current password" : ""}/>
+                        </Form.Item>
 
-                    <Typography.Title level={5}>Resource Access</Typography.Title>
-                    <Typography.Paragraph type="secondary" style={{marginTop: 0}}>
-                        Filter resources by type, optional site file subtype, or search text and move selected items to the right.
-                    </Typography.Paragraph>
+                        <Typography.Title level={5}>Resource Access</Typography.Title>
+                        <Typography.Paragraph type="secondary" style={{marginTop: 0}}>
+                            Filter resources by type, optional site file subtype, or search text and move selected items to the right.
+                        </Typography.Paragraph>
 
-                    <Space orientation={"vertical"} style={{width: "100%", marginBottom: 16}}>
-                        <Space.Compact style={{width: "100%"}}>
-                            <Select<ResourceType | undefined>
-                                placeholder="Resource type"
-                                value={resourceType}
-                                onChange={(value) => setResourceType(value)}
-                                allowClear
-                                style={{width: 200}}
-                                options={resourceTypeOptions.map((value) => ({label: value.replace("_", " "), value}))}
-                            />
-                            <Select<FileType | undefined>
-                                placeholder="Site file type"
-                                value={fileType}
-                                onChange={(value) => setFileType(value)}
-                                allowClear
-                                style={{width: 200}}
-                                disabled={resourceType !== WebSiteResourceTypeValues.SITE_FILE}
-                                options={fileTypeOptions.map((value) => ({label: value, value}))}
-                            />
-                            <Input
-                                placeholder="Search resources"
-                                value={searchQuery}
-                                onChange={(event) => setSearchQuery(event.target.value)}
-                                allowClear
-                                onPressEnter={handleSearchResources}
-                            />
-                            <Button
-                                type="primary"
-                                icon={<SearchOutlined />}
-                                onClick={handleSearchResources}
-                                loading={resourcesLoading}
-                            >
-                                Search
-                            </Button>
-                        </Space.Compact>
-                        <Typography.Text type="secondary">
-                            Showing {transferDataSource.length} of {totalElements} resources
-                        </Typography.Text>
-                    </Space>
+                        <Space orientation={"vertical"} style={{width: "100%", marginBottom: 16}}>
+                            <Space.Compact style={{width: "100%"}}>
+                                <Select<ResourceType | undefined>
+                                        placeholder="Resource type"
+                                        value={resourceType}
+                                        onChange={(value) => setResourceType(value)}
+                                        allowClear
+                                        style={{width: 200}}
+                                        options={resourceTypeOptions.map((value) => ({label: value.replace("_", " "), value}))}
+                                />
+                                <Select<FileType | undefined>
+                                        placeholder="Site file type"
+                                        value={fileType}
+                                        onChange={(value) => setFileType(value)}
+                                        allowClear
+                                        style={{width: 200}}
+                                        disabled={resourceType !== WebSiteResourceTypeValues.SITE_FILE}
+                                        options={fileTypeOptions.map((value) => ({label: value, value}))}
+                                />
+                                <Input
+                                        placeholder="Search resources"
+                                        value={searchQuery}
+                                        onChange={(event) => setSearchQuery(event.target.value)}
+                                        allowClear
+                                        onPressEnter={handleSearchResources}
+                                />
+                                <Button
+                                        type="primary"
+                                        icon={<SearchOutlined/>}
+                                        onClick={handleSearchResources}
+                                        loading={resourcesLoading}
+                                >
+                                    Search
+                                </Button>
+                            </Space.Compact>
+                            <Typography.Text type="secondary">
+                                Showing {transferDataSource.length} of {totalElements} resources
+                            </Typography.Text>
+                        </Space>
 
-                    <Transfer<TransferItem>
-                        dataSource={transferDataSource}
-                        targetKeys={transferTargetKeys}
-                        onChange={handleTransferChange}
-                        render={renderTransferItem}
-                        showSearch
-                        style={{width: "100%"}}
-                        titles={["Available", "Assigned"]}
-                        locale={{itemUnit: "resource", itemsUnit: "resources"}}
-                        oneWay={selectedAclIds.length === 0}
-                        showSelectAll={true}
-                    >
-                        {({onItemSelect, selectedKeys, filteredItems}) => (
-                            <VirtualList
-                                data={filteredItems}
-                                height={400}
-                                itemHeight={40}
-                                itemKey="key"
-                            >
-                                {(item) => {
-                                    const disabled = false;
-                                    const checked = selectedKeys.includes(item.key);
-                                    return (
-                                        <div
-                                            key={item.key}
-                                            className="virtual-transfer-item"
-                                            style={{padding: "4px 8px", cursor: disabled ? "not-allowed" : "pointer"}}
-                                            onClick={() => !disabled && onItemSelect(item.key, !checked)}
-                                            onKeyDown={(event) => {
-                                                if (event.key === "Enter" && !disabled) {
-                                                    onItemSelect(item.key, !checked);
-                                                }
-                                            }}
-                                            role="option"
-                                            aria-selected={checked}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                readOnly
-                                                checked={checked}
-                                                style={{marginRight: 8}}
-                                            />
-                                            {renderTransferItem(item)}
-                                        </div>
-                                    );
-                                }}
-                            </VirtualList>
+                        <Transfer<TransferItem>
+                                dataSource={transferDataSource}
+                                targetKeys={transferTargetKeys}
+                                onChange={handleTransferChange}
+                                render={renderTransferItem}
+                                showSearch
+                                filterOption={(input, item) => item.title.toLowerCase().includes(input.toLowerCase())}
+                                style={{width: "100%"}}
+                                titles={["Available", "Assigned"]}
+                                locale={{itemUnit: "resource", itemsUnit: "resources"}}
+                                oneWay={selectedAclIds.length === 0}
+                                showSelectAll={true}
+                        >
+                            {({onItemSelect, selectedKeys, filteredItems}) => (
+                                    <VirtualList
+                                            data={filteredItems}
+                                            height={400}
+                                            itemHeight={40}
+                                            itemKey="key"
+                                    >
+                                        {(item) => {
+                                            const disabled = false;
+                                            const checked = selectedKeys.includes(item.key);
+                                            return (
+                                                    <div
+                                                            key={item.key}
+                                                            className="virtual-transfer-item"
+                                                            style={{padding: "4px 8px", cursor: disabled ? "not-allowed" : "pointer"}}
+                                                            onClick={() => !disabled && onItemSelect(item.key, !checked)}
+                                                            onKeyDown={(event) => {
+                                                                if (event.key === "Enter" && !disabled) {
+                                                                    onItemSelect(item.key, !checked);
+                                                                }
+                                                            }}
+                                                            role="option"
+                                                            aria-selected={checked}
+                                                    >
+                                                        <input
+                                                                type="checkbox"
+                                                                readOnly
+                                                                checked={checked}
+                                                                style={{marginRight: 8}}
+                                                        />
+                                                        {renderTransferItem(item)}
+                                                    </div>
+                                            );
+                                        }}
+                                    </VirtualList>
+                            )}
+                        </Transfer>
+
+                        {currentPage + 1 < totalPages && (
+                                <Button style={{marginTop: 12}} onClick={handleLoadMoreResources} loading={resourcesLoading}>
+                                    Load more resources (page {currentPage + 2} of {totalPages}, {totalElements} total)
+                                </Button>
                         )}
-                    </Transfer>
 
-                    {currentPage + 1 < totalPages && (
-                        <Button style={{marginTop: 12}} onClick={handleLoadMoreResources} loading={resourcesLoading}>
-                            Load more resources (page {currentPage + 2} of {totalPages}, {totalElements} total)
-                        </Button>
-                    )}
-
-                    <Typography.Text type={selectedAclIds.length === 0 ? "warning" : "secondary"} style={{display: "block", marginTop: 12}}>
-                        {selectedAclIds.length} resource{selectedAclIds.length === 1 ? "" : "s"} selected
-                    </Typography.Text>
-                </Form>
-            </Modal>
-        </>
+                        <Typography.Text type={selectedAclIds.length === 0 ? "warning" : "secondary"} style={{display: "block", marginTop: 12}}>
+                            {selectedAclIds.length} resource{selectedAclIds.length === 1 ? "" : "s"} selected
+                        </Typography.Text>
+                    </Form>
+                </Modal>
+            </>
     );
 }

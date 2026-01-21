@@ -4,7 +4,7 @@ import {pageAPI} from "../services";
 import {SubmitResultHandler} from "../main";
 import {Button, Spin} from "antd";
 import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
-import type {PageVO} from "../models";
+import type {PageResponse} from "../models";
 
 export function PageDelete() {
     const {paramId} = useParams();
@@ -12,7 +12,7 @@ export function PageDelete() {
     const [loading, setLoading] = useState<boolean>(true);
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
-    const [page, setPage] = useState<PageVO | null>(null);
+    const [page, setPage] = useState<PageResponse | null>(null);
 
     useEffect(() => {
         let tmpPageId: number = validateParamId(paramId);
