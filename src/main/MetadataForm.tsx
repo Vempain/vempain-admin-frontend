@@ -1,11 +1,11 @@
 import {Col, Divider, Row} from "antd";
-import dayjs from "dayjs";
+import dayjs, {type Dayjs} from "dayjs";
 
 interface Metadata {
     creator: number;
-    created: Date;
+    created: Dayjs;
     modifier?: number | null;
-    modified?: Date | null;
+    modified?: Dayjs | null;
 }
 
 interface MetadataFormProps {
@@ -13,10 +13,8 @@ interface MetadataFormProps {
 }
 
 function MetadataForm({metadata}: MetadataFormProps) {
-    const formatDate = (date: Date | null | undefined) => {
-        return date ? dayjs(date).format("YYYY-MM-DD HH:mm") : "-";
-    };
-
+    const displayCreated = dayjs(metadata.created).format("YYYY-MM-DD hh:mm");
+    const displayModified = metadata.modified ? dayjs(metadata.modified).format("YYYY-MM-DD hh:mm") : "-";
     return (
             <div style={{backgroundColor: "rgba(190, 190, 190, 0.1)", padding: "16px", borderRadius: "4px"}}>
                 <Divider orientation={"horizontal"} key={"page-meta-divider"}>Metadata</Divider>
@@ -29,9 +27,9 @@ function MetadataForm({metadata}: MetadataFormProps) {
                     </Row>
                     <Row gutter={[16, 16]}>
                         <Col span={6}>{metadata.creator}</Col>
-                        <Col span={6}>{formatDate(metadata.created)}</Col>
+                        <Col span={6}>{displayCreated}</Col>
                         <Col span={6}>{metadata.modifier ?? "-"}</Col>
-                        <Col span={6}>{formatDate(metadata.modified)}</Col>
+                        <Col span={6}>{displayModified}</Col>
                     </Row>
                 </div>
             </div>

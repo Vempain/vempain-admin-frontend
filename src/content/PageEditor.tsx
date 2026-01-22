@@ -8,6 +8,7 @@ import {formAPI, galleryAPI, pageAPI} from "../services";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-design/icons";
 import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 import {type FormVO, type PageResponse, QueryDetailEnum} from "../models";
+import dayjs from "dayjs";
 
 // Define the loading messages
 const spinMessages: Record<string, string> = {
@@ -100,9 +101,9 @@ export function PageEditor() {
                             acls: [],
                             locked: false,
                             creator: 0,
-                            created: new Date(),
+                            created: dayjs(),
                             modifier: 0,
-                            modified: new Date(),
+                            modified: null,
                             published: null
                         });
                     }
@@ -265,7 +266,7 @@ export function PageEditor() {
                         <Form.Item name={"body"} label={"Body"}>
                             <TextArea autoSize={true}/>
                         </Form.Item>
-                        <Form.Item name={"path"} label={"Path"}>
+                        <Form.Item name={"page_path"} label={"Path"}>
                             <Input/>
                         </Form.Item>
 
