@@ -1,5 +1,5 @@
-import {DeleteOutlined, EditOutlined, PlusOutlined, SearchOutlined} from "@ant-design/icons";
-import {Button, Form, Input, message, Modal, Select, Space, Table, Transfer, Typography} from "antd";
+import {DeleteOutlined, EditOutlined, GlobalOutlined, PlusOutlined, SearchOutlined} from "@ant-design/icons";
+import {Button, Form, Input, message, Modal, Select, Space, Switch, Table, theme, Transfer, Typography} from "antd";
 import type {ColumnsType} from "antd/es/table";
 import type {TransferProps} from "antd/es/transfer";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
@@ -72,6 +72,7 @@ export function WebSiteUserList() {
     const [submitting, setSubmitting] = useState(false);
     const [editingUser, setEditingUser] = useState<WebSiteUserResponse | null>(null);
     const [form] = Form.useForm<WebSiteUserRequest>();
+    const {token} = theme.useToken();
 
     const [resourceOptions, setResourceOptions] = useState<ResourceOption[]>([]);
     const [userResourceOptions, setUserResourceOptions] = useState<ResourceOption[]>([]);
@@ -162,7 +163,7 @@ export function WebSiteUserList() {
 
     const openCreateModal = (): void => {
         setEditingUser(null);
-        form.resetFields();
+        form.setFieldsValue({username: "", password: "", global_permission: false});
         setResourceType(undefined);
         setFileType(undefined);
         setSearchQuery("");
@@ -175,7 +176,7 @@ export function WebSiteUserList() {
 
     const openEditModal = (user: WebSiteUserResponse): void => {
         setEditingUser(user);
-        form.setFieldsValue({username: user.username, password: ""});
+        form.setFieldsValue({username: user.username, password: "", global_permission: user.global_permission ?? false});
         setResourceType(undefined);
         setFileType(undefined);
         setSearchQuery("");
@@ -365,6 +366,12 @@ export function WebSiteUserList() {
             render: (_, record) => (record.modified === null || record.modified === undefined || record.modified.length === 0) ? "-" : formatDateTime(record.modified)
         },
         {
+            title: "Global",
+            dataIndex: "global_permission",
+            align: "center",
+            render: (_, record) => record.global_permission ? <GlobalOutlined style={{color: token.colorPrimary}}/> : null
+        },
+        {
             title: "Actions",
             key: "actions",
             render: (_, record) => (
@@ -374,7 +381,7 @@ export function WebSiteUserList() {
                     </Space>
             )
         }
-    ], []);
+    ], [token]);
 
     const renderTransferItem = (item: TransferItem) => (
             <span>{item.title}</span>
@@ -407,7 +414,7 @@ export function WebSiteUserList() {
                         confirmLoading={submitting}
                         width={"95%"}
                 >
-                    <Form form={form} layout="vertical" preserve={false}>
+                    <Form form={form} layout="vertical" preserve={false} initialValues={{global_permission: false}}>
                         <Form.Item
                                 label="Username"
                                 name="username"
@@ -421,6 +428,13 @@ export function WebSiteUserList() {
                                 rules={editingUser ? [] : [{required: true, message: "Password is required"}]}
                         >
                             <Input.Password placeholder={editingUser ? "Leave blank to keep current password" : ""}/>
+                        </Form.Item>
+                        <Form.Item
+                                label="Global Permission"
+                                name="global_permission"
+                                valuePropName="checked"
+                        >
+                            <Switch/>
                         </Form.Item>
 
                         <Typography.Title level={5}>Resource Access</Typography.Title>

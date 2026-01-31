@@ -7,6 +7,7 @@ export interface WebSiteUserResponse {
     created: string;
     modifier: number | null;
     modified: string | null;
+    global_permission: boolean;
     resources: WebSiteResourceResponse[]
 }
 
