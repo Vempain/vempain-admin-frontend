@@ -11,7 +11,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
         <React.StrictMode>
-            <SessionProvider baseURL={`${import.meta.env.VITE_APP_API_URL}`}>
+            <SessionProvider baseURL={`${import.meta.env.VITE_APP_API_URL}`} loginPath="/login">
                 <BrowserRouter>
                     <App/>
                 </BrowserRouter>

@@ -1,28 +1,7 @@
-import Axios, {type AxiosInstance} from "axios";
 import type {FileImportScheduleResponse, PublishScheduleRequest, PublishScheduleResponse, ScheduleTriggerRequest, ScheduleTriggerResponse} from "../models";
-import type {JwtResponse} from "@vempain/vempain-auth-frontend";
+import {AbstractAPI} from "@vempain/vempain-auth-frontend";
 
-class ScheduleAPI {
-    protected axiosInstance: AxiosInstance;
-
-    constructor(baseURL: string, member: string) {
-        this.axiosInstance = Axios.create({
-            baseURL: baseURL + member
-        });
-    }
-
-    /**
-     * Sets the authorization header for the axios instance. We get the authorization bearer value from the local storage. We're forced
-     * to do this on every request because the token can expire at any time.
-     * @protected
-     */
-    protected setAuthorizationHeader(): void {
-        const session: JwtResponse = JSON.parse(localStorage.getItem("vempainUser") || "{}");
-
-        if (session && session.token) {
-            this.axiosInstance.defaults.headers.common['Authorization'] = 'Bearer ' + session.token;
-        }
-    }
+class ScheduleAPI extends AbstractAPI<ScheduleTriggerRequest, ScheduleTriggerResponse> {
 
     public async getSystemSchedules(): Promise<ScheduleTriggerResponse[]> {
         this.setAuthorizationHeader();
