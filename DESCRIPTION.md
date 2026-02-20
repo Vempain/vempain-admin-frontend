@@ -48,7 +48,7 @@ The file management area supports **14 distinct file types**, each with a dedica
 | Vectors | SVG and other vector graphics |
 | Videos | Video media |
 
-All file views support paginated listing, metadata inspection, and file-card previews.
+All file views support paginated listing and metadata inspection, while file-card previews are available in gallery publish/refresh workflows when selecting site files.
 
 ### 3. Gallery Management
 
@@ -92,9 +92,9 @@ Three dedicated scheduling modules allow batch operations to be planned and trig
 - **API layer** — Every data operation is handled through strongly-typed TypeScript service classes (e.g. `PageAPI`, `GalleryAPI`, `ScheduleAPI`) that extend a shared `AbstractAPI` base from `@vempain/vempain-auth-frontend`. All requests use Axios.
 - **Authentication** — Delegated to the `@vempain/vempain-auth-frontend` package, which manages login/logout state and injects auth tokens into API requests. The `/login` and `/logout` routes are handled by this package.
 - **UI framework** — Ant Design v6 (enterprise React component library) with a dark-mode theme applied globally.
-- **Type safety** — The full data layer is described with TypeScript interfaces covering request payloads (`models/Requests/`) and response shapes (`models/Responses/`), including an `enums/` directory for domain enumerations (`FileTypeEnum`, `PublishStatusEnum`, `ContentTypeEnum`, etc.).
+- **Type safety** — The full data layer is described with TypeScript interfaces covering request payloads (`models/Requests/`) and response shapes (`models/Responses/`), plus enum files directly under `src/models/` (`FileTypeEnum.ts`, `PublishStatusEnum.ts`, `ContentTypeEnum.ts`, etc.).
 - **Environment configuration** — Runtime settings (API URL, page title, copyright text) are injected at build time via `VITE_APP_*` environment variables from per-environment `.env` files.
-- **Build tooling** — Vite 7 with the SWC React plugin for fast development and production builds. Tests run via Jest with `ts-jest` and `@testing-library/react`.
+- **Build tooling** — Vite 7 with the official React plugin (`@vitejs/plugin-react`) for fast development and production builds. Tests run via Jest with `ts-jest` and `@testing-library/react`.
 
 ---
 
