@@ -2861,7 +2861,7 @@ __metadata:
     "@types/react": "npm:^19.2.14"
     "@types/react-dom": "npm:^19.2.3"
     "@types/react-highlight-words": "npm:^0.20.1"
-    "@vempain/vempain-auth-frontend": "npm:^1.0.2"
+    "@vempain/vempain-auth-frontend": "npm:^1.0.3"
     "@vitejs/plugin-react": "npm:^5.1.4"
     "@vitejs/plugin-react-swc": "npm:^4.2.3"
     antd: "npm:^6.3.0"
@@ -2889,14 +2889,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@vempain/vempain-auth-frontend@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "@vempain/vempain-auth-frontend@npm:1.0.2::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-auth-frontend%2F1.0.2%2Faed7b3e26118fc2a15fd4f46dfc8ba9a934c643f"
+"@vempain/vempain-auth-frontend@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@vempain/vempain-auth-frontend@npm:1.0.3::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-auth-frontend%2F1.0.3%2F6be773097b0592ab947788e1fa362be0067389af"
   dependencies:
-    antd: "npm:^6.2.3"
+    antd: "npm:^6.3.0"
     dayjs: "npm:^1.11.19"
     env-cmd: "npm:^11.0.0"
-    jsonwebtoken: "npm:^9.0.0"
+    jsonwebtoken: "npm:^9.0.3"
     react-router: "npm:^7.13.0"
     react-router-dom: "npm:^7.13.0"
     typescript: "npm:^5.9.3"
@@ -2904,7 +2904,7 @@ __metadata:
     axios: ^1.13.5
     react: ^19.2.4
     react-dom: ^19.2.4
-  checksum: 10c0/ca1a21c4f805bf472e59f5232c88bc4a5a2176f1588ed2d98f4a68fd7d12212b647fcef9b061f168a7085b4a4d1142b7f14032340099abd5aebaa167f7a0244f
+  checksum: 10c0/3ffa882d4cbe60253724a5567bbc02e69091ed53ca47145d49700de3fa873baefaf53bb871875f69ac60182dee360796e5a115a9af44b797d73163eaa7693572
   languageName: node
   linkType: hard
 
@@ -3026,7 +3026,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"antd@npm:^6.2.3, antd@npm:^6.3.0":
+"antd@npm:^6.3.0":
   version: 6.3.0
   resolution: "antd@npm:6.3.0"
   dependencies:
@@ -5328,7 +5328,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsonwebtoken@npm:^9.0.0":
+"jsonwebtoken@npm:^9.0.3":
   version: 9.0.3
   resolution: "jsonwebtoken@npm:9.0.3"
   dependencies:
