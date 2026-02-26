@@ -142,11 +142,10 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
 
     const insertLink = (url: string, text: string) => {
         editorRef.current?.focus();
-        // Reject dangerous URL schemes (javascript:, data:, etc.)
+        // Reject dangerous URL schemes (javascript:, data:, vbscript:, etc.)
         const trimmedUrl = url.trim().toLowerCase();
-        const safeUrl = (trimmedUrl.startsWith('javascript:') || trimmedUrl.startsWith('data:'))
-            ? '#'
-            : url;
+        const dangerousSchemes = ['javascript:', 'data:', 'vbscript:'];
+        const safeUrl = dangerousSchemes.some(s => trimmedUrl.startsWith(s)) ? '#' : url;
         const selection = window.getSelection();
         if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
             execCmd('createLink', safeUrl);
