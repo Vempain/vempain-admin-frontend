@@ -1,6 +1,6 @@
-import {buildEmbedTag, convertPlaceholdersToTags, convertTagsToPlaceholders, type EmbedType} from '../tools/embedTools';
+import {buildEmbedTag, buildCarouselTag, convertPlaceholdersToTags, convertTagsToPlaceholders, parseCarouselParams, type EmbedType} from '../tools/embedTools';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Button, Form, Input, InputNumber, Modal, Select, Space, Switch, Tooltip} from 'antd';
+import {Button, Form, Input, Modal, Select, Space, Tooltip} from 'antd';
 import {
     BoldOutlined,
     CaretRightOutlined,
@@ -16,6 +16,11 @@ import {
     UnorderedListOutlined,
 } from '@ant-design/icons';
 import DOMPurify from 'dompurify';
+import {RichEmbedGalleryEditor} from './embeds/RichEmbedGalleryEditor';
+import {RichEmbedImageEditor} from './embeds/RichEmbedImageEditor';
+import {RichEmbedHeroEditor} from './embeds/RichEmbedHeroEditor';
+import {RichEmbedCollapseEditor} from './embeds/RichEmbedCollapseEditor';
+import {RichEmbedCarouselEditor} from './embeds/RichEmbedCarouselEditor';
 
 interface RichTextEditorProps {
     value?: string;
@@ -25,6 +30,10 @@ interface RichTextEditorProps {
 interface EmbedDialogState {
     open: boolean;
     type: EmbedType | null;
+    /** ID of the embed being edited (undefined = new insertion) */
+    initialId?: number;
+    /** Extra params string for carousel edits */
+    initialExtra?: string;
 }
 
 /**
@@ -39,28 +48,35 @@ interface EmbedDialogState {
  * - Table insertion
  * - Embed tag insertion (gallery, image, hero, collapse, carousel)
  * - Toggle between WYSIWYG and HTML source view
+ * - Click-to-edit for existing embed placeholders
  */
 export function RichTextEditor({value, onChange}: RichTextEditorProps) {
     const editorRef = useRef<HTMLDivElement>(null);
     const [sourceMode, setSourceMode] = useState(false);
     // htmlContent mirrors the canonical HTML without placeholders
     const htmlContentRef = useRef<string>(value || '');
-    const [, forceRender] = useState(0);
+    // Reference to the placeholder span being edited (null = new insertion)
+    const editingPlaceholderRef = useRef<HTMLElement | null>(null);
 
     const [embedDialog, setEmbedDialog] = useState<EmbedDialogState>({open: false, type: null});
     const [linkDialogOpen, setLinkDialogOpen] = useState(false);
 
-    const [embedForm] = Form.useForm();
     const [linkForm] = Form.useForm();
 
-    // Initialise editor content on mount
+    // Initialise htmlContentRef on mount
     useEffect(() => {
-        if (editorRef.current) {
-            editorRef.current.innerHTML = convertTagsToPlaceholders(value || '');
-        }
         htmlContentRef.current = value || '';
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // Restore editor content whenever switching back to WYSIWYG mode.
+    // This runs after the render that mounts the contentEditable div,
+    // so editorRef.current is guaranteed to be non-null.
+    useEffect(() => {
+        if (!sourceMode && editorRef.current) {
+            editorRef.current.innerHTML = convertTagsToPlaceholders(htmlContentRef.current);
+        }
+    }, [sourceMode]);
 
     // Sync from outside (e.g. form reset) when value changes significantly
     const prevValueRef = useRef<string>(value || '');
@@ -79,12 +95,12 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
         return convertPlaceholdersToTags(editorRef.current.innerHTML);
     }, []);
 
-    const handleEditorInput = () => {
+    const handleEditorInput = useCallback(() => {
         const html = getEditorHtml();
         htmlContentRef.current = html;
         prevValueRef.current = html;
         onChange?.(html);
-    };
+    }, [getEditorHtml, onChange]);
 
     const handleSourceChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         htmlContentRef.current = e.target.value;
@@ -94,18 +110,13 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
 
     const handleModeSwitch = (toSource: boolean) => {
         if (toSource) {
-            // Capture WYSIWYG content before switching
+            // Capture current WYSIWYG content before switching to source view
             const html = getEditorHtml();
             htmlContentRef.current = html;
             prevValueRef.current = html;
-        } else {
-            // Restore WYSIWYG view from latest source
-            if (editorRef.current) {
-                editorRef.current.innerHTML = convertTagsToPlaceholders(htmlContentRef.current);
-            }
         }
+        // When switching back to WYSIWYG the useEffect on sourceMode restores the content
         setSourceMode(toSource);
-        forceRender(n => n + 1);
     };
 
     // Execute document.execCommand for basic formatting.
@@ -113,11 +124,11 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
     // native way to implement rich text editing without an external library.
     // All major browsers continue to support it and no removal timeline has
     // been announced as of 2024.
-    const execCmd = (command: string, cmdValue?: string) => {
+    const execCmd = useCallback((command: string, cmdValue?: string) => {
         editorRef.current?.focus();
         document.execCommand(command, false, cmdValue);
         handleEditorInput();
-    };
+    }, [handleEditorInput]);
 
     const insertHeading = (level: string) => {
         editorRef.current?.focus();
@@ -157,26 +168,57 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
     };
 
     const openEmbedDialog = (type: EmbedType) => {
-        embedForm.resetFields();
+        editingPlaceholderRef.current = null;
         setEmbedDialog({open: true, type});
     };
 
-    const handleEmbedInsert = () => {
-        embedForm.validateFields().then((values) => {
-            if (!embedDialog.type) return;
+    /** Replace a placeholder span in the editor with a new one, or insert at cursor if none. */
+    const insertOrReplacePlaceholder = useCallback((tag: string) => {
+        const placeholder = editingPlaceholderRef.current;
+        const newHtml = convertTagsToPlaceholders(tag);
 
-            let tag: string;
-            if (embedDialog.type === 'carousel') {
-                const extra = `${values.autoplay ?? false}:${values.dotDuration ?? false}:${values.speed ?? 500}`;
-                tag = buildEmbedTag({type: 'carousel', id: values.id, extra});
-            } else {
-                tag = buildEmbedTag({type: embedDialog.type, id: values.id});
-            }
+        if (placeholder && editorRef.current?.contains(placeholder)) {
+            placeholder.outerHTML = newHtml;
+            handleEditorInput();
+        } else {
+            execCmd('insertHTML', newHtml);
+        }
+        editingPlaceholderRef.current = null;
+    }, [execCmd, handleEditorInput]);
 
-            const placeholder = convertTagsToPlaceholders(tag);
-            execCmd('insertHTML', placeholder);
-            setEmbedDialog({open: false, type: null});
-        });
+    const handleGalleryConfirm = (id: number) => {
+        const tag = buildEmbedTag({type: 'gallery', id});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
+    const handleImageConfirm = (id: number) => {
+        const tag = buildEmbedTag({type: 'image', id});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
+    const handleHeroConfirm = (id: number) => {
+        const tag = buildEmbedTag({type: 'hero', id});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
+    const handleCollapseConfirm = (id: number) => {
+        const tag = buildEmbedTag({type: 'collapse', id});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
+    const handleCarouselConfirm = (id: number, autoplay: boolean, dotDuration: boolean, speed: number) => {
+        const tag = buildCarouselTag(id, {autoplay, dotDuration, speed});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
+    const handleEmbedCancel = () => {
+        editingPlaceholderRef.current = null;
+        setEmbedDialog({open: false, type: null});
     };
 
     const handleLinkInsert = () => {
@@ -184,6 +226,21 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
             insertLink(values.url, values.text);
             setLinkDialogOpen(false);
         });
+    };
+
+    /** Handle clicks on the contentEditable area to detect placeholder clicks. */
+    const handleEditorClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        const target = e.target as HTMLElement;
+        const placeholder = target.closest('.vps-embed-placeholder') as HTMLElement | null;
+        if (placeholder) {
+            const type = placeholder.dataset.type as EmbedType;
+            const rawId = placeholder.dataset.id;
+            const id = rawId ? parseInt(rawId, 10) : NaN;
+            if (!type || isNaN(id)) return;
+            const extra = placeholder.dataset.extra || '';
+            editingPlaceholderRef.current = placeholder;
+            setEmbedDialog({open: true, type, initialId: id, initialExtra: extra || undefined});
+        }
     };
 
     const toolbarStyle: React.CSSProperties = {
@@ -242,6 +299,10 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
         {label: 'H5', value: 'h5'},
         {label: 'H6', value: 'h6'},
     ];
+
+    const carouselParams = embedDialog.initialExtra
+        ? parseCarouselParams(embedDialog.initialExtra)
+        : undefined;
 
     return (
         <div style={{width: '100%'}}>
@@ -381,6 +442,7 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
                         style={editorStyle}
                         onInput={handleEditorInput}
                         onBlur={handleEditorInput}
+                        onClick={handleEditorClick}
                     />
                 )}
             </div>
@@ -403,49 +465,40 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
                 </Form>
             </Modal>
 
-            {/* Embed insertion dialog */}
-            <Modal
-                title={`Insert ${embedDialog.type ? embedDialog.type.charAt(0).toUpperCase() + embedDialog.type.slice(1) : ''} Embed`}
-                open={embedDialog.open}
-                onOk={handleEmbedInsert}
-                onCancel={() => setEmbedDialog({open: false, type: null})}
-                destroyOnClose={true}
-            >
-                <Form form={embedForm} layout="vertical">
-                    {(embedDialog.type === 'gallery' || embedDialog.type === 'image' || embedDialog.type === 'hero') && (
-                        <Form.Item
-                            name="id"
-                            label={embedDialog.type === 'gallery' ? 'Gallery ID' : 'File ID'}
-                            rules={[{required: true, message: 'Please enter an ID'}]}
-                        >
-                            <InputNumber min={1} style={{width: '100%'}} placeholder="Enter numeric ID"/>
-                        </Form.Item>
-                    )}
-                    {(embedDialog.type === 'collapse' || embedDialog.type === 'carousel') && (
-                        <Form.Item
-                            name="id"
-                            label="Parent Page ID"
-                            rules={[{required: true, message: 'Please enter a parent page ID'}]}
-                        >
-                            <InputNumber min={1} style={{width: '100%'}} placeholder="Enter parent page ID"/>
-                        </Form.Item>
-                    )}
-                    {embedDialog.type === 'carousel' && (
-                        <>
-                            <Form.Item name="autoplay" label="Autoplay" valuePropName="checked" initialValue={false}>
-                                <Switch/>
-                            </Form.Item>
-                            <Form.Item name="dotDuration" label="Dot Duration" valuePropName="checked"
-                                       initialValue={false}>
-                                <Switch/>
-                            </Form.Item>
-                            <Form.Item name="speed" label="Transition Speed (ms)" initialValue={500}>
-                                <InputNumber min={100} max={10000} style={{width: '100%'}}/>
-                            </Form.Item>
-                        </>
-                    )}
-                </Form>
-            </Modal>
+            {/* Per-embed editor dialogs */}
+            <RichEmbedGalleryEditor
+                open={embedDialog.open && embedDialog.type === 'gallery'}
+                initialId={embedDialog.initialId}
+                onConfirm={handleGalleryConfirm}
+                onCancel={handleEmbedCancel}
+            />
+            <RichEmbedImageEditor
+                open={embedDialog.open && embedDialog.type === 'image'}
+                initialId={embedDialog.initialId}
+                onConfirm={handleImageConfirm}
+                onCancel={handleEmbedCancel}
+            />
+            <RichEmbedHeroEditor
+                open={embedDialog.open && embedDialog.type === 'hero'}
+                initialId={embedDialog.initialId}
+                onConfirm={handleHeroConfirm}
+                onCancel={handleEmbedCancel}
+            />
+            <RichEmbedCollapseEditor
+                open={embedDialog.open && embedDialog.type === 'collapse'}
+                initialId={embedDialog.initialId}
+                onConfirm={handleCollapseConfirm}
+                onCancel={handleEmbedCancel}
+            />
+            <RichEmbedCarouselEditor
+                open={embedDialog.open && embedDialog.type === 'carousel'}
+                initialId={embedDialog.initialId}
+                initialAutoplay={carouselParams?.autoplay}
+                initialDotDuration={carouselParams?.dotDuration}
+                initialSpeed={carouselParams?.speed}
+                onConfirm={handleCarouselConfirm}
+                onCancel={handleEmbedCancel}
+            />
         </div>
     );
 }

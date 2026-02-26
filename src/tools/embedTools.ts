@@ -108,7 +108,7 @@ export function convertTagsToPlaceholders(html: string): string {
             `data-type="${type}" data-id="${id}" data-extra="${extra ?? ''}" ` +
             `contenteditable="false" ` +
             `style="display:inline-block;background:#1a3a5c;border:1px solid #4a90d9;` +
-            `border-radius:4px;padding:2px 8px;margin:2px 4px;cursor:default;` +
+            `border-radius:4px;padding:2px 8px;margin:2px 4px;cursor:pointer;` +
             `user-select:none;color:#90c4f8;font-size:0.85em;white-space:nowrap;"` +
             `>${label}</span>`
         );
