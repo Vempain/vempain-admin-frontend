@@ -1,4 +1,4 @@
-import {buildEmbedTag, buildCarouselTag, convertPlaceholdersToTags, convertTagsToPlaceholders, parseCarouselParams, type EmbedType} from '../tools/embedTools';
+import {buildCarouselTag, buildEmbedTag, convertPlaceholdersToTags, convertTagsToPlaceholders, type EmbedType, parseCarouselParams} from '../tools/embedTools';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Button, Form, Input, Modal, Select, Space, Tooltip} from 'antd';
 import {
@@ -16,11 +16,7 @@ import {
     UnorderedListOutlined,
 } from '@ant-design/icons';
 import DOMPurify from 'dompurify';
-import {RichEmbedGalleryEditor} from './embeds/RichEmbedGalleryEditor';
-import {RichEmbedImageEditor} from './embeds/RichEmbedImageEditor';
-import {RichEmbedHeroEditor} from './embeds/RichEmbedHeroEditor';
-import {RichEmbedCollapseEditor} from './embeds/RichEmbedCollapseEditor';
-import {RichEmbedCarouselEditor} from './embeds/RichEmbedCarouselEditor';
+import {RichEmbedCarouselEditor, RichEmbedCollapseEditor, RichEmbedGalleryEditor, RichEmbedHeroEditor, RichEmbedImageEditor} from './embeds';
 
 interface RichTextEditorProps {
     value?: string;
