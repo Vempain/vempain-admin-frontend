@@ -2,7 +2,7 @@ import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
 import {AclEdit} from "./AclEdit";
-import TextArea from "antd/es/input/TextArea";
+import {RichTextEditor} from "./RichTextEditor";
 import {MetadataForm, SubmitResultHandler} from "../main";
 import {formAPI, galleryAPI, pageAPI} from "../services";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-design/icons";
@@ -264,7 +264,7 @@ export function PageEditor() {
                             <Input/>
                         </Form.Item>
                         <Form.Item name={"body"} label={"Body"}>
-                            <TextArea autoSize={true}/>
+                            <RichTextEditor/>
                         </Form.Item>
                         <Form.Item name={"page_path"} label={"Path"}>
                             <Input/>
