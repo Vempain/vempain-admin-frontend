@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Form, InputNumber, Modal, Select, Spin, Switch} from 'antd';
+import {Alert, Form, InputNumber, Modal, Select, Spin, Switch} from 'antd';
 import {pageAPI} from '../../services';
 import type {PageResponse} from '../../models';
 import {QueryDetailEnum} from '../../models';
@@ -25,20 +25,26 @@ export function RichEmbedCarouselEditor({
 }: RichEmbedCarouselEditorProps) {
     const [pages, setPages] = useState<PageResponse[]>([]);
     const [loading, setLoading] = useState(false);
+    const [loadError, setLoadError] = useState<string | null>(null);
     const [selectedId, setSelectedId] = useState<number | undefined>(initialId);
     const [form] = Form.useForm();
 
     useEffect(() => {
         if (open) {
             setSelectedId(initialId);
+            setLoadError(null);
             form.setFieldsValue({autoplay: initialAutoplay, dotDuration: initialDotDuration, speed: initialSpeed});
             setLoading(true);
             pageAPI.findAll({details: QueryDetailEnum.MINIMAL})
                 .then(setPages)
-                .catch(console.error)
+                .catch((error) => {
+                    console.error(error);
+                    setLoadError('Failed to load pages. Please try again.');
+                })
                 .finally(() => setLoading(false));
         }
-    }, [open, initialId, initialAutoplay, initialDotDuration, initialSpeed, form]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open, initialId, initialAutoplay, initialDotDuration, initialSpeed]);
 
     const handleOk = () => {
         form.validateFields().then(values => {
@@ -55,11 +61,12 @@ export function RichEmbedCarouselEditor({
             title="Insert Carousel Embed"
             open={open}
             onOk={handleOk}
-            okButtonProps={{disabled: selectedId == null}}
+            okButtonProps={{disabled: selectedId == null || loadError != null}}
             onCancel={onCancel}
             destroyOnClose
         >
             <Spin spinning={loading}>
+                {loadError && <Alert type="error" message={loadError} style={{marginBottom: 8}}/>}
                 <Form form={form} layout="vertical">
                     <Form.Item label="Parent Page" required>
                         <Select
@@ -70,6 +77,7 @@ export function RichEmbedCarouselEditor({
                             optionFilterProp="label"
                             style={{width: '100%'}}
                             placeholder="Select a parent page"
+                            disabled={loadError != null}
                         />
                     </Form.Item>
                     <Form.Item name="autoplay" label="Autoplay" valuePropName="checked">

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Modal, Select, Spin} from 'antd';
+import {Alert, Modal, Select, Spin} from 'antd';
 import {galleryAPI} from '../../services';
 import type {GalleryVO} from '../../models';
 import {QueryDetailEnum} from '../../models';
@@ -14,15 +14,20 @@ interface RichEmbedGalleryEditorProps {
 export function RichEmbedGalleryEditor({open, initialId, onConfirm, onCancel}: RichEmbedGalleryEditorProps) {
     const [galleries, setGalleries] = useState<GalleryVO[]>([]);
     const [loading, setLoading] = useState(false);
+    const [loadError, setLoadError] = useState<string | null>(null);
     const [selectedId, setSelectedId] = useState<number | undefined>(initialId);
 
     useEffect(() => {
         if (open) {
             setSelectedId(initialId);
+            setLoadError(null);
             setLoading(true);
             galleryAPI.findAll({details: QueryDetailEnum.MINIMAL})
                 .then(setGalleries)
-                .catch(console.error)
+                .catch((error) => {
+                    console.error(error);
+                    setLoadError('Failed to load galleries. Please try again.');
+                })
                 .finally(() => setLoading(false));
         }
     }, [open, initialId]);
@@ -32,11 +37,12 @@ export function RichEmbedGalleryEditor({open, initialId, onConfirm, onCancel}: R
             title="Insert Gallery Embed"
             open={open}
             onOk={() => selectedId != null && onConfirm(selectedId)}
-            okButtonProps={{disabled: selectedId == null}}
+            okButtonProps={{disabled: selectedId == null || loadError != null}}
             onCancel={onCancel}
             destroyOnClose
         >
             <Spin spinning={loading}>
+                {loadError && <Alert type="error" message={loadError} style={{marginBottom: 8}}/>}
                 <Select
                     value={selectedId}
                     onChange={setSelectedId}
@@ -45,6 +51,7 @@ export function RichEmbedGalleryEditor({open, initialId, onConfirm, onCancel}: R
                     optionFilterProp="label"
                     style={{width: '100%'}}
                     placeholder="Select a gallery"
+                    disabled={loadError != null}
                 />
             </Spin>
         </Modal>

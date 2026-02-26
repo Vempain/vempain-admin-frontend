@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Modal, Select, Spin} from 'antd';
+import {Alert, Modal, Select, Spin} from 'antd';
 import {siteFileAPI} from '../../services';
 import type {SiteFileResponse} from '../../models';
 import {FileTypeEnum} from '../../models';
@@ -14,15 +14,20 @@ interface RichEmbedHeroEditorProps {
 export function RichEmbedHeroEditor({open, initialId, onConfirm, onCancel}: RichEmbedHeroEditorProps) {
     const [images, setImages] = useState<SiteFileResponse[]>([]);
     const [loading, setLoading] = useState(false);
+    const [loadError, setLoadError] = useState<string | null>(null);
     const [selectedId, setSelectedId] = useState<number | undefined>(initialId);
 
     useEffect(() => {
         if (open) {
             setSelectedId(initialId);
+            setLoadError(null);
             setLoading(true);
-            siteFileAPI.getPagedSiteFiles({page_size: 200, page_number: 0, file_type: FileTypeEnum.IMAGE})
+            siteFileAPI.getPagedSiteFiles({page_size: 1000, page_number: 0, file_type: FileTypeEnum.IMAGE})
                 .then(response => setImages(response.content ?? []))
-                .catch(console.error)
+                .catch((error) => {
+                    console.error(error);
+                    setLoadError('Failed to load images. Please try again.');
+                })
                 .finally(() => setLoading(false));
         }
     }, [open, initialId]);
@@ -32,11 +37,12 @@ export function RichEmbedHeroEditor({open, initialId, onConfirm, onCancel}: Rich
             title="Insert Hero Image Embed"
             open={open}
             onOk={() => selectedId != null && onConfirm(selectedId)}
-            okButtonProps={{disabled: selectedId == null}}
+            okButtonProps={{disabled: selectedId == null || loadError != null}}
             onCancel={onCancel}
             destroyOnClose
         >
             <Spin spinning={loading}>
+                {loadError && <Alert type="error" message={loadError} style={{marginBottom: 8}}/>}
                 <Select
                     value={selectedId}
                     onChange={setSelectedId}
@@ -45,6 +51,7 @@ export function RichEmbedHeroEditor({open, initialId, onConfirm, onCancel}: Rich
                     optionFilterProp="label"
                     style={{width: '100%'}}
                     placeholder="Select a hero image"
+                    disabled={loadError != null}
                 />
             </Spin>
         </Modal>
