@@ -1,9 +1,9 @@
 import {useParams} from 'react-router-dom';
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Carousel, Collapse, Image, Spin} from 'antd';
 import {pageAPI} from '../services';
 import {type PageResponse} from '../models';
-import {type CarouselParams, parseCarouselParams, parseEmbeds} from '../tools/embedTools';
+import {type CarouselParams, type CollapseCarouselItem, parseCarouselParams, parseEmbeds} from '../tools/embedTools';
 import DOMPurify from 'dompurify';
 import {ActionResult, type SubmitResult, validateParamId} from '@vempain/vempain-auth-frontend';
 import {SubmitResultHandler} from '../main';
@@ -60,94 +60,54 @@ function EmbedHero({id, pageTitle}: EmbedHeroProps) {
     );
 }
 
-interface ChildPagesEmbedProps {
-    parentId: number;
-    renderChildren: (children: PageResponse[]) => React.ReactNode;
-}
-
-function ChildPagesEmbed({parentId, renderChildren}: ChildPagesEmbedProps) {
-    const [children, setChildren] = useState<PageResponse[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        pageAPI.findByParentId(parentId)
-            .then((pages) => {
-                const sorted = [...pages].sort((a, b) => {
-                    // Pages without a published date are placed last
-                    const aTime = a.published ? new Date(a.published).getTime() : Number.MAX_SAFE_INTEGER;
-                    const bTime = b.published ? new Date(b.published).getTime() : Number.MAX_SAFE_INTEGER;
-                    return aTime - bTime;
-                });
-                setChildren(sorted);
-            })
-            .catch((err) => {
-                console.error('Failed to load child pages:', err);
-            })
-            .finally(() => setLoading(false));
-    }, [parentId]);
-
-    if (loading) return <Spin size="small"/>;
-    return <>{renderChildren(children)}</>;
-}
-
 interface EmbedCollapseProps {
-    parentId: number;
+    items: CollapseCarouselItem[];
 }
 
-function EmbedCollapse({parentId}: EmbedCollapseProps) {
+function EmbedCollapse({items}: EmbedCollapseProps) {
     return (
-        <ChildPagesEmbed
-            parentId={parentId}
-            renderChildren={(children) => (
-                <Collapse
-                    items={children.map((child) => ({
-                        key: String(child.id),
-                        label: child.title,
-                        children: (
-                            <div
-                                dangerouslySetInnerHTML={{
-                                    __html: DOMPurify.sanitize(child.body ?? ''),
-                                }}
-                            />
-                        ),
-                    }))}
-                />
-            )}
+        <Collapse
+            items={items.map((item, index) => ({
+                key: String(index),
+                label: item.title,
+                children: (
+                    <div
+                        dangerouslySetInnerHTML={{
+                            __html: DOMPurify.sanitize(item.body),
+                        }}
+                    />
+                ),
+            }))}
         />
     );
 }
 
 interface EmbedCarouselProps {
-    parentId: number;
+    items: CollapseCarouselItem[];
     params: CarouselParams;
 }
 
-function EmbedCarousel({parentId, params}: EmbedCarouselProps) {
+function EmbedCarousel({items, params}: EmbedCarouselProps) {
     return (
-        <ChildPagesEmbed
-            parentId={parentId}
-            renderChildren={(children) => (
-                <Carousel
-                    autoplay={params.autoplay}
-                    autoplaySpeed={params.dotDuration ? undefined : params.speed}
-                    speed={params.speed}
-                    dots={true}
-                    style={{background: '#1a1a2e', padding: '8px 0'}}
-                >
-                    {children.map((child) => (
-                        <div key={child.id}>
-                            <h3 style={{textAlign: 'center', color: '#E0E0E0', padding: '8px'}}>{child.title}</h3>
-                            <div
-                                style={{padding: '0 16px'}}
-                                dangerouslySetInnerHTML={{
-                                    __html: DOMPurify.sanitize(child.body ?? ''),
-                                }}
-                            />
-                        </div>
-                    ))}
-                </Carousel>
-            )}
-        />
+        <Carousel
+            autoplay={params.autoplay}
+            autoplaySpeed={params.dotDuration ? undefined : params.speed}
+            speed={params.speed}
+            dots={true}
+            style={{background: '#1a1a2e', padding: '8px 0'}}
+        >
+            {items.map((item, index) => (
+                <div key={index}>
+                    <h3 style={{textAlign: 'center', color: '#E0E0E0', padding: '8px'}}>{item.title}</h3>
+                    <div
+                        style={{padding: '0 16px'}}
+                        dangerouslySetInnerHTML={{
+                            __html: DOMPurify.sanitize(item.body),
+                        }}
+                    />
+                </div>
+            ))}
+        </Carousel>
     );
 }
 
@@ -159,8 +119,8 @@ function EmbedCarousel({parentId, params}: EmbedCarouselProps) {
  *   <!--vps:embed:gallery:%d-->
  *   <!--vps:embed:image:%d-->
  *   <!--vps:embed:hero:%d-->
- *   <!--vps:embed:collapse:%d-->
- *   <!--vps:embed:carousel:%d:<autoplay>:<dotDuration>:<speed>-->
+ *   <!--vps:embed:collapse:<url-encoded-json>-->
+ *   <!--vps:embed:carousel:<url-encoded-json>:<autoplay>:<dotDuration>:<speed>-->
  */
 export function PageView() {
     const {paramId} = useParams<{paramId: string}>();
@@ -233,12 +193,12 @@ export function PageView() {
                     case 'hero':
                         return <EmbedHero key={index} id={descriptor.id} pageTitle={page.title}/>;
                     case 'collapse':
-                        return <EmbedCollapse key={index} parentId={descriptor.id}/>;
+                        return <EmbedCollapse key={index} items={descriptor.items}/>;
                     case 'carousel': {
                         const carouselParams = descriptor.extra
                             ? parseCarouselParams(descriptor.extra)
                             : {autoplay: false, dotDuration: false, speed: 500};
-                        return <EmbedCarousel key={index} parentId={descriptor.id} params={carouselParams}/>;
+                        return <EmbedCarousel key={index} items={descriptor.items} params={carouselParams}/>;
                     }
                     default:
                         return null;

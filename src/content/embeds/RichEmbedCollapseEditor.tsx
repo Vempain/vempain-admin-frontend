@@ -1,59 +1,78 @@
-import {useEffect, useState} from 'react';
-import {Alert, Modal, Select, Spin} from 'antd';
-import {pageAPI} from '../../services';
-import type {PageResponse} from '../../models';
-import {QueryDetailEnum} from '../../models';
+import {useEffect} from 'react';
+import {Button, Form, Input, Modal, Space} from 'antd';
+import {MinusCircleOutlined, PlusOutlined} from '@ant-design/icons';
+import type {CollapseCarouselItem} from '../../tools/embedTools';
 
 interface RichEmbedCollapseEditorProps {
     open: boolean;
-    initialId?: number;
-    onConfirm: (id: number) => void;
+    initialItems?: CollapseCarouselItem[];
+    onConfirm: (items: CollapseCarouselItem[]) => void;
     onCancel: () => void;
 }
 
-export function RichEmbedCollapseEditor({open, initialId, onConfirm, onCancel}: RichEmbedCollapseEditorProps) {
-    const [pages, setPages] = useState<PageResponse[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [loadError, setLoadError] = useState<string | null>(null);
-    const [selectedId, setSelectedId] = useState<number | undefined>(initialId);
+export function RichEmbedCollapseEditor({open, initialItems, onConfirm, onCancel}: RichEmbedCollapseEditorProps) {
+    const [form] = Form.useForm();
 
     useEffect(() => {
         if (open) {
-            setSelectedId(initialId);
-            setLoadError(null);
-            setLoading(true);
-            pageAPI.findAll({details: QueryDetailEnum.MINIMAL})
-                .then(setPages)
-                .catch((error) => {
-                    console.error(error);
-                    setLoadError('Failed to load pages. Please try again.');
-                })
-                .finally(() => setLoading(false));
+            form.setFieldsValue({
+                items: initialItems?.length ? initialItems : [{title: '', body: ''}],
+            });
         }
-    }, [open, initialId]);
+    }, [open, initialItems, form]);
+
+    const handleOk = () => {
+        form.validateFields().then(values => {
+            onConfirm(values.items ?? []);
+        }).catch(() => {
+            // validation failed — stay in dialog
+        });
+    };
 
     return (
         <Modal
             title="Insert Collapse Embed"
             open={open}
-            onOk={() => selectedId != null && onConfirm(selectedId)}
-            okButtonProps={{disabled: selectedId == null || loadError != null}}
+            onOk={handleOk}
             onCancel={onCancel}
             destroyOnHidden
+            width={600}
         >
-            <Spin spinning={loading}>
-                {loadError && <Alert type="error" message={loadError} style={{marginBottom: 8}}/>}
-                <Select
-                    value={selectedId}
-                    onChange={setSelectedId}
-                    options={pages.map(p => ({label: p.page_path || p.title, value: p.id}))}
-                    showSearch
-                    optionFilterProp="label"
-                    style={{width: '100%'}}
-                    placeholder="Select a parent page"
-                    disabled={loadError != null}
-                />
-            </Spin>
+            <Form form={form}>
+                <Form.List name="items">
+                    {(fields, {add, remove}) => (
+                        <>
+                            {fields.map(({key, name, ...restField}) => (
+                                <Space key={key} style={{display: 'flex', marginBottom: 8}} align="baseline">
+                                    <Form.Item
+                                        {...restField}
+                                        name={[name, 'title']}
+                                        rules={[{required: true, message: 'Please enter a title'}]}
+                                        style={{marginBottom: 0, flex: 1}}
+                                    >
+                                        <Input placeholder="Title"/>
+                                    </Form.Item>
+                                    <Form.Item
+                                        {...restField}
+                                        name={[name, 'body']}
+                                        rules={[{required: true, message: 'Please enter body text'}]}
+                                        style={{marginBottom: 0, flex: 2}}
+                                    >
+                                        <Input.TextArea placeholder="Body" autoSize={{minRows: 1, maxRows: 4}}/>
+                                    </Form.Item>
+                                    <MinusCircleOutlined onClick={() => remove(name)}/>
+                                </Space>
+                            ))}
+                            <Form.Item>
+                                <Button type="dashed" onClick={() => add({title: '', body: ''})} block
+                                        icon={<PlusOutlined/>}>
+                                    Add Item
+                                </Button>
+                            </Form.Item>
+                        </>
+                    )}
+                </Form.List>
+            </Form>
         </Modal>
     );
 }
