@@ -55,7 +55,7 @@ function SystemScheduleList() {
     }, []);
     return (
             <div className={"DarkDiv"} key={"systemScheduleListDiv"}>
-                <Spin tip={"Loading"} spinning={loading} key={"systemScheduleListSpinner"}>
+                <Spin description={"Loading"} spinning={loading} key={"systemScheduleListSpinner"}>
                     <h1 key={"systemScheduleListHeader"}>System schedule List</h1>
 
                     {systemScheduleList.length > 0 && <Table

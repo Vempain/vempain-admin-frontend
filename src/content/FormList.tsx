@@ -7,6 +7,7 @@ import {type FormVO, QueryDetailEnum} from "../models";
 import {getPaginationConfig} from "../tools";
 import {formAPI} from "../services";
 import {aclTool, PrivilegeEnum, useSession} from "@vempain/vempain-auth-frontend";
+import dayjs from "dayjs";
 
 export function FormList() {
     const [loading, setLoading] = useState<boolean>(false);
@@ -67,19 +68,19 @@ export function FormList() {
             title: "Created",
             dataIndex: "created",
             key: "created",
-            sorter: (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
+            sorter: (a, b) => dayjs(a.created).unix() - dayjs(b.created).unix()
         },
         {
             title: "Modifier",
             dataIndex: "modifier",
             key: "modifier",
-            sorter: (a, b) => a.modifier - b.modifier
+            sorter: (a, b) => (a.modifier === null ? 0 : a.modifier) - (b.modifier === null ? 0 : b.modifier)
         },
         {
             title: "Modified",
             dataIndex: "modified",
             key: "modified",
-            sorter: (a, b) => new Date(a.modified).getTime() - new Date(b.modified).getTime()
+            sorter: (a, b) => dayjs(a.modified).unix() - dayjs(b.modified).unix()
         },
         {
             title: "Action",
@@ -111,7 +112,7 @@ export function FormList() {
 
     return (
             <div className={"DarkDiv"} key={"formListDiv"}>
-                <Spin tip={"Loading"} spinning={loading} key={"formListSpinner"}>
+                <Spin description={"Loading"} spinning={loading} key={"formListSpinner"}>
                     <h1 key={"formListHeader"}>Form List <Link to={"/forms/0/edit"}><PlusCircleFilled/></Link></h1>
 
                     {formList.length > 0 && <Table

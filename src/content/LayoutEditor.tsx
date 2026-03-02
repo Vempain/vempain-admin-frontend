@@ -103,7 +103,7 @@ export function LayoutEditor() {
     }
 
     return (<div className={"DarkDiv"}>
-                <Spin tip={"Loading"} spinning={loading}>
+                <Spin description={"Loading"} spinning={loading}>
                     {layoutId === 0 && <h1>Create new layout</h1>}
                     {layoutId > 0 && <h1>Edit layout {layoutId}</h1>}
                     {layout !== null && <Form

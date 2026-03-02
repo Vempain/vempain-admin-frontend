@@ -5,6 +5,7 @@ import {type PageResponse, QueryDetailEnum} from "../models";
 import {galleryAPI, pageAPI} from "../services";
 import {Button, Divider, Space, Spin, Table} from "antd";
 import {SubmitResultHandler} from "../main";
+import {RichTextEditor} from "./RichTextEditor";
 import TextArea from "antd/es/input/TextArea";
 import dayjs, {Dayjs} from "dayjs";
 import {PublishSchedule} from "./PublishSchedule";
@@ -102,13 +103,12 @@ export function PagePublish() {
 
     return (
             <div className={"DarkDiv"} key={"pagePublishDiv"}>
-                <Spin spinning={loading} tip={"Uploading page and files..."}>
+                <Spin spinning={loading} description={"Uploading page and files..."}>
                     {page !== null && page.body !== undefined && <div>
                         <Space vertical={true} size={"large"}>
-                            <TextArea key={"pageBody"}
+                            <RichTextEditor key={"pageBody"}
                                       value={page.body}
-                                      style={{width: 800, height: "100%"}}
-                                      autoSize={true}
+                                            readOnly={true}
                             />
                             {galleryList.length > 0 && <Table key={"galleryList"}
                                                               columns={galleryColumns}

@@ -2,7 +2,7 @@ import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
 import {AclEdit} from "./AclEdit";
-import TextArea from "antd/es/input/TextArea";
+import {RichTextEditor} from "./RichTextEditor";
 import {MetadataForm, SubmitResultHandler} from "../main";
 import {formAPI, galleryAPI, pageAPI} from "../services";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-design/icons";
@@ -209,8 +209,8 @@ export function PageEditor() {
     }
 
     return (
-            <div className={"DarkDiv"}>
-                <Spin tip={spinTip} spinning={loading}>
+            <div className={"DarkDiv"} style={{width: "99%"}}>
+                <Spin description={spinTip} spinning={loading}>
                     {pageId === 0 && <h1>Create new page</h1>}
                     {pageId > 0 && <h1>Edit page '{pageTitle}'</h1>}
                     {page !== null && !loading && <Form
@@ -264,7 +264,7 @@ export function PageEditor() {
                             <Input/>
                         </Form.Item>
                         <Form.Item name={"body"} label={"Body"}>
-                            <TextArea autoSize={true}/>
+                            <RichTextEditor/>
                         </Form.Item>
                         <Form.Item name={"page_path"} label={"Path"}>
                             <Input/>

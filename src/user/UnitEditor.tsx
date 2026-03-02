@@ -104,7 +104,7 @@ export function UnitEditor() {
 
     return (
             <div className={"DarkDiv"}>
-                <Spin tip={"Loading"} spinning={loading}>
+                <Spin description={"Loading"} spinning={loading}>
                     {unitId === 0 && <h1>Create new unit</h1>}
                     {unitId > 0 && <h1>Edit unit {unitId}</h1>}
                 </Spin>
