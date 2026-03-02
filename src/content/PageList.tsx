@@ -311,7 +311,7 @@ export function PageList() {
     return (
             <div className={"DarkDiv"} key={"pageListDiv"}>
                 {contextHolder}
-                <Spin tip={spinMessage} spinning={loading} key={"pageListSpinner"}>
+                <Spin description={spinMessage} spinning={loading} key={"pageListSpinner"}>
                     <Space vertical={true} size={"large"} key={"pageListSpace"}>
                         <h1 key={"pageListHeader"}>Page List <Link to={"/pages/0/edit"}><PlusCircleFilled/></Link></h1>
                         <Button type={"primary"} onClick={publishAll}>Publish all pages</Button>

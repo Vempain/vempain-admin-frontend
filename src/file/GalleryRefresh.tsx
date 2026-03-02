@@ -80,7 +80,7 @@ export function GalleryRefresh() {
     return (
             <div className={"DarkDiv"} key={"galleryRefreshFilesDiv"}>
                 <Spin spinning={loading}
-                      tip={loadingMessage}
+                      description={loadingMessage}
                       indicator={<LoadingOutlined style={{fontSize: 24}} spin={true}/>}
                 >
                     {gallery !== null && gallery?.id !== undefined && <div>

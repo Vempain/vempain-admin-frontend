@@ -7,6 +7,7 @@ import {AclEdit} from "./AclEdit";
 import {type ComponentVO, type FormVO, type LayoutVO} from "../models";
 import {componentAPI, formAPI, layoutAPI} from "../services";
 import {type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import dayjs from "dayjs";
 
 export function FormEditor() {
     const {paramId} = useParams();
@@ -73,9 +74,9 @@ export function FormEditor() {
                 acls: [],
                 locked: false,
                 creator: 0,
-                created: new Date(),
+                created: dayjs(),
                 modifier: 0,
-                modified: new Date(),
+                modified: dayjs(),
             });
             setLoading(false);
         }
@@ -120,7 +121,7 @@ export function FormEditor() {
 
     return (
             <div className={"DarkDiv"}>
-                <Spin tip={"Loading"} spinning={loading}>
+                <Spin description={"Loading"} spinning={loading}>
                     {formId === 0 && <h1>Create new form</h1>}
                     {formId > 0 && <h1>Edit form {formId}</h1>}
                     {form !== null && <Form
