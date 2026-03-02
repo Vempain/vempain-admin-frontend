@@ -1,4 +1,12 @@
-import {buildCarouselTag, buildEmbedTag, convertPlaceholdersToTags, convertTagsToPlaceholders, type CollapseCarouselItem, type EmbedType, parseCarouselParams} from '../tools/embedTools';
+import {
+    buildCarouselTag,
+    buildEmbedTag,
+    type CollapseCarouselItem,
+    convertPlaceholdersToTags,
+    convertTagsToPlaceholders,
+    type EmbedType,
+    parseCarouselParams
+} from '../tools/embedTools';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Button, Form, Input, Modal, Select, Space, Tooltip} from 'antd';
 import {
@@ -21,6 +29,8 @@ import {RichEmbedCarouselEditor, RichEmbedCollapseEditor, RichEmbedGalleryEditor
 interface RichTextEditorProps {
     value?: string;
     onChange?: (value: string) => void;
+    /** When true, hides the toolbar and makes the content non-editable */
+    readOnly?: boolean;
 }
 
 interface EmbedDialogState {
@@ -48,7 +58,7 @@ interface EmbedDialogState {
  * - Toggle between WYSIWYG and HTML source view
  * - Click-to-edit for existing embed placeholders
  */
-export function RichTextEditor({value, onChange}: RichTextEditorProps) {
+export function RichTextEditor({value, onChange, readOnly = false}: RichTextEditorProps) {
     const editorRef = useRef<HTMLDivElement>(null);
     const [sourceMode, setSourceMode] = useState(false);
     // htmlContent mirrors the canonical HTML without placeholders
@@ -306,31 +316,56 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
             if (!type) return;
 
             if (type === 'collapse' || type === 'carousel') {
-                // data-content stores the raw embed tag content (URL-encoded JSON or legacy numeric).
-                // Decode once to get plain JSON.
-                let rawContent = placeholder.dataset.content || '';
-                let decoded: string;
-                try {
-                    decoded = decodeURIComponent(rawContent);
-                } catch {
-                    decoded = rawContent; // malformed encoding — use raw
-                }
+                // data-content stores the raw embed tag content (plain JSON).
+                // The browser auto-unescapes HTML entities from dataset attributes.
+                const rawContent = placeholder.dataset.content || '';
 
                 let items: CollapseCarouselItem[] = [];
                 let extra: string | undefined;
 
-                if (decoded.startsWith('[')) {
-                    // New JSON format
-                    const jsonEnd = decoded.lastIndexOf(']');
-                    if (jsonEnd !== -1) {
-                        try {
-                            const parsed = JSON.parse(decoded.substring(0, jsonEnd + 1));
+                const trimmed = rawContent.trimStart();
+                if (trimmed.startsWith('[')) {
+                    // Parse JSON array — find end using bracket-depth tracking
+                    // (imported from embedTools indirectly via parseEmbedContent logic)
+                    try {
+                        // Find the matching ] by tracking depth
+                        let depth = 0;
+                        let inStr = false;
+                        let esc = false;
+                        let jsonEnd = -1;
+                        for (let i = 0; i < trimmed.length; i++) {
+                            const ch = trimmed[i];
+                            if (esc) {
+                                esc = false;
+                                continue;
+                            }
+                            if (ch === '\\' && inStr) {
+                                esc = true;
+                                continue;
+                            }
+                            if (ch === '"') {
+                                inStr = !inStr;
+                                continue;
+                            }
+                            if (inStr) continue;
+                            if (ch === '[') depth++;
+                            else if (ch === ']') {
+                                depth--;
+                                if (depth === 0) {
+                                    jsonEnd = i;
+                                    break;
+                                }
+                            }
+                        }
+                        if (jsonEnd !== -1) {
+                            const parsed = JSON.parse(trimmed.substring(0, jsonEnd + 1));
                             if (Array.isArray(parsed)) {
                                 items = parsed as CollapseCarouselItem[];
                             }
-                        } catch { /* ignore malformed JSON */ }
-                        const rest = decoded.substring(jsonEnd + 1);
-                        extra = rest.startsWith(':') ? rest.substring(1) : undefined;
+                            const rest = trimmed.substring(jsonEnd + 1);
+                            extra = rest.startsWith(':') ? rest.substring(1) : undefined;
+                        }
+                    } catch { /* ignore malformed JSON */
                     }
                 }
                 // For legacy numeric format, items stays [] and we open editor empty
@@ -411,8 +446,9 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
         : undefined;
 
     return (
-        <div style={{width: '100%'}}>
-            {/* Toolbar */}
+            <div style={{width: '98%'}}>
+                {/* Toolbar — hidden in readOnly mode */}
+                {!readOnly && (
             <div style={toolbarStyle}>
                 {/* Format block selector */}
                 <Select
@@ -532,10 +568,14 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
                     </Button>
                 </Tooltip>
             </div>
+                )}
 
             {/* Editor area */}
-            <div style={editorContainerStyle}>
-                {sourceMode ? (
+                <div style={{
+                    ...editorContainerStyle,
+                    ...(readOnly ? {borderRadius: '4px'} : {}),
+                }}>
+                    {sourceMode && !readOnly ? (
                     <textarea
                         style={sourceStyle}
                         value={htmlContentRef.current}
@@ -544,16 +584,19 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
                 ) : (
                     <div
                         ref={editorRef}
-                        contentEditable={true}
+                        contentEditable={!readOnly}
                         suppressContentEditableWarning={true}
                         style={editorStyle}
-                        onInput={handleEditorInput}
-                        onBlur={handleEditorInput}
-                        onClick={handleEditorClick}
+                        onInput={readOnly ? undefined : handleEditorInput}
+                        onBlur={readOnly ? undefined : handleEditorInput}
+                        onClick={readOnly ? undefined : handleEditorClick}
                     />
                 )}
             </div>
 
+                {/* Modals — only rendered in editable mode */}
+                {!readOnly && (
+                        <>
             {/* Link insertion dialog */}
             <Modal
                 title="Insert Link"
@@ -606,6 +649,8 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
                 onConfirm={handleCarouselConfirm}
                 onCancel={handleEmbedCancel}
             />
+                        </>
+                )}
         </div>
     );
 }
