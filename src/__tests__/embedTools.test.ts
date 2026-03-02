@@ -7,6 +7,11 @@ import {
     parseEmbeds,
 } from '../tools/embedTools';
 
+const SAMPLE_ITEMS = [
+    {title: 'Title of the first item', body: 'Body of the first item'},
+    {title: 'Title of the second item', body: 'Body of the second item'},
+];
+
 describe('parseCarouselParams', () => {
     it('parses all params correctly', () => {
         const result = parseCarouselParams('true:true:800');
@@ -37,21 +42,26 @@ describe('buildEmbedTag', () => {
         expect(buildEmbedTag({type: 'hero', id: 3})).toBe('<!--vps:embed:hero:3-->');
     });
 
-    it('builds collapse tag', () => {
-        expect(buildEmbedTag({type: 'collapse', id: 30})).toBe('<!--vps:embed:collapse:30-->');
+    it('builds collapse tag with JSON items', () => {
+        const items = [{title: 'Title 1', body: 'Body 1'}];
+        expect(buildEmbedTag({type: 'collapse', items})).toBe(
+            `<!--vps:embed:collapse:${JSON.stringify(items)}-->`,
+        );
     });
 
-    it('builds carousel tag with extra params', () => {
-        expect(buildEmbedTag({type: 'carousel', id: 7, extra: 'true:false:600'})).toBe(
-            '<!--vps:embed:carousel:7:true:false:600-->',
+    it('builds carousel tag with JSON items and extra params', () => {
+        const items = [{title: 'Title 1', body: 'Body 1'}];
+        expect(buildEmbedTag({type: 'carousel', items, extra: 'true:false:600'})).toBe(
+            `<!--vps:embed:carousel:${JSON.stringify(items)}:true:false:600-->`,
         );
     });
 });
 
 describe('buildCarouselTag', () => {
-    it('builds a full carousel tag', () => {
-        const tag = buildCarouselTag(10, {autoplay: true, dotDuration: false, speed: 300});
-        expect(tag).toBe('<!--vps:embed:carousel:10:true:false:300-->');
+    it('builds a full carousel tag with JSON items', () => {
+        const items = [{title: 'Title 1', body: 'Body 1'}];
+        const tag = buildCarouselTag(items, {autoplay: true, dotDuration: false, speed: 300});
+        expect(tag).toBe(`<!--vps:embed:carousel:${JSON.stringify(items)}:true:false:300-->`);
     });
 });
 
@@ -77,7 +87,7 @@ describe('parseEmbeds', () => {
         expect(segments[2]).toEqual({kind: 'html', content: '<p>After</p>'});
     });
 
-    it('parses carousel embed with extra params', () => {
+    it('parses carousel embed with extra params (legacy numeric format)', () => {
         const html = '<!--vps:embed:carousel:7:true:false:600-->';
         const segments = parseEmbeds(html);
         expect(segments).toHaveLength(1);
@@ -89,13 +99,40 @@ describe('parseEmbeds', () => {
         }
     });
 
+    it('parses collapse embed with JSON items', () => {
+        const tag = `<!--vps:embed:collapse:${JSON.stringify(SAMPLE_ITEMS)}-->`;
+        const segments = parseEmbeds(tag);
+        expect(segments).toHaveLength(1);
+        expect(segments[0].kind).toBe('embed');
+        if (segments[0].kind === 'embed') {
+            expect(segments[0].descriptor.type).toBe('collapse');
+            expect(segments[0].descriptor.items).toEqual(SAMPLE_ITEMS);
+        }
+    });
+
+    it('parses carousel embed with JSON items and extra params', () => {
+        const tag = `<!--vps:embed:carousel:${JSON.stringify(SAMPLE_ITEMS)}:true:false:600-->`;
+        const segments = parseEmbeds(tag);
+        expect(segments).toHaveLength(1);
+        expect(segments[0].kind).toBe('embed');
+        if (segments[0].kind === 'embed') {
+            expect(segments[0].descriptor.type).toBe('carousel');
+            expect(segments[0].descriptor.items).toEqual(SAMPLE_ITEMS);
+            expect(segments[0].descriptor.extra).toBe('true:false:600');
+        }
+    });
+
     it('parses multiple embeds', () => {
-        const html = '<!--vps:embed:collapse:30--><!--vps:embed:hero:1-->';
+        const collapseTag = `<!--vps:embed:collapse:${JSON.stringify(SAMPLE_ITEMS)}-->`;
+        const html = `${collapseTag}<!--vps:embed:hero:1-->`;
         const segments = parseEmbeds(html);
         expect(segments).toHaveLength(2);
         expect(segments[0].kind).toBe('embed');
         expect(segments[1].kind).toBe('embed');
-        if (segments[0].kind === 'embed') expect(segments[0].descriptor.type).toBe('collapse');
+        if (segments[0].kind === 'embed') {
+            expect(segments[0].descriptor.type).toBe('collapse');
+            expect(segments[0].descriptor.items).toEqual(SAMPLE_ITEMS);
+        }
         if (segments[1].kind === 'embed') expect(segments[1].descriptor.type).toBe('hero');
     });
 });
@@ -108,11 +145,21 @@ describe('convertTagsToPlaceholders', () => {
         expect(result).toContain('data-id="5"');
     });
 
-    it('converts carousel tag preserving extra params', () => {
-        const result = convertTagsToPlaceholders('<!--vps:embed:carousel:7:true:false:600-->');
+    it('converts collapse tag with JSON items to placeholder span', () => {
+        const tag = `<!--vps:embed:collapse:${JSON.stringify(SAMPLE_ITEMS)}-->`;
+        const result = convertTagsToPlaceholders(tag);
+        expect(result).toContain('class="vps-embed-placeholder"');
+        expect(result).toContain('data-type="collapse"');
+        expect(result).toContain('data-content=');
+        expect(result).not.toContain('data-id=');
+    });
+
+    it('converts carousel tag with JSON items preserving extra params', () => {
+        const tag = `<!--vps:embed:carousel:${JSON.stringify(SAMPLE_ITEMS)}:true:false:600-->`;
+        const result = convertTagsToPlaceholders(tag);
         expect(result).toContain('data-type="carousel"');
-        expect(result).toContain('data-id="7"');
-        expect(result).toContain('data-extra="true:false:600"');
+        expect(result).toContain('data-content=');
+        expect(result).not.toContain('data-id=');
     });
 
     it('leaves non-embed html unchanged', () => {
@@ -129,8 +176,15 @@ describe('convertPlaceholdersToTags', () => {
         expect(result).toBe(original);
     });
 
-    it('is the inverse of convertTagsToPlaceholders for carousel', () => {
-        const original = '<!--vps:embed:carousel:7:true:false:600-->';
+    it('is the inverse of convertTagsToPlaceholders for collapse with JSON items', () => {
+        const original = `<!--vps:embed:collapse:${JSON.stringify(SAMPLE_ITEMS)}-->`;
+        const placeholder = convertTagsToPlaceholders(original);
+        const result = convertPlaceholdersToTags(placeholder);
+        expect(result).toBe(original);
+    });
+
+    it('is the inverse of convertTagsToPlaceholders for carousel with JSON items', () => {
+        const original = `<!--vps:embed:carousel:${JSON.stringify(SAMPLE_ITEMS)}:true:false:600-->`;
         const placeholder = convertTagsToPlaceholders(original);
         const result = convertPlaceholdersToTags(placeholder);
         expect(result).toBe(original);

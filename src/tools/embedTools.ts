@@ -5,16 +5,24 @@
  *   <!--vps:embed:gallery:%d-->
  *   <!--vps:embed:image:%d-->
  *   <!--vps:embed:hero:%d-->
- *   <!--vps:embed:collapse:%d-->
- *   <!--vps:embed:carousel:%d:<autoplay>:<dotDuration>:<speed>-->
+ *   <!--vps:embed:collapse:[{"title":"...","body":"..."},...]-->
+ *   <!--vps:embed:carousel:[{"title":"...","body":"..."},...]:autoplay:dotDuration:speed-->
  */
 
 export type EmbedType = 'gallery' | 'image' | 'hero' | 'collapse' | 'carousel';
 
+export interface CollapseCarouselItem {
+    title: string;
+    body: string;
+}
+
 export interface EmbedDescriptor {
     type: EmbedType;
-    id: number;
-    /** Extra parameters string after the id (for carousel: "autoplay:dotDuration:speed") */
+    /** Numeric ID — used for gallery, image and hero embed types */
+    id?: number;
+    /** JSON items — used for collapse and carousel embed types */
+    items?: CollapseCarouselItem[];
+    /** Extra parameters string (for carousel: "autoplay:dotDuration:speed") */
     extra?: string;
 }
 
@@ -24,7 +32,9 @@ export interface CarouselParams {
     speed: number;
 }
 
-const EMBED_REGEX = /<!--vps:embed:([a-z]+):(\d+)(?::([^-]*))?-->/g;
+// Matches any embed tag: <!--vps:embed:<type>:<content>-->
+// content may be a numeric id, a JSON array, or a JSON array followed by carousel params
+const EMBED_REGEX = /<!--vps:embed:([a-z]+):(.*?)-->/g;
 
 /**
  * Parse a carousel extra-params string into structured params.
@@ -40,18 +50,26 @@ export function parseCarouselParams(extra: string): CarouselParams {
 }
 
 /**
- * Build a carousel embed tag from structured params.
+ * Build a carousel embed tag from a list of items and carousel params.
  */
-export function buildCarouselTag(id: number, params: CarouselParams): string {
-    return `<!--vps:embed:carousel:${id}:${params.autoplay}:${params.dotDuration}:${params.speed}-->`;
+export function buildCarouselTag(items: CollapseCarouselItem[], params: CarouselParams): string {
+    return `<!--vps:embed:carousel:${JSON.stringify(items)}:${params.autoplay}:${params.dotDuration}:${params.speed}-->`;
 }
 
 /**
  * Build an embed tag string from an EmbedDescriptor.
  */
 export function buildEmbedTag(descriptor: EmbedDescriptor): string {
-    if (descriptor.type === 'carousel' && descriptor.extra) {
-        return `<!--vps:embed:carousel:${descriptor.id}:${descriptor.extra}-->`;
+    if (descriptor.type === 'collapse' && descriptor.items) {
+        return `<!--vps:embed:collapse:${JSON.stringify(descriptor.items)}-->`;
+    }
+    if (descriptor.type === 'carousel' && descriptor.items) {
+        const extra = descriptor.extra ? `:${descriptor.extra}` : '';
+        return `<!--vps:embed:carousel:${JSON.stringify(descriptor.items)}${extra}-->`;
+    }
+    // gallery, image, hero — numeric ID based
+    if (descriptor.extra) {
+        return `<!--vps:embed:${descriptor.type}:${descriptor.id}:${descriptor.extra}-->`;
     }
     return `<!--vps:embed:${descriptor.type}:${descriptor.id}-->`;
 }
@@ -66,6 +84,35 @@ export type ContentSegment =
     | { kind: 'html'; content: string }
     | { kind: 'embed'; descriptor: EmbedDescriptor };
 
+/**
+ * Parse the raw content string (everything after the type colon) into
+ * the relevant EmbedDescriptor fields based on the embed type.
+ */
+function parseEmbedContent(type: EmbedType, content: string): Omit<EmbedDescriptor, 'type'> {
+    if ((type === 'collapse' || type === 'carousel') && content.startsWith('[')) {
+        const jsonEnd = content.lastIndexOf(']');
+        if (jsonEnd === -1) {
+            return {items: []};
+        }
+        const jsonStr = content.substring(0, jsonEnd + 1);
+        const rest = content.substring(jsonEnd + 1);
+        let items: CollapseCarouselItem[] = [];
+        try {
+            items = JSON.parse(jsonStr) as CollapseCarouselItem[];
+        } catch {
+            // malformed JSON — treat as empty items list
+        }
+        const extra = rest.startsWith(':') ? rest.substring(1) : undefined;
+        return {items, ...(extra ? {extra} : {})};
+    }
+    // Numeric-ID format: used for gallery, image, hero (and old-format collapse/carousel)
+    const firstColon = content.indexOf(':');
+    if (firstColon === -1) {
+        return {id: parseInt(content, 10)};
+    }
+    return {id: parseInt(content.substring(0, firstColon), 10), extra: content.substring(firstColon + 1)};
+}
+
 export function parseEmbeds(html: string): ContentSegment[] {
     const segments: ContentSegment[] = [];
     let lastIndex = 0;
@@ -78,12 +125,11 @@ export function parseEmbeds(html: string): ContentSegment[] {
         }
 
         const type = match[1] as EmbedType;
-        const id = parseInt(match[2], 10);
-        const extra = match[3];
+        const content = match[2];
 
         segments.push({
             kind: 'embed',
-            descriptor: {type, id, extra},
+            descriptor: {type, ...parseEmbedContent(type, content)},
         });
 
         lastIndex = match.index + match[0].length;
@@ -99,13 +145,30 @@ export function parseEmbeds(html: string): ContentSegment[] {
 /**
  * Convert embed comment tags in HTML to visual placeholder spans
  * for display in the rich text editor (WYSIWYG mode).
+ *
+ * For gallery/image/hero the placeholder stores data-id and data-extra.
+ * For collapse/carousel the placeholder stores data-content (URL-encoded raw content).
  */
 export function convertTagsToPlaceholders(html: string): string {
-    return html.replace(new RegExp(EMBED_REGEX.source, 'g'), (_match, type, id, extra) => {
-        const label = buildPlaceholderLabel(type as EmbedType, parseInt(id, 10), extra);
+    return html.replace(new RegExp(EMBED_REGEX.source, 'g'), (_match, type, content) => {
+        const embedType = type as EmbedType;
+        let dataAttrs: string;
+
+        if (embedType === 'collapse' || embedType === 'carousel') {
+            // Store URL-encoded content so the full JSON (and carousel params) can be restored
+            dataAttrs = `data-type="${type}" data-content="${encodeURIComponent(content)}"`;
+        } else {
+            // gallery / image / hero: split numeric id from optional extra params
+            const firstColon = content.indexOf(':');
+            const id = firstColon === -1 ? content : content.substring(0, firstColon);
+            const extra = firstColon === -1 ? '' : content.substring(firstColon + 1);
+            dataAttrs = `data-type="${type}" data-id="${id}" data-extra="${extra}"`;
+        }
+
+        const label = buildPlaceholderLabel(embedType, content);
         return (
             `<span class="vps-embed-placeholder" ` +
-            `data-type="${type}" data-id="${id}" data-extra="${extra ?? ''}" ` +
+            `${dataAttrs} ` +
             `contenteditable="false" ` +
             `style="display:inline-block;background:#1a3a5c;border:1px solid #4a90d9;` +
             `border-radius:4px;padding:2px 8px;margin:2px 4px;cursor:pointer;` +
@@ -115,24 +178,40 @@ export function convertTagsToPlaceholders(html: string): string {
     });
 }
 
-function buildPlaceholderLabel(type: EmbedType, id: number, extra?: string): string {
+function buildPlaceholderLabel(type: EmbedType, content: string): string {
     switch (type) {
         case 'gallery':
-            return `🖼 gallery:${id}`;
+            return `🖼 gallery:${content}`;
         case 'image':
-            return `🖼 image:${id}`;
+            return `🖼 image:${content}`;
         case 'hero':
-            return `🎨 hero:${id}`;
-        case 'collapse':
-            return `📂 collapse:${id}`;
+            return `🎨 hero:${content}`;
+        case 'collapse': {
+            try {
+                const items = JSON.parse(content) as CollapseCarouselItem[];
+                const count = items.length;
+                return `📂 collapse (${count} item${count !== 1 ? 's' : ''})`;
+            } catch {
+                return `📂 collapse:${content}`;
+            }
+        }
         case 'carousel': {
-            const params = extra ? parseCarouselParams(extra) : null;
-            return params
-                ? `🎠 carousel:${id} [autoplay:${params.autoplay} speed:${params.speed}ms]`
-                : `🎠 carousel:${id}`;
+            try {
+                const jsonEnd = content.lastIndexOf(']');
+                const jsonStr = content.substring(0, jsonEnd + 1);
+                const rest = content.substring(jsonEnd + 1);
+                const items = JSON.parse(jsonStr) as CollapseCarouselItem[];
+                const count = items.length;
+                const extra = rest.startsWith(':') ? rest.substring(1) : '';
+                const params = extra ? parseCarouselParams(extra) : null;
+                const speedInfo = params ? ` speed:${params.speed}ms` : '';
+                return `🎠 carousel (${count} item${count !== 1 ? 's' : ''})${speedInfo}`;
+            } catch {
+                return `🎠 carousel:${content}`;
+            }
         }
         default:
-            return `embed:${id}`;
+            return `embed:${content}`;
     }
 }
 
@@ -141,7 +220,15 @@ function buildPlaceholderLabel(type: EmbedType, id: number, extra?: string): str
  * Inverse of convertTagsToPlaceholders.
  */
 export function convertPlaceholdersToTags(html: string): string {
-    return html.replace(
+    // Handle collapse/carousel placeholders that use data-content
+    let result = html.replace(
+        /<span[^>]+class="vps-embed-placeholder"[^>]+data-type="([^"]+)"[^>]+data-content="([^"]*)"[^>]*>.*?<\/span>/g,
+        (_match, type, encodedContent) => {
+            return `<!--vps:embed:${type}:${decodeURIComponent(encodedContent)}-->`;
+        },
+    );
+    // Handle gallery/image/hero placeholders that use data-id and data-extra
+    result = result.replace(
         /<span[^>]+class="vps-embed-placeholder"[^>]+data-type="([^"]+)"[^>]+data-id="([^"]+)"[^>]+data-extra="([^"]*)"[^>]*>.*?<\/span>/g,
         (_match, type, id, extra) => {
             if (extra) {
@@ -150,4 +237,5 @@ export function convertPlaceholdersToTags(html: string): string {
             return `<!--vps:embed:${type}:${id}-->`;
         },
     );
+    return result;
 }

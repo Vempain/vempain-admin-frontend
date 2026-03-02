@@ -1,4 +1,4 @@
-import {buildCarouselTag, buildEmbedTag, convertPlaceholdersToTags, convertTagsToPlaceholders, type EmbedType, parseCarouselParams} from '../tools/embedTools';
+import {buildCarouselTag, buildEmbedTag, convertPlaceholdersToTags, convertTagsToPlaceholders, type CollapseCarouselItem, type EmbedType, parseCarouselParams} from '../tools/embedTools';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Button, Form, Input, Modal, Select, Space, Tooltip} from 'antd';
 import {
@@ -26,10 +26,12 @@ interface RichTextEditorProps {
 interface EmbedDialogState {
     open: boolean;
     type: EmbedType | null;
-    /** ID of the embed being edited (undefined = new insertion) */
+    /** ID of the embed being edited — used for gallery, image and hero types */
     initialId?: number;
-    /** Extra params string for carousel edits */
+    /** Extra params string for carousel edits (e.g. "true:false:500") */
     initialExtra?: string;
+    /** JSON items for collapse and carousel embed types */
+    initialItems?: CollapseCarouselItem[];
 }
 
 /**
@@ -271,14 +273,14 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
         setEmbedDialog({open: false, type: null});
     };
 
-    const handleCollapseConfirm = (id: number) => {
-        const tag = buildEmbedTag({type: 'collapse', id});
+    const handleCollapseConfirm = (items: CollapseCarouselItem[]) => {
+        const tag = buildEmbedTag({type: 'collapse', items});
         insertOrReplacePlaceholder(tag);
         setEmbedDialog({open: false, type: null});
     };
 
-    const handleCarouselConfirm = (id: number, autoplay: boolean, dotDuration: boolean, speed: number) => {
-        const tag = buildCarouselTag(id, {autoplay, dotDuration, speed});
+    const handleCarouselConfirm = (items: CollapseCarouselItem[], autoplay: boolean, dotDuration: boolean, speed: number) => {
+        const tag = buildCarouselTag(items, {autoplay, dotDuration, speed});
         insertOrReplacePlaceholder(tag);
         setEmbedDialog({open: false, type: null});
     };
@@ -301,12 +303,35 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
         const placeholder = target.closest('.vps-embed-placeholder') as HTMLElement | null;
         if (placeholder) {
             const type = placeholder.dataset.type as EmbedType;
-            const rawId = placeholder.dataset.id;
-            const id = rawId ? parseInt(rawId, 10) : NaN;
-            if (!type || isNaN(id)) return;
-            const extra = placeholder.dataset.extra || '';
-            editingPlaceholderRef.current = placeholder;
-            setEmbedDialog({open: true, type, initialId: id, initialExtra: extra || undefined});
+            if (!type) return;
+
+            if (type === 'collapse' || type === 'carousel') {
+                // Collapse/carousel placeholders use data-content (URL-encoded)
+                const encodedContent = placeholder.dataset.content || '';
+                const content = decodeURIComponent(encodedContent);
+                let items: CollapseCarouselItem[] = [];
+                let extra: string | undefined;
+                if (content.startsWith('[')) {
+                    const jsonEnd = content.lastIndexOf(']');
+                    if (jsonEnd !== -1) {
+                        try {
+                            items = JSON.parse(content.substring(0, jsonEnd + 1)) as CollapseCarouselItem[];
+                        } catch { /* ignore malformed JSON */ }
+                        const rest = content.substring(jsonEnd + 1);
+                        extra = rest.startsWith(':') ? rest.substring(1) : undefined;
+                    }
+                }
+                editingPlaceholderRef.current = placeholder;
+                setEmbedDialog({open: true, type, initialItems: items, initialExtra: extra});
+            } else {
+                // Gallery/image/hero placeholders use data-id and data-extra
+                const rawId = placeholder.dataset.id;
+                const id = rawId ? parseInt(rawId, 10) : NaN;
+                if (isNaN(id)) return;
+                const extra = placeholder.dataset.extra || '';
+                editingPlaceholderRef.current = placeholder;
+                setEmbedDialog({open: true, type, initialId: id, initialExtra: extra || undefined});
+            }
         }
     };
 
@@ -554,13 +579,13 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
             />
             <RichEmbedCollapseEditor
                 open={embedDialog.open && embedDialog.type === 'collapse'}
-                initialId={embedDialog.initialId}
+                initialItems={embedDialog.initialItems}
                 onConfirm={handleCollapseConfirm}
                 onCancel={handleEmbedCancel}
             />
             <RichEmbedCarouselEditor
                 open={embedDialog.open && embedDialog.type === 'carousel'}
-                initialId={embedDialog.initialId}
+                initialItems={embedDialog.initialItems}
                 initialAutoplay={carouselParams?.autoplay}
                 initialDotDuration={carouselParams?.dotDuration}
                 initialSpeed={carouselParams?.speed}
