@@ -83,7 +83,7 @@ export function LayoutList() {
 
     return (
             <div className={"DarkDiv"} key={"layoutListDiv"}>
-                <Spin tip={"Loading"} spinning={loading} key={"layoutListSpinner"}>
+                <Spin description={"Loading"} spinning={loading} key={"layoutListSpinner"}>
                     <h1 key={"layoutListHeader"}>Layout List <Link to={"/layouts/0/edit"}><PlusCircleFilled/></Link></h1>
 
                     {layoutList.length > 0 && <Table

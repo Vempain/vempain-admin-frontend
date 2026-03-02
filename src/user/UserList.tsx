@@ -123,7 +123,7 @@ export function UserList() {
 
     return (
             <div className={"DarkDiv"} key={"userListDiv"}>
-                <Spin tip={"Loading"} spinning={loading} key={"userListSpinner"}>
+                <Spin description={"Loading"} spinning={loading} key={"userListSpinner"}>
                     <h1 key={"userListHeader"}>User List <Link to={"/users/0/edit"}><PlusCircleFilled/></Link></h1>
 
                     {userList.length > 0 && <Table

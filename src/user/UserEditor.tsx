@@ -118,7 +118,7 @@ export function UserEditor() {
 
     return (
             <div className={"DarkDiv"}>
-                <Spin tip={"Loading"} spinning={loading}>
+                <Spin description={"Loading"} spinning={loading}>
                     {userId === 0 && <h1>Create new user</h1>}
                     {userId > 0 && <h1>Edit user {userId}</h1>}
                 </Spin>

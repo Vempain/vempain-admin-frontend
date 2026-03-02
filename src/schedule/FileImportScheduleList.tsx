@@ -92,7 +92,7 @@ function FileImportScheduleList() {
 
     return (
             <div className={"DarkDiv"} key={"layoutListDiv"}>
-                <Spin tip={"Loading"} spinning={loading} key={"fileImportScheduleListSpinner"}>
+                <Spin description={"Loading"} spinning={loading} key={"fileImportScheduleListSpinner"}>
                     <h1 key={"fileImportScheduleListHeader"}>File import schedule List</h1>
 
                     {systemScheduleList.length > 0 && <Table

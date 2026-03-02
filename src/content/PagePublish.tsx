@@ -102,7 +102,7 @@ export function PagePublish() {
 
     return (
             <div className={"DarkDiv"} key={"pagePublishDiv"}>
-                <Spin spinning={loading} tip={"Uploading page and files..."}>
+                <Spin spinning={loading} description={"Uploading page and files..."}>
                     {page !== null && page.body !== undefined && <div>
                         <Space vertical={true} size={"large"}>
                             <TextArea key={"pageBody"}

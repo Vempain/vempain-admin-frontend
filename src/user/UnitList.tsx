@@ -81,7 +81,7 @@ export function UnitList() {
 
     return (
             <div className={"DarkDiv"} key={"unitListDiv"}>
-                <Spin tip={"Loading"} spinning={loading} key={"unitListSpinner"}>
+                <Spin description={"Loading"} spinning={loading} key={"unitListSpinner"}>
                     <h1 key={"unitListHeader"}>Unit List <Link to={"/units/0/edit"}><PlusCircleFilled/></Link></h1>
 
                     {unitList.length > 0 && <Table
