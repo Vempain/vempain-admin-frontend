@@ -266,9 +266,20 @@ export type ContentSegment =
 /**
  * Strip HTML comment delimiters from user content.
  * Only embed tags are allowed to use comment syntax.
+ *
+ * The replacement is applied in a loop to prevent incomplete sanitization
+ * when nested or overlapping patterns like "<!<!---->" produce new comment
+ * delimiters after a single pass.  The end-tag pattern also matches the
+ * non-standard but browser-accepted "--!>" form.
  */
 function stripCommentTags(value: string): string {
-    return value.replace(/<!--/g, '').replace(/-->/g, '');
+    const pattern = /<!--|--!?>/g;
+    let previous: string;
+    do {
+        previous = value;
+        value = value.replace(pattern, '');
+    } while (value !== previous);
+    return value;
 }
 
 function sanitizeCollapseCarouselItems(items: CollapseCarouselItem[]): CollapseCarouselItem[] {
