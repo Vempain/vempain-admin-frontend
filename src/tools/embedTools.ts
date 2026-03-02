@@ -5,11 +5,11 @@
  *   <!--vps:embed:gallery:%d-->
  *   <!--vps:embed:image:%d-->
  *   <!--vps:embed:hero:%d-->
- *   <!--vps:embed:collapse:<url-encoded-json>-->
- *   <!--vps:embed:carousel:<url-encoded-json>:autoplay:dotDuration:speed-->
+ *   <!--vps:embed:collapse:<json-array>-->
+ *   <!--vps:embed:carousel:<json-array>:autoplay:dotDuration:speed-->
  *
- * The JSON payload for collapse/carousel is URL-encoded to prevent `-->` in
- * user-provided text from prematurely terminating the HTML comment.
+ * The JSON payload for collapse/carousel is stored as plain JSON.
+ * No other HTML comments are allowed in content except embed tags.
  */
 
 export type EmbedType = 'gallery' | 'image' | 'hero' | 'collapse' | 'carousel';
@@ -36,10 +36,155 @@ export interface CarouselParams {
     speed: number;
 }
 
-// Matches any embed tag: <!--vps:embed:<type>:<content>-->
-// content may be a numeric id, a URL-encoded JSON array, or a URL-encoded JSON
-// array followed by carousel params
-const EMBED_REGEX = /<!--vps:embed:([a-z]+):(.*?)-->/g;
+/**
+ * Matches simple (non-JSON) embed tags: gallery, image, hero.
+ * These only contain a numeric ID and optional extra params — no newlines or
+ * dangerous `-->` sequences in their content.
+ */
+const SIMPLE_EMBED_REGEX = /<!--vps:embed:(gallery|image|hero):([\s\S]*?)-->/g;
+
+/**
+ * Detects the opening of a collapse/carousel embed tag.
+ * We cannot use a simple regex for the full tag because the JSON payload may
+ * contain `-->` sequences or newlines which break `.*?` matching.
+ * Instead we locate the opening marker and then use bracket-depth parsing to
+ * find where the JSON array ends, followed by the closing `-->`.
+ */
+const JSON_EMBED_OPEN = '<!--vps:embed:';
+
+/**
+ * Find all embed tags in `html`, returning their start index, length and raw
+ * content string (everything between the type colon and the closing `-->`).
+ *
+ * For simple tags (gallery/image/hero) we use a normal regex.
+ * For JSON-carrying tags (collapse/carousel) we use bracket-depth parsing so
+ * that `-->` inside JSON string values does not prematurely close the match
+ * and newlines inside the content are handled correctly.
+ */
+interface RawEmbedMatch {
+    index: number;
+    length: number;
+    type: EmbedType;
+    content: string; // raw content between type: and -->
+}
+
+function findAllEmbedMatches(html: string): RawEmbedMatch[] {
+    const matches: RawEmbedMatch[] = [];
+
+    // 1. Find simple embeds via regex
+    const simpleRe = new RegExp(SIMPLE_EMBED_REGEX.source, 'g');
+    let m: RegExpExecArray | null;
+    while ((m = simpleRe.exec(html)) !== null) {
+        matches.push({
+            index: m.index,
+            length: m[0].length,
+            type: m[1] as EmbedType,
+            content: m[2],
+        });
+    }
+
+    // 2. Find collapse/carousel embeds using bracket-depth parsing
+    let searchFrom = 0;
+    while (searchFrom < html.length) {
+        const openIdx = html.indexOf(JSON_EMBED_OPEN, searchFrom);
+        if (openIdx === -1) break;
+
+        // Extract the type name (characters up to the next ':')
+        const afterOpen = openIdx + JSON_EMBED_OPEN.length;
+        const typeEnd = html.indexOf(':', afterOpen);
+        if (typeEnd === -1) {
+            searchFrom = afterOpen;
+            continue;
+        }
+        const type = html.substring(afterOpen, typeEnd);
+        if (type !== 'collapse' && type !== 'carousel') {
+            searchFrom = afterOpen;
+            continue;
+        }
+
+        // Content starts after "<!--vps:embed:<type>:"
+        const contentStart = typeEnd + 1;
+
+        // The content must start with '[' for the JSON format
+        // (skip whitespace for robustness)
+        let jsonStart = contentStart;
+        while (jsonStart < html.length && html[jsonStart] === ' ') jsonStart++;
+
+        if (html[jsonStart] === '[') {
+            // Parse with bracket depth tracking, respecting JSON string escaping
+            const jsonEnd = findJsonArrayEnd(html, jsonStart);
+            if (jsonEnd !== -1) {
+                // After the JSON array, look for --> (with optional extra params for carousel)
+                const afterJson = jsonEnd + 1;
+                const closingIdx = html.indexOf('-->', afterJson);
+                if (closingIdx !== -1) {
+                    const fullLength = (closingIdx + 3) - openIdx;
+                    const content = html.substring(contentStart, closingIdx);
+                    matches.push({
+                        index: openIdx,
+                        length: fullLength,
+                        type: type as EmbedType,
+                        content,
+                    });
+                    searchFrom = closingIdx + 3;
+                    continue;
+                }
+            }
+        }
+
+        // If we get here, the tag is malformed — skip past this opening marker
+        searchFrom = afterOpen;
+    }
+
+    // Sort by index so segments are produced in document order
+    matches.sort((a, b) => a.index - b.index);
+    return matches;
+}
+
+/**
+ * Starting at `html[startIdx]` which must be `[`, find the index of the
+ * matching `]` by tracking bracket depth.  Handles JSON string escaping
+ * so that `]` inside quoted strings is not counted.
+ *
+ * Returns the index of the closing `]`, or -1 if not found.
+ */
+function findJsonArrayEnd(html: string, startIdx: number): number {
+    let depth = 0;
+    let inString = false;
+    let escape = false;
+
+    for (let i = startIdx; i < html.length; i++) {
+        const ch = html[i];
+
+        if (escape) {
+            escape = false;
+            continue;
+        }
+
+        if (ch === '\\' && inString) {
+            escape = true;
+            continue;
+        }
+
+        if (ch === '"') {
+            inString = !inString;
+            continue;
+        }
+
+        if (inString) continue;
+
+        if (ch === '[') {
+            depth++;
+        } else if (ch === ']') {
+            depth--;
+            if (depth === 0) {
+                return i;
+            }
+        }
+    }
+
+    return -1; // unbalanced
+}
 
 /**
  * Escape a string for safe use inside an HTML attribute value (double-quoted).
@@ -50,6 +195,18 @@ function escapeAttr(value: string): string {
         .replace(/"/g, '&quot;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
+}
+
+/**
+ * Unescape an HTML-escaped attribute value back to the original string.
+ * Inverse of escapeAttr.
+ */
+function unescapeAttr(value: string): string {
+    return value
+        .replace(/&gt;/g, '>')
+        .replace(/&lt;/g, '<')
+        .replace(/&quot;/g, '"')
+        .replace(/&amp;/g, '&');
 }
 
 /**
@@ -67,11 +224,12 @@ export function parseCarouselParams(extra: string): CarouselParams {
 
 /**
  * Build a carousel embed tag from a list of items and carousel params.
- * The JSON payload is URL-encoded to prevent `-->` in text from breaking the HTML comment.
+ * The JSON payload is stored as plain JSON (no URL-encoding).
  */
 export function buildCarouselTag(items: CollapseCarouselItem[], params: CarouselParams): string {
-    const encoded = encodeURIComponent(JSON.stringify(items));
-    return `<!--vps:embed:carousel:${encoded}:${params.autoplay}:${params.dotDuration}:${params.speed}-->`;
+    const safeItems = sanitizeCollapseCarouselItems(items);
+    const json = JSON.stringify(safeItems);
+    return `<!--vps:embed:carousel:${json}:${params.autoplay}:${params.dotDuration}:${params.speed}-->`;
 }
 
 /**
@@ -79,11 +237,13 @@ export function buildCarouselTag(items: CollapseCarouselItem[], params: Carousel
  */
 export function buildEmbedTag(descriptor: EmbedDescriptor): string {
     if (descriptor.type === 'collapse') {
-        return `<!--vps:embed:collapse:${encodeURIComponent(JSON.stringify(descriptor.items))}-->`;
+        const safeItems = sanitizeCollapseCarouselItems(descriptor.items);
+        return `<!--vps:embed:collapse:${JSON.stringify(safeItems)}-->`;
     }
     if (descriptor.type === 'carousel') {
+        const safeItems = sanitizeCollapseCarouselItems(descriptor.items);
         const extra = descriptor.extra ? `:${descriptor.extra}` : '';
-        return `<!--vps:embed:carousel:${encodeURIComponent(JSON.stringify(descriptor.items))}${extra}-->`;
+        return `<!--vps:embed:carousel:${JSON.stringify(safeItems)}${extra}-->`;
     }
     // gallery, image, hero — numeric ID based
     if (descriptor.extra) {
@@ -102,33 +262,39 @@ export type ContentSegment =
     | { kind: 'html'; content: string }
     | { kind: 'embed'; descriptor: EmbedDescriptor };
 
+
 /**
- * Decode URL-encoded JSON for collapse/carousel embed content.
- * Handles both new (URL-encoded) and legacy (plain) format.
+ * Strip HTML comment delimiters from user content.
+ * Only embed tags are allowed to use comment syntax.
  */
-function decodeEmbedJson(raw: string): string {
-    try {
-        return decodeURIComponent(raw);
-    } catch {
-        return raw; // already plain text or malformed encoding
-    }
+function stripCommentTags(value: string): string {
+    return value.replace(/<!--/g, '').replace(/-->/g, '');
+}
+
+function sanitizeCollapseCarouselItems(items: CollapseCarouselItem[]): CollapseCarouselItem[] {
+    return items.map(item => ({
+        title: stripCommentTags(item.title ?? ''),
+        body: stripCommentTags(item.body ?? ''),
+    }));
 }
 
 /**
  * Parse the raw content string (everything after the type colon) into an EmbedDescriptor.
- * Supports both:
- *   - New format: URL-encoded JSON array for collapse/carousel
- *   - Legacy format: numeric id (optionally followed by extra params)
+ * Supports:
+ *   - Plain JSON array for collapse/carousel
+ *   - Legacy numeric id (optionally followed by extra params)
  */
 function parseEmbedContent(type: EmbedType, raw: string): EmbedDescriptor {
     if (type === 'collapse' || type === 'carousel') {
-        const decoded = decodeEmbedJson(raw);
+        // Trim leading whitespace for robustness
+        const trimmed = raw.trimStart();
 
-        if (decoded.startsWith('[')) {
-            const jsonEnd = decoded.lastIndexOf(']');
+        if (trimmed.startsWith('[')) {
+            // Use bracket-depth parsing to find the end of the JSON array
+            const jsonEnd = findJsonArrayEnd(trimmed, 0);
             if (jsonEnd !== -1) {
-                const jsonStr = decoded.substring(0, jsonEnd + 1);
-                const rest = decoded.substring(jsonEnd + 1);
+                const jsonStr = trimmed.substring(0, jsonEnd + 1);
+                const rest = trimmed.substring(jsonEnd + 1);
                 let items: CollapseCarouselItem[] = [];
                 try {
                     const parsed = JSON.parse(jsonStr);
@@ -171,24 +337,23 @@ function parseEmbedContent(type: EmbedType, raw: string): EmbedDescriptor {
 
 export function parseEmbeds(html: string): ContentSegment[] {
     const segments: ContentSegment[] = [];
+    const matches = findAllEmbedMatches(html);
     let lastIndex = 0;
-    const regex = new RegExp(EMBED_REGEX.source, 'g');
-    let match: RegExpExecArray | null;
 
-    while ((match = regex.exec(html)) !== null) {
+    for (const match of matches) {
+        // Skip overlapping matches (shouldn't happen, but be safe)
+        if (match.index < lastIndex) continue;
+
         if (match.index > lastIndex) {
             segments.push({kind: 'html', content: html.slice(lastIndex, match.index)});
         }
 
-        const type = match[1] as EmbedType;
-        const content = match[2];
-
         segments.push({
             kind: 'embed',
-            descriptor: parseEmbedContent(type, content),
+            descriptor: parseEmbedContent(match.type, match.content),
         });
 
-        lastIndex = match.index + match[0].length;
+        lastIndex = match.index + match.length;
     }
 
     if (lastIndex < html.length) {
@@ -203,39 +368,48 @@ export function parseEmbeds(html: string): ContentSegment[] {
  * for display in the rich text editor (WYSIWYG mode).
  *
  * For gallery/image/hero the placeholder stores data-id and data-extra (HTML-escaped).
- * For collapse/carousel the placeholder stores data-content with the raw URL-encoded
- * embed tag content (safe in HTML attributes, no further encoding needed).
+ * For collapse/carousel the placeholder stores data-content with raw JSON (HTML-escaped).
  */
 export function convertTagsToPlaceholders(html: string): string {
-    return html.replace(new RegExp(EMBED_REGEX.source, 'g'), (_match, type, content) => {
-        const embedType = type as EmbedType;
+    const matches = findAllEmbedMatches(html);
+    if (matches.length === 0) return html;
+
+    let result = '';
+    let lastIndex = 0;
+
+    for (const match of matches) {
+        if (match.index < lastIndex) continue;
+
+        result += html.slice(lastIndex, match.index);
+
+        const embedType = match.type;
+        const content = match.content;
         let dataAttrs: string;
 
         if (embedType === 'collapse' || embedType === 'carousel') {
-            // content is already URL-encoded JSON (or legacy numeric).
-            // URL-encoded strings only contain safe chars (%XX, alphanumeric, - _ . ! ~ * ' ( ))
-            // so they are safe to embed directly in an HTML attribute without further encoding.
-            dataAttrs = `data-type="${escapeAttr(type)}" data-content="${content}"`;
+            dataAttrs = `data-type="${escapeAttr(embedType)}" data-content="${escapeAttr(content)}"`;
         } else {
-            // gallery / image / hero: split numeric id from optional extra params
             const firstColon = content.indexOf(':');
             const id = firstColon === -1 ? content : content.substring(0, firstColon);
             const extra = firstColon === -1 ? '' : content.substring(firstColon + 1);
-            // Escape attribute values to prevent attribute injection
-            dataAttrs = `data-type="${escapeAttr(type)}" data-id="${escapeAttr(id)}" data-extra="${escapeAttr(extra)}"`;
+            dataAttrs = `data-type="${escapeAttr(embedType)}" data-id="${escapeAttr(id)}" data-extra="${escapeAttr(extra)}"`;
         }
 
         const label = buildPlaceholderLabel(embedType, content);
-        return (
+        result +=
             `<span class="vps-embed-placeholder" ` +
             `${dataAttrs} ` +
             `contenteditable="false" ` +
             `style="display:inline-block;background:#1a3a5c;border:1px solid #4a90d9;` +
             `border-radius:4px;padding:2px 8px;margin:2px 4px;cursor:pointer;` +
             `user-select:none;color:#90c4f8;font-size:0.85em;white-space:nowrap;"` +
-            `>${label}</span>`
-        );
-    });
+            `>${label}</span>`;
+
+        lastIndex = match.index + match.length;
+    }
+
+    result += html.slice(lastIndex);
+    return result;
 }
 
 function buildPlaceholderLabel(type: EmbedType, content: string): string {
@@ -247,33 +421,42 @@ function buildPlaceholderLabel(type: EmbedType, content: string): string {
         case 'hero':
             return `🎨 hero:${content}`;
         case 'collapse': {
-            const decoded = decodeEmbedJson(content);
-            try {
-                const parsed = JSON.parse(decoded);
-                if (Array.isArray(parsed)) {
-                    const count = parsed.length;
-                    return `📂 collapse (${count} item${count !== 1 ? 's' : ''})`;
+            const trimmed = content.trimStart();
+            if (trimmed.startsWith('[')) {
+                try {
+                    const jsonEnd = findJsonArrayEnd(trimmed, 0);
+                    if (jsonEnd !== -1) {
+                        const parsed = JSON.parse(trimmed.substring(0, jsonEnd + 1));
+                        if (Array.isArray(parsed)) {
+                            const count = parsed.length;
+                            return `📂 collapse (${count} item${count !== 1 ? 's' : ''})`;
+                        }
+                    }
+                } catch { /* ignore */
                 }
-            } catch { /* ignore */ }
-            return `📂 collapse:${content}`;
+            }
+            return `📂 collapse:${content.substring(0, 30)}…`;
         }
         case 'carousel': {
-            const decoded = decodeEmbedJson(content);
-            try {
-                const jsonEnd = decoded.lastIndexOf(']');
-                if (jsonEnd !== -1) {
-                    const parsed = JSON.parse(decoded.substring(0, jsonEnd + 1));
-                    if (Array.isArray(parsed)) {
-                        const count = parsed.length;
-                        const rest = decoded.substring(jsonEnd + 1);
-                        const extra = rest.startsWith(':') ? rest.substring(1) : '';
-                        const params = extra ? parseCarouselParams(extra) : null;
-                        const speedInfo = params ? ` speed:${params.speed}ms` : '';
-                        return `🎠 carousel (${count} item${count !== 1 ? 's' : ''})${speedInfo}`;
+            const trimmed = content.trimStart();
+            if (trimmed.startsWith('[')) {
+                try {
+                    const jsonEnd = findJsonArrayEnd(trimmed, 0);
+                    if (jsonEnd !== -1) {
+                        const parsed = JSON.parse(trimmed.substring(0, jsonEnd + 1));
+                        if (Array.isArray(parsed)) {
+                            const count = parsed.length;
+                            const rest = trimmed.substring(jsonEnd + 1);
+                            const extra = rest.startsWith(':') ? rest.substring(1) : '';
+                            const params = extra ? parseCarouselParams(extra) : null;
+                            const speedInfo = params ? ` speed:${params.speed}ms` : '';
+                            return `🎠 carousel (${count} item${count !== 1 ? 's' : ''})${speedInfo}`;
+                        }
                     }
+                } catch { /* ignore */
                 }
-            } catch { /* ignore */ }
-            return `🎠 carousel:${content}`;
+            }
+            return `🎠 carousel:${content.substring(0, 30)}…`;
         }
         default:
             return `embed:${content}`;
@@ -286,11 +469,12 @@ function buildPlaceholderLabel(type: EmbedType, content: string): string {
  */
 export function convertPlaceholdersToTags(html: string): string {
     // Handle collapse/carousel placeholders that use data-content.
-    // The stored value is the raw embed tag content (URL-encoded JSON) — put it back as-is.
+    // The stored value was HTML-escaped; unescape it to restore the original embed content.
     let result = html.replace(
         /<span[^>]+class="vps-embed-placeholder"[^>]+data-type="([^"]+)"[^>]+data-content="([^"]*)"[^>]*>.*?<\/span>/g,
         (_match, type, rawContent) => {
-            return `<!--vps:embed:${type}:${rawContent}-->`;
+            const content = unescapeAttr(rawContent);
+            return `<!--vps:embed:${type}:${content}-->`;
         },
     );
     // Handle gallery/image/hero placeholders that use data-id and data-extra

@@ -116,7 +116,7 @@ export function RichEmbedImageEditor({open, initialId, onConfirm, onCancel}: Ric
             onOk={() => selectedId != null && onConfirm(selectedId)}
             okButtonProps={{disabled: selectedId == null || loadError != null}}
             onCancel={onCancel}
-            destroyOnClose
+            destroyOnHidden={true}
         >
             <Spin spinning={loading}>
                 {loadError && <Alert type="error" message={loadError} style={{marginBottom: 8}}/>}

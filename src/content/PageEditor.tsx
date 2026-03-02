@@ -209,7 +209,7 @@ export function PageEditor() {
     }
 
     return (
-            <div className={"DarkDiv"}>
+            <div className={"DarkDiv"} style={{width: "99%"}}>
                 <Spin description={spinTip} spinning={loading}>
                     {pageId === 0 && <h1>Create new page</h1>}
                     {pageId > 0 && <h1>Edit page '{pageTitle}'</h1>}
