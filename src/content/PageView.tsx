@@ -3,9 +3,9 @@ import React, {useEffect, useState} from 'react';
 import {Carousel, Collapse, Image, Spin} from 'antd';
 import {pageAPI} from '../services';
 import {type PageResponse} from '../models';
-import {parseEmbeds, type CarouselParams, parseCarouselParams} from '../tools/embedTools';
+import {type CarouselParams, parseCarouselParams, parseEmbeds} from '../tools/embedTools';
 import DOMPurify from 'dompurify';
-import {validateParamId, ActionResult, type SubmitResult} from '@vempain/vempain-auth-frontend';
+import {ActionResult, type SubmitResult, validateParamId} from '@vempain/vempain-auth-frontend';
 import {SubmitResultHandler} from '../main';
 
 const FILE_BASE_URL = import.meta.env.VITE_APP_FILE_URL ?? '';
@@ -186,7 +186,9 @@ export function PageView() {
     }
 
     if (loading) {
-        return <Spin tip="Loading page..." spinning={true}><div style={{minHeight: 200}}/></Spin>;
+        return <Spin description="Loading page..." spinning={true}>
+            <div style={{minHeight: 200}}/>
+        </Spin>;
     }
 
     if (!page) return null;

@@ -125,7 +125,7 @@ function ItemPublishTrigger() {
 
     return (
             <div className={"DarkDiv"} key={"pagePublishDiv"}>
-                <Spin spinning={loading} tip={spinTip}>
+                <Spin spinning={loading} description={spinTip}>
                     <Space vertical={true} size={"large"}>
                         <h2>Publish Schedule Trigger</h2>
                         {publishSchedule !== null && <>
@@ -140,7 +140,7 @@ function ItemPublishTrigger() {
                                         minuteStep={15 as 15}
                                         format={'YYYY-DD-MM HH:mm'}
                                         onChange={(value, _dateString) => {
-                                            setPublishDate(value);
+                                            setPublishDate(dayjs(value));
                                         }}
                             />
                             <Button type={"primary"} onClick={triggerPublish}>Trigger</Button>

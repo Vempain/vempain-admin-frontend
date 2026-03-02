@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Alert, Modal, Select, Spin} from 'antd';
 import {galleryAPI} from '../../services';
 import type {GalleryVO} from '../../models';
@@ -39,7 +39,7 @@ export function RichEmbedGalleryEditor({open, initialId, onConfirm, onCancel}: R
             onOk={() => selectedId != null && onConfirm(selectedId)}
             okButtonProps={{disabled: selectedId == null || loadError != null}}
             onCancel={onCancel}
-            destroyOnClose
+            destroyOnHidden
         >
             <Spin spinning={loading}>
                 {loadError && <Alert type="error" message={loadError} style={{marginBottom: 8}}/>}

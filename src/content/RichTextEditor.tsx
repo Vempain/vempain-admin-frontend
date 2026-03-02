@@ -53,6 +53,8 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
     const htmlContentRef = useRef<string>(value || '');
     // Reference to the placeholder span being edited (null = new insertion)
     const editingPlaceholderRef = useRef<HTMLElement | null>(null);
+    // Saved selection range so we can restore cursor position after a modal closes
+    const savedRangeRef = useRef<Range | null>(null);
 
     const [embedDialog, setEmbedDialog] = useState<EmbedDialogState>({open: false, type: null});
     const [linkDialogOpen, setLinkDialogOpen] = useState(false);
@@ -148,6 +150,7 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
     };
 
     const insertLink = (url: string, text: string) => {
+        restoreSelection();
         editorRef.current?.focus();
         // Reject dangerous URL schemes (javascript:, data:, vbscript:, etc.)
         const trimmedUrl = url.trim().toLowerCase();
@@ -163,7 +166,54 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
         }
     };
 
+    const saveSelection = useCallback(() => {
+        const sel = window.getSelection();
+        if (sel && sel.rangeCount > 0 && editorRef.current) {
+            const range = sel.getRangeAt(0);
+            if (editorRef.current.contains(range.commonAncestorContainer)) {
+                savedRangeRef.current = range.cloneRange();
+                console.debug('[RTE] saveSelection: saved range —',
+                        'startContainer:', range.startContainer.nodeName,
+                        'startOffset:', range.startOffset,
+                        'collapsed:', range.collapsed,
+                        'text around:', JSON.stringify(
+                                (range.startContainer.textContent || '').substring(
+                                        Math.max(0, range.startOffset - 10), range.startOffset + 10)));
+                return;
+            }
+            console.debug('[RTE] saveSelection: range is outside editor, not saving');
+        } else {
+            console.debug('[RTE] saveSelection: no selection or no editor ref');
+        }
+        savedRangeRef.current = null;
+    }, []);
+
+    const restoreSelection = useCallback((): boolean => {
+        const range = savedRangeRef.current;
+        if (range && editorRef.current) {
+            if (!editorRef.current.contains(range.startContainer)) {
+                console.debug('[RTE] restoreSelection: startContainer no longer in editor DOM');
+                return false;
+            }
+            editorRef.current.focus();
+            const sel = window.getSelection();
+            if (sel) {
+                sel.removeAllRanges();
+                sel.addRange(range);
+                console.debug('[RTE] restoreSelection: restored —',
+                        'startContainer:', range.startContainer.nodeName,
+                        'startOffset:', range.startOffset,
+                        'collapsed:', range.collapsed);
+                return true;
+            }
+        }
+        console.debug('[RTE] restoreSelection: no saved range or no editor ref');
+        return false;
+    }, []);
+
     const openEmbedDialog = (type: EmbedType) => {
+        console.debug('[RTE] openEmbedDialog: type =', type);
+        saveSelection();
         editingPlaceholderRef.current = null;
         setEmbedDialog({open: true, type});
     };
@@ -172,15 +222,36 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
     const insertOrReplacePlaceholder = useCallback((tag: string) => {
         const placeholder = editingPlaceholderRef.current;
         const newHtml = convertTagsToPlaceholders(tag);
+        console.debug('[RTE] insertOrReplacePlaceholder: tag =', tag, 'editing existing?', !!placeholder);
 
         if (placeholder && editorRef.current?.contains(placeholder)) {
+            console.debug('[RTE] replacing existing placeholder in-place');
             placeholder.outerHTML = newHtml;
             handleEditorInput();
         } else {
-            execCmd('insertHTML', newHtml);
+            // Restore saved cursor position, then insert there.
+            // IMPORTANT: we must NOT call execCmd() here because it calls
+            // editorRef.current.focus() which moves the cursor to the start
+            // of the editor, wiping the selection we just restored.
+            const restored = restoreSelection();
+            console.debug('[RTE] selection restored?', restored);
+
+            if (restored) {
+                document.execCommand('insertHTML', false, newHtml);
+                handleEditorInput();
+                console.debug('[RTE] inserted via document.execCommand at restored cursor position');
+            } else {
+                // Fallback: append at the end of the editor content
+                console.debug('[RTE] fallback — appending at end of editor');
+                if (editorRef.current) {
+                    editorRef.current.insertAdjacentHTML('beforeend', newHtml);
+                    handleEditorInput();
+                }
+            }
         }
         editingPlaceholderRef.current = null;
-    }, [execCmd, handleEditorInput]);
+        savedRangeRef.current = null;
+    }, [handleEditorInput, restoreSelection]);
 
     const handleGalleryConfirm = (id: number) => {
         const tag = buildEmbedTag({type: 'gallery', id});
@@ -358,6 +429,7 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
                     <Tooltip title="Insert Link">
                         <Button size="small" icon={<LinkOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
+                            saveSelection();
                             setLinkDialogOpen(true);
                         }}/>
                     </Tooltip>
@@ -449,7 +521,7 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
                 open={linkDialogOpen}
                 onOk={handleLinkInsert}
                 onCancel={() => setLinkDialogOpen(false)}
-                destroyOnClose={true}
+                destroyOnHidden={true}
             >
                 <Form form={linkForm} layout="vertical">
                     <Form.Item name="url" label="URL" rules={[{required: true, message: 'Please enter a URL'}]}>

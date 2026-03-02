@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {Alert, Form, InputNumber, Modal, Select, Spin, Switch} from 'antd';
 import {pageAPI} from '../../services';
 import type {PageResponse} from '../../models';
@@ -63,7 +63,7 @@ export function RichEmbedCarouselEditor({
             onOk={handleOk}
             okButtonProps={{disabled: selectedId == null || loadError != null}}
             onCancel={onCancel}
-            destroyOnClose
+            destroyOnHidden
         >
             <Spin spinning={loading}>
                 {loadError && <Alert type="error" message={loadError} style={{marginBottom: 8}}/>}
