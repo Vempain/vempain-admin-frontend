@@ -306,21 +306,35 @@ export function RichTextEditor({value, onChange}: RichTextEditorProps) {
             if (!type) return;
 
             if (type === 'collapse' || type === 'carousel') {
-                // Collapse/carousel placeholders use data-content (URL-encoded)
-                const encodedContent = placeholder.dataset.content || '';
-                const content = decodeURIComponent(encodedContent);
+                // data-content stores the raw embed tag content (URL-encoded JSON or legacy numeric).
+                // Decode once to get plain JSON.
+                let rawContent = placeholder.dataset.content || '';
+                let decoded: string;
+                try {
+                    decoded = decodeURIComponent(rawContent);
+                } catch {
+                    decoded = rawContent; // malformed encoding — use raw
+                }
+
                 let items: CollapseCarouselItem[] = [];
                 let extra: string | undefined;
-                if (content.startsWith('[')) {
-                    const jsonEnd = content.lastIndexOf(']');
+
+                if (decoded.startsWith('[')) {
+                    // New JSON format
+                    const jsonEnd = decoded.lastIndexOf(']');
                     if (jsonEnd !== -1) {
                         try {
-                            items = JSON.parse(content.substring(0, jsonEnd + 1)) as CollapseCarouselItem[];
+                            const parsed = JSON.parse(decoded.substring(0, jsonEnd + 1));
+                            if (Array.isArray(parsed)) {
+                                items = parsed as CollapseCarouselItem[];
+                            }
                         } catch { /* ignore malformed JSON */ }
-                        const rest = content.substring(jsonEnd + 1);
+                        const rest = decoded.substring(jsonEnd + 1);
                         extra = rest.startsWith(':') ? rest.substring(1) : undefined;
                     }
                 }
+                // For legacy numeric format, items stays [] and we open editor empty
+
                 editingPlaceholderRef.current = placeholder;
                 setEmbedDialog({open: true, type, initialItems: items, initialExtra: extra});
             } else {

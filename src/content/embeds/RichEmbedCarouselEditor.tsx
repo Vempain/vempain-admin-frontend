@@ -33,8 +33,7 @@ export function RichEmbedCarouselEditor({
                 speed: initialSpeed,
             });
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [open, initialItems, initialAutoplay, initialDotDuration, initialSpeed]);
+    }, [open, initialItems, initialAutoplay, initialDotDuration, initialSpeed, form]);
 
     const handleOk = () => {
         form.validateFields().then(values => {
