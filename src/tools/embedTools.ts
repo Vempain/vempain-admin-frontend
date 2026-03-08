@@ -5,6 +5,10 @@
  *   <!--vps:embed:gallery:%d-->
  *   <!--vps:embed:image:%d-->
  *   <!--vps:embed:hero:%d-->
+ *   <!--vps:embed:video:%d-->
+ *   <!--vps:embed:audio:%d-->
+ *   <!--vps:embed:youtube:%s-->
+ *   <!--vps:embed:last:{type}:{count}-->
  *   <!--vps:embed:collapse:<json-array>-->
  *   <!--vps:embed:carousel:<json-array>:autoplay:dotDuration:speed-->
  *
@@ -12,7 +16,18 @@
  * No other HTML comments are allowed in content except embed tags.
  */
 
-export type EmbedType = 'gallery' | 'image' | 'hero' | 'collapse' | 'carousel';
+export type EmbedType =
+    | 'gallery'
+    | 'image'
+    | 'hero'
+    | 'video'
+    | 'audio'
+    | 'youtube'
+    | 'last'
+    | 'collapse'
+    | 'carousel';
+
+export type LastEmbedType = 'pages' | 'galleries' | 'images' | 'videos' | 'audio' | 'documents';
 
 export interface CollapseCarouselItem {
     title: string;
@@ -27,6 +42,10 @@ export type EmbedDescriptor =
     | { type: 'gallery'; id: number; extra?: string }
     | { type: 'image'; id: number; extra?: string }
     | { type: 'hero'; id: number; extra?: string }
+    | { type: 'video'; id: number; extra?: string }
+    | { type: 'audio'; id: number; extra?: string }
+    | { type: 'youtube'; url: string }
+    | { type: 'last'; itemType: LastEmbedType; count: number }
     | { type: 'collapse'; items: CollapseCarouselItem[] }
     | { type: 'carousel'; items: CollapseCarouselItem[]; extra?: string };
 
@@ -37,11 +56,14 @@ export interface CarouselParams {
 }
 
 /**
- * Matches simple (non-JSON) embed tags: gallery, image, hero.
- * These only contain a numeric ID and optional extra params — no newlines or
+ * Matches simple (non-JSON) embed tags.
+ * These contain plain values and optional extra params — no newlines or
  * dangerous `-->` sequences in their content.
  */
-const SIMPLE_EMBED_REGEX = /<!--vps:embed:(gallery|image|hero):([\s\S]*?)-->/g;
+const SIMPLE_EMBED_REGEX = /<!--vps:embed:(gallery|image|hero|video|audio|youtube|last):([\s\S]*?)-->/g;
+
+const CONTENT_EMBED_TYPES = new Set<EmbedType>(['collapse', 'carousel', 'youtube', 'last']);
+const LAST_TYPES: LastEmbedType[] = ['pages', 'galleries', 'images', 'videos', 'audio', 'documents'];
 
 /**
  * Detects the opening of a collapse/carousel embed tag.
@@ -245,7 +267,13 @@ export function buildEmbedTag(descriptor: EmbedDescriptor): string {
         const extra = descriptor.extra ? `:${descriptor.extra}` : '';
         return `<!--vps:embed:carousel:${JSON.stringify(safeItems)}${extra}-->`;
     }
-    // gallery, image, hero — numeric ID based
+    if (descriptor.type === 'youtube') {
+        return `<!--vps:embed:youtube:${stripCommentTags(descriptor.url)}-->`;
+    }
+    if (descriptor.type === 'last') {
+        return `<!--vps:embed:last:${descriptor.itemType}:${descriptor.count}-->`;
+    }
+    // gallery, image, hero, video, audio — numeric ID based
     if (descriptor.extra) {
         return `<!--vps:embed:${descriptor.type}:${descriptor.id}:${descriptor.extra}-->`;
     }
@@ -334,16 +362,29 @@ function parseEmbedContent(type: EmbedType, raw: string): EmbedDescriptor {
         return extra ? {type, items: [], extra} : {type, items: []};
     }
 
-    // Numeric-ID format: used for gallery, image, hero
+    if (type === 'youtube') {
+        return {type, url: raw};
+    }
+
+    if (type === 'last') {
+        const parts = raw.split(':');
+        const parsedType = (parts[0] ?? '').trim().toLowerCase() as LastEmbedType;
+        const itemType = LAST_TYPES.includes(parsedType) ? parsedType : 'pages';
+        const parsedCount = parseInt(parts[1] ?? '0', 10);
+        const count = Number.isFinite(parsedCount) && parsedCount > 0 ? parsedCount : 1;
+        return {type, itemType, count};
+    }
+
+    // Numeric-ID format: used for gallery, image, hero, video, audio
     const firstColon = raw.indexOf(':');
     const idStr = firstColon === -1 ? raw : raw.substring(0, firstColon);
     const extra = firstColon === -1 ? undefined : raw.substring(firstColon + 1);
     const id = parseInt(idStr, 10);
-    // Always include extra (undefined when absent) to preserve the original descriptor shape.
-    // Use explicit type narrowing to avoid casting the discriminated union.
     if (type === 'gallery') return {type, id, extra};
     if (type === 'image') return {type, id, extra};
-    return {type: 'hero', id, extra};
+    if (type === 'hero') return {type, id, extra};
+    if (type === 'video') return {type, id, extra};
+    return {type: 'audio', id, extra};
 }
 
 export function parseEmbeds(html: string): ContentSegment[] {
@@ -397,7 +438,7 @@ export function convertTagsToPlaceholders(html: string): string {
         const content = match.content;
         let dataAttrs: string;
 
-        if (embedType === 'collapse' || embedType === 'carousel') {
+        if (CONTENT_EMBED_TYPES.has(embedType)) {
             dataAttrs = `data-type="${escapeAttr(embedType)}" data-content="${escapeAttr(content)}"`;
         } else {
             const firstColon = content.indexOf(':');
@@ -431,6 +472,21 @@ function buildPlaceholderLabel(type: EmbedType, content: string): string {
             return `🖼 image:${content}`;
         case 'hero':
             return `🎨 hero:${content}`;
+        case 'video':
+            return `🎬 video:${content}`;
+        case 'audio':
+            return `🎵 audio:${content}`;
+        case 'youtube': {
+            const short = content.length > 40 ? `${content.substring(0, 40)}...` : content;
+            return `▶ youtube:${short}`;
+        }
+        case 'last': {
+            const parts = content.split(':');
+            const itemType = (parts[0] ?? 'pages').toLowerCase();
+            const count = parseInt(parts[1] ?? '1', 10);
+            const safeCount = Number.isFinite(count) && count > 0 ? count : 1;
+            return `🧾 last ${safeCount} ${itemType}`;
+        }
         case 'collapse': {
             const trimmed = content.trimStart();
             if (trimmed.startsWith('[')) {
@@ -479,7 +535,7 @@ function buildPlaceholderLabel(type: EmbedType, content: string): string {
  * Inverse of convertTagsToPlaceholders.
  */
 export function convertPlaceholdersToTags(html: string): string {
-    // Handle collapse/carousel placeholders that use data-content.
+    // Handle placeholders that use data-content.
     // The stored value was HTML-escaped; unescape it to restore the original embed content.
     let result = html.replace(
         /<span[^>]+class="vps-embed-placeholder"[^>]+data-type="([^"]+)"[^>]+data-content="([^"]*)"[^>]*>.*?<\/span>/g,
@@ -488,7 +544,7 @@ export function convertPlaceholdersToTags(html: string): string {
             return `<!--vps:embed:${type}:${content}-->`;
         },
     );
-    // Handle gallery/image/hero placeholders that use data-id and data-extra
+    // Handle placeholders that use data-id and data-extra
     result = result.replace(
         /<span[^>]+class="vps-embed-placeholder"[^>]+data-type="([^"]+)"[^>]+data-id="([^"]+)"[^>]+data-extra="([^"]*)"[^>]*>.*?<\/span>/g,
         (_match, type, id, extra) => {

@@ -5,6 +5,7 @@ import {
     convertPlaceholdersToTags,
     convertTagsToPlaceholders,
     type EmbedType,
+    type LastEmbedType,
     parseCarouselParams
 } from '../tools/embedTools';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
@@ -24,7 +25,17 @@ import {
     UnorderedListOutlined,
 } from '@ant-design/icons';
 import DOMPurify from 'dompurify';
-import {RichEmbedCarouselEditor, RichEmbedCollapseEditor, RichEmbedGalleryEditor, RichEmbedHeroEditor, RichEmbedImageEditor} from './embeds';
+import {
+    RichEmbedAudioEditor,
+    RichEmbedCarouselEditor,
+    RichEmbedCollapseEditor,
+    RichEmbedGalleryEditor,
+    RichEmbedHeroEditor,
+    RichEmbedImageEditor,
+    RichEmbedLastEditor,
+    RichEmbedVideoEditor,
+    RichEmbedYoutubeEditor
+} from './embeds';
 
 interface RichTextEditorProps {
     value?: string;
@@ -36,12 +47,17 @@ interface RichTextEditorProps {
 interface EmbedDialogState {
     open: boolean;
     type: EmbedType | null;
-    /** ID of the embed being edited — used for gallery, image and hero types */
+    /** ID of the embed being edited — used for gallery/image/hero/video/audio types */
     initialId?: number;
     /** Extra params string for carousel edits (e.g. "true:false:500") */
     initialExtra?: string;
     /** JSON items for collapse and carousel embed types */
     initialItems?: CollapseCarouselItem[];
+    /** URL for youtube embed edits */
+    initialUrl?: string;
+    /** last embed edits */
+    initialLastType?: LastEmbedType;
+    initialCount?: number;
 }
 
 /**
@@ -54,7 +70,7 @@ interface EmbedDialogState {
  * - Lists (ordered, unordered)
  * - Link insertion
  * - Table insertion
- * - Embed tag insertion (gallery, image, hero, collapse, carousel)
+ * - Embed tag insertion (gallery, image, hero, video, audio, youtube, last, collapse, carousel)
  * - Toggle between WYSIWYG and HTML source view
  * - Click-to-edit for existing embed placeholders
  */
@@ -295,6 +311,30 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
         setEmbedDialog({open: false, type: null});
     };
 
+    const handleVideoConfirm = (id: number) => {
+        const tag = buildEmbedTag({type: 'video', id});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
+    const handleAudioConfirm = (id: number) => {
+        const tag = buildEmbedTag({type: 'audio', id});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
+    const handleYoutubeConfirm = (url: string) => {
+        const tag = buildEmbedTag({type: 'youtube', url});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
+    const handleLastConfirm = (itemType: LastEmbedType, count: number) => {
+        const tag = buildEmbedTag({type: 'last', itemType, count});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
     const handleEmbedCancel = () => {
         editingPlaceholderRef.current = null;
         setEmbedDialog({open: false, type: null});
@@ -325,10 +365,7 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
 
                 const trimmed = rawContent.trimStart();
                 if (trimmed.startsWith('[')) {
-                    // Parse JSON array — find end using bracket-depth tracking
-                    // (imported from embedTools indirectly via parseEmbedContent logic)
                     try {
-                        // Find the matching ] by tracking depth
                         let depth = 0;
                         let inStr = false;
                         let esc = false;
@@ -365,22 +402,44 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                             const rest = trimmed.substring(jsonEnd + 1);
                             extra = rest.startsWith(':') ? rest.substring(1) : undefined;
                         }
-                    } catch { /* ignore malformed JSON */
+                    } catch {
+                        // ignore malformed JSON
                     }
                 }
-                // For legacy numeric format, items stays [] and we open editor empty
 
                 editingPlaceholderRef.current = placeholder;
                 setEmbedDialog({open: true, type, initialItems: items, initialExtra: extra});
-            } else {
-                // Gallery/image/hero placeholders use data-id and data-extra
-                const rawId = placeholder.dataset.id;
-                const id = rawId ? parseInt(rawId, 10) : NaN;
-                if (isNaN(id)) return;
-                const extra = placeholder.dataset.extra || '';
-                editingPlaceholderRef.current = placeholder;
-                setEmbedDialog({open: true, type, initialId: id, initialExtra: extra || undefined});
+                return;
             }
+
+            if (type === 'youtube') {
+                editingPlaceholderRef.current = placeholder;
+                setEmbedDialog({open: true, type, initialUrl: placeholder.dataset.content || ''});
+                return;
+            }
+
+            if (type === 'last') {
+                const rawContent = placeholder.dataset.content || '';
+                const parts = rawContent.split(':');
+                const parsedType = (parts[0] ?? 'pages').toLowerCase() as LastEmbedType;
+                const count = parseInt(parts[1] ?? '1', 10);
+                editingPlaceholderRef.current = placeholder;
+                setEmbedDialog({
+                    open: true,
+                    type,
+                    initialLastType: parsedType,
+                    initialCount: Number.isFinite(count) && count > 0 ? count : 1,
+                });
+                return;
+            }
+
+            // Gallery/image/hero/video/audio placeholders use data-id and data-extra
+            const rawId = placeholder.dataset.id;
+            const id = rawId ? parseInt(rawId, 10) : NaN;
+            if (isNaN(id)) return;
+            const extra = placeholder.dataset.extra || '';
+            editingPlaceholderRef.current = placeholder;
+            setEmbedDialog({open: true, type, initialId: id, initialExtra: extra || undefined});
         }
     };
 
@@ -538,6 +597,30 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                                     openEmbedDialog('hero');
                                 }}>Hero</Button>
                     </Tooltip>
+                    <Tooltip title="Insert Video Embed">
+                        <Button size="small" style={embedButtonStyle} onMouseDown={(e) => {
+                            e.preventDefault();
+                            openEmbedDialog('video');
+                        }}>Video</Button>
+                    </Tooltip>
+                    <Tooltip title="Insert Audio Embed">
+                        <Button size="small" style={embedButtonStyle} onMouseDown={(e) => {
+                            e.preventDefault();
+                            openEmbedDialog('audio');
+                        }}>Audio</Button>
+                    </Tooltip>
+                    <Tooltip title="Insert YouTube Embed">
+                        <Button size="small" style={embedButtonStyle} onMouseDown={(e) => {
+                            e.preventDefault();
+                            openEmbedDialog('youtube');
+                        }}>YouTube</Button>
+                    </Tooltip>
+                    <Tooltip title="Insert Last Items Embed">
+                        <Button size="small" style={embedButtonStyle} onMouseDown={(e) => {
+                            e.preventDefault();
+                            openEmbedDialog('last');
+                        }}>Last</Button>
+                    </Tooltip>
                     <Tooltip title="Insert Collapse Embed">
                         <Button size="small" style={embedButtonStyle} onMouseDown={(e) => {
                             e.preventDefault();
@@ -648,6 +731,31 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                 initialSpeed={carouselParams?.speed}
                 onConfirm={handleCarouselConfirm}
                 onCancel={handleEmbedCancel}
+            />
+                            <RichEmbedVideoEditor
+                                    open={embedDialog.open && embedDialog.type === 'video'}
+                                    initialId={embedDialog.initialId}
+                                    onConfirm={handleVideoConfirm}
+                                    onCancel={handleEmbedCancel}
+                            />
+                            <RichEmbedAudioEditor
+                                    open={embedDialog.open && embedDialog.type === 'audio'}
+                                    initialId={embedDialog.initialId}
+                                    onConfirm={handleAudioConfirm}
+                                    onCancel={handleEmbedCancel}
+                            />
+                            <RichEmbedYoutubeEditor
+                                    open={embedDialog.open && embedDialog.type === 'youtube'}
+                                    initialUrl={embedDialog.initialUrl}
+                                    onConfirm={handleYoutubeConfirm}
+                                    onCancel={handleEmbedCancel}
+                            />
+                            <RichEmbedLastEditor
+                                    open={embedDialog.open && embedDialog.type === 'last'}
+                                    initialType={embedDialog.initialLastType}
+                                    initialCount={embedDialog.initialCount}
+                                    onConfirm={handleLastConfirm}
+                                    onCancel={handleEmbedCancel}
             />
                         </>
                 )}
