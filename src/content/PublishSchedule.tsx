@@ -16,7 +16,7 @@ export function PublishSchedule(publishScheduleProps: PublishScheduleProps) {
         publishScheduleProps.setSchedulePublish(checked);
     }
 
-    function handleDatePickerChange(value: Dayjs | null, _dateString: string | string[]): void {
+    function handleDatePickerChange(value: Dayjs | null, _dateString: string | null): void {
         publishScheduleProps.setPublishDate(value);
     }
 

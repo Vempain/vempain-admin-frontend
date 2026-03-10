@@ -37,7 +37,5 @@ export function buildResourceQuery(params: WebSiteResourceQueryParams): string {
 }
 
 export function isWebSiteResourceResponse(value: unknown): value is WebSiteResourceResponse {
-    if (typeof value !== 'object' || value === null) return false;
-    const v = value as WebSiteResourceResponse;
-    return typeof v.resource_type === 'string' && typeof v.resource_id === 'number' && typeof v.acl_id === 'number';
+    return !(typeof value !== 'object' || value === null);
 }

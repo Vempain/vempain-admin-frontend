@@ -140,8 +140,9 @@ export function FileImport() {
                 });
     }
 
-    function handleFormValuesChange(something: Record<string, unknown>, allValues: FileImportFormProps) {
-        const formField = Object.keys(something)[0];
+    function handleFormValuesChange(formRecord: Partial<FileImportFormProps>, allValues: FileImportFormProps) {
+        const formField = Object.keys(formRecord)[0];
+
         switch (formField) {
             case "site_directory":
                 if (allValues.site_directory !== allValues.source_directory) {
@@ -158,10 +159,18 @@ export function FileImport() {
                 }
                 break;
             case "create_gallery":
-                setCreateGallery(something[formField]);
+                if (formRecord[formField] === undefined) {
+                    setCreateGallery(false);
+                } else {
+                    setCreateGallery(formRecord[formField]);
+                }
                 break;
             case "create_page":
-                setCreatePage(something[formField]);
+                if (formRecord[formField] === undefined) {
+                    setCreatePage(false);
+                } else {
+                    setCreatePage(formRecord[formField]);
+                }
                 break;
             default:
                 console.log("Other form field: " + formField);

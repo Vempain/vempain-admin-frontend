@@ -145,36 +145,185 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
         setSourceMode(toSource);
     };
 
-    // Execute document.execCommand for basic formatting.
-    // Note: execCommand is deprecated in the HTML spec but remains the only
-    // native way to implement rich text editing without an external library.
-    // All major browsers continue to support it and no removal timeline has
-    // been announced as of 2024.
-    const execCmd = useCallback((command: string, cmdValue?: string) => {
+    // Execute rich text commands using Selection/Range APIs (execCommand replacement).
+    const withEditorRange = useCallback((action: (range: Range) => void): boolean => {
         editorRef.current?.focus();
-        document.execCommand(command, false, cmdValue);
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0 || !editorRef.current) return false;
+        const range = sel.getRangeAt(0);
+        if (!editorRef.current.contains(range.commonAncestorContainer)) return false;
+        action(range);
         handleEditorInput();
+        return true;
     }, [handleEditorInput]);
 
+    const insertHtmlAtRange = useCallback((range: Range, html: string) => {
+        const template = document.createElement('template');
+        template.innerHTML = html;
+        const fragment = template.content;
+        const lastNode = fragment.lastChild;
+        range.deleteContents();
+        range.insertNode(fragment);
+        if (lastNode) {
+            const after = document.createRange();
+            after.setStartAfter(lastNode);
+            after.collapse(true);
+            const sel = window.getSelection();
+            if (sel) {
+                sel.removeAllRanges();
+                sel.addRange(after);
+            }
+        }
+    }, []);
+
+    const wrapSelectionWithTag = useCallback((tagName: 'b' | 'i' | 'u' | 's') => {
+        withEditorRange((range) => {
+            const wrapper = document.createElement(tagName);
+            if (range.collapsed) {
+                wrapper.appendChild(document.createTextNode('\u200b'));
+                range.insertNode(wrapper);
+                const caret = document.createRange();
+                caret.setStart(wrapper.firstChild as Node, 1);
+                caret.collapse(true);
+                const sel = window.getSelection();
+                if (sel) {
+                    sel.removeAllRanges();
+                    sel.addRange(caret);
+                }
+                return;
+            }
+
+            const content = range.extractContents();
+            wrapper.appendChild(content);
+            range.insertNode(wrapper);
+            const sel = window.getSelection();
+            if (sel) {
+                const after = document.createRange();
+                after.setStartAfter(wrapper);
+                after.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(after);
+            }
+        });
+    }, [withEditorRange]);
+
+    const findBlockElement = useCallback((node: Node | null): HTMLElement | null => {
+        let current: Node | null = node;
+        while (current && current !== editorRef.current) {
+            if (
+                    current instanceof HTMLElement &&
+                    ['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI'].includes(current.tagName)
+            ) {
+                return current;
+            }
+            current = current.parentNode;
+        }
+        return null;
+    }, []);
+
+    const replaceBlockTag = useCallback((tagName: string) => {
+        withEditorRange((range) => {
+            const block = findBlockElement(range.startContainer) ?? editorRef.current;
+            if (!block || !(block instanceof HTMLElement) || !editorRef.current) return;
+            if (block === editorRef.current) {
+                insertHtmlAtRange(range, `<${tagName}></${tagName}>`);
+                return;
+            }
+            if (block.tagName.toLowerCase() === tagName.toLowerCase()) return;
+
+            const replacement = document.createElement(tagName);
+            replacement.innerHTML = block.innerHTML;
+            block.replaceWith(replacement);
+
+            const sel = window.getSelection();
+            if (sel) {
+                const caret = document.createRange();
+                caret.selectNodeContents(replacement);
+                caret.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(caret);
+            }
+        });
+    }, [findBlockElement, insertHtmlAtRange, withEditorRange]);
+
+    const toggleList = useCallback((listTag: 'ol' | 'ul') => {
+        withEditorRange((range) => {
+            const block = findBlockElement(range.startContainer);
+            if (!block || !editorRef.current) return;
+
+            const parent = block.parentElement;
+            if (parent && parent.tagName.toLowerCase() === listTag && block.tagName.toLowerCase() === 'li') {
+                const p = document.createElement('p');
+                p.innerHTML = block.innerHTML;
+                parent.replaceWith(p);
+                return;
+            }
+
+            const list = document.createElement(listTag);
+            const li = document.createElement('li');
+            li.innerHTML = block.innerHTML || '\u200b';
+            list.appendChild(li);
+            block.replaceWith(list);
+
+            const sel = window.getSelection();
+            if (sel) {
+                const caret = document.createRange();
+                caret.selectNodeContents(li);
+                caret.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(caret);
+            }
+        });
+    }, [findBlockElement, withEditorRange]);
+
+    const createLinkAtSelection = useCallback((href: string, text: string) => {
+        withEditorRange((range) => {
+            const link = document.createElement('a');
+            link.setAttribute('href', href);
+
+            if (!range.collapsed) {
+                const content = range.extractContents();
+                link.appendChild(content);
+                range.insertNode(link);
+            } else {
+                link.textContent = text;
+                range.insertNode(link);
+            }
+
+            const sel = window.getSelection();
+            if (sel) {
+                const after = document.createRange();
+                after.setStartAfter(link);
+                after.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(after);
+            }
+        });
+    }, [withEditorRange]);
+
+    const insertHtmlAtSelection = useCallback((html: string) => {
+        withEditorRange((range) => insertHtmlAtRange(range, html));
+    }, [insertHtmlAtRange, withEditorRange]);
+
     const insertHeading = (level: string) => {
-        editorRef.current?.focus();
-        document.execCommand('formatBlock', false, level);
-        handleEditorInput();
+        replaceBlockTag(level);
     };
 
     const insertTable = () => {
         const rows = 3;
         const cols = 3;
-        let html = '<table border="1" style="border-collapse:collapse;width:100%"><tbody>';
+        let html = '<table style="border-collapse:collapse;width:100%;border:1px solid #666"><tbody>';
         for (let r = 0; r < rows; r++) {
             html += '<tr>';
             for (let c = 0; c < cols; c++) {
-                html += r === 0 ? '<th style="padding:4px;"></th>' : '<td style="padding:4px;"></td>';
+                html += r === 0
+                        ? '<th style="padding:4px;border:1px solid #666"></th>'
+                        : '<td style="padding:4px;border:1px solid #666"></td>';
             }
             html += '</tr>';
         }
         html += '</tbody></table><p></p>';
-        execCmd('insertHTML', html);
+        insertHtmlAtSelection(html);
     };
 
     const insertLink = (url: string, text: string) => {
@@ -184,14 +333,9 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
         const trimmedUrl = url.trim().toLowerCase();
         const dangerousSchemes = ['javascript:', 'data:', 'vbscript:'];
         const safeUrl = dangerousSchemes.some(s => trimmedUrl.startsWith(s)) ? '#' : url;
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-            execCmd('createLink', safeUrl);
-        } else {
-            const escapedUrl = DOMPurify.sanitize(safeUrl, {ALLOWED_TAGS: []});
-            const escapedText = DOMPurify.sanitize(text || safeUrl, {ALLOWED_TAGS: []});
-            execCmd('insertHTML', `<a href="${escapedUrl}">${escapedText}</a>`);
-        }
+        const escapedUrl = DOMPurify.sanitize(safeUrl, {ALLOWED_TAGS: []});
+        const escapedText = DOMPurify.sanitize(text || safeUrl, {ALLOWED_TAGS: []});
+        createLinkAtSelection(escapedUrl, escapedText);
     };
 
     const saveSelection = useCallback(() => {
@@ -265,9 +409,8 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
             console.debug('[RTE] selection restored?', restored);
 
             if (restored) {
-                document.execCommand('insertHTML', false, newHtml);
-                handleEditorInput();
-                console.debug('[RTE] inserted via document.execCommand at restored cursor position');
+                insertHtmlAtSelection(newHtml);
+                console.debug('[RTE] inserted via Range API at restored cursor position');
             } else {
                 // Fallback: append at the end of the editor content
                 console.debug('[RTE] fallback — appending at end of editor');
@@ -521,25 +664,25 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                     <Tooltip title="Bold (Ctrl+B)">
                         <Button size="small" icon={<BoldOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
-                            execCmd('bold');
+                            wrapSelectionWithTag('b');
                         }}/>
                     </Tooltip>
                     <Tooltip title="Italic (Ctrl+I)">
                         <Button size="small" icon={<ItalicOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
-                            execCmd('italic');
+                            wrapSelectionWithTag('i');
                         }}/>
                     </Tooltip>
                     <Tooltip title="Underline (Ctrl+U)">
                         <Button size="small" icon={<UnderlineOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
-                            execCmd('underline');
+                            wrapSelectionWithTag('u');
                         }}/>
                     </Tooltip>
                     <Tooltip title="Strikethrough">
                         <Button size="small" icon={<StrikethroughOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
-                            execCmd('strikeThrough');
+                            wrapSelectionWithTag('s');
                         }}/>
                     </Tooltip>
                 </Space.Compact>
@@ -548,13 +691,13 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                     <Tooltip title="Ordered List">
                         <Button size="small" icon={<OrderedListOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
-                            execCmd('insertOrderedList');
+                            toggleList('ol');
                         }}/>
                     </Tooltip>
                     <Tooltip title="Unordered List">
                         <Button size="small" icon={<UnorderedListOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
-                            execCmd('insertUnorderedList');
+                            toggleList('ul');
                         }}/>
                     </Tooltip>
                 </Space.Compact>

@@ -1,11 +1,18 @@
-import type {JwtResponse} from "@vempain/vempain-auth-frontend";
+interface StoredSession {
+    token?: string;
+}
 
 export function authHeader() {
-    const session: JwtResponse = JSON.parse(localStorage.getItem("vempainUser") || "{}");
+    let session: StoredSession;
 
-    if (session && session.token) {
-        return {Authorization: "Bearer " + session.token};
-    } else {
-        return {};
+    try {
+        session = JSON.parse(localStorage.getItem("vempainUser") || "{}") as StoredSession;
+    } catch {
+        session = {};
     }
+
+    if (session.token) {
+        return {Authorization: "Bearer " + session.token};
+    }
+    return {};
 }

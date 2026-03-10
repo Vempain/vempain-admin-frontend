@@ -6,6 +6,7 @@ import {MetadataForm, SubmitResultHandler} from "../main";
 import {layoutAPI} from "../services";
 import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 import type {LayoutVO} from "../models";
+import dayjs from "dayjs";
 
 export function LayoutEditor() {
     const {paramId} = useParams();
@@ -51,9 +52,9 @@ export function LayoutEditor() {
                 acls: [],
                 locked: false,
                 creator: 0,
-                created: new Date(),
+                created: dayjs(),
                 modifier: 0,
-                modified: new Date(),
+                modified: dayjs(),
             });
             setLoading(false);
         }

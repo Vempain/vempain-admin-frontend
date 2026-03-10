@@ -40,7 +40,7 @@ function ItemPublishingList() {
             title: "Type",
             dataIndex: "publish_type",
             key: "publish_type",
-            sorter: (a, _b) => (a as Record<string, unknown>).publish_type as unknown as string,
+            sorter: (a, b) => a.publish_type.localeCompare(b.publish_type),
             render: (_: Record<string, unknown>, response: PublishScheduleResponse) => {
                 let color: string;
                 let typeLabel: string;
@@ -89,8 +89,8 @@ function ItemPublishingList() {
             title: "Action",
             dataIndex: "action",
             key: "action",
-            render: (_text: Record<string, unknown>, record: Record<string, unknown>) => (
-                    <Button type="primary" href={`/schedule/publish/${(record.id as number)}/trigger`}>Trigger</Button>
+            render: (_text, record: PublishScheduleResponse) => (
+                    <Button type="primary" href={`/schedule/publish/${record.id}/trigger`}>Trigger</Button>
             )
         }
     ];

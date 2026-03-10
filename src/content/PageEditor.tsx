@@ -1,6 +1,7 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
+import type {RuleObject} from "antd/es/form";
 import {AclEdit} from "./AclEdit";
 import {RichTextEditor} from "./RichTextEditor";
 import {MetadataForm, SubmitResultHandler} from "../main";
@@ -181,7 +182,7 @@ export function PageEditor() {
                 });
     }
 
-    function formValidation(_rule: Record<string, unknown>, value: number): Promise<void> {
+    function formValidation(_rule: RuleObject, value: number): Promise<void> {
         if (value > 0 && formList.filter(form => form.id === value).length > 0) {
             return Promise.resolve();
         }

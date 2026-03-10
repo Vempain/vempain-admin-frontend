@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
-export default tseslint.config(
+export default [
     {
         ignores: [
             'dist',
@@ -55,6 +55,5 @@ export default tseslint.config(
             'react-hooks/set-state-in-effect': 'off',
             'react-hooks/exhaustive-deps': 'warn',
         },
-    }
-);
-
+    },
+];

@@ -74,13 +74,18 @@ export function FormList() {
             title: "Modifier",
             dataIndex: "modifier",
             key: "modifier",
-            sorter: (a, b) => (a.modifier === null ? 0 : a.modifier) - (b.modifier === null ? 0 : b.modifier)
+            sorter: (a, b) => (a.modifier ?? 0) - (b.modifier ?? 0)
         },
         {
             title: "Modified",
             dataIndex: "modified",
             key: "modified",
-            sorter: (a, b) => dayjs(a.modified).unix() - dayjs(b.modified).unix()
+            sorter: (a, b) => {
+                if (a.modified === null && b.modified === null) return 0;
+                if (a.modified === null) return -1;
+                if (b.modified === null) return 1;
+                return dayjs(a.modified).unix() - dayjs(b.modified).unix();
+            }
         },
         {
             title: "Action",

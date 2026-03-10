@@ -1,7 +1,7 @@
 import type {TablePaginationConfig} from 'antd/es/table';
 
 const tablePaginationConfig: TablePaginationConfig = {
-    position: ["topRight", "bottomRight"],
+    placement: ["topEnd", "bottomEnd"],
     defaultPageSize: 15,
     hideOnSinglePage: true,
     showSizeChanger: true,
