@@ -47,8 +47,10 @@ export function RichEmbedYoutubeEditor({open, initialUrl, onConfirm, onCancel}: 
                                             const parsed = new URL(input);
                                             const host = parsed.hostname.toLowerCase();
                                             if (
-                                                    host.includes('youtube.com') ||
-                                                    host.includes('youtu.be')
+                                                    host === 'youtube.com' ||
+                                                    host.endsWith('.youtube.com') ||
+                                                    host === 'youtu.be' ||
+                                                    host.endsWith('.youtu.be')
                                             ) {
                                                 return;
                                             }

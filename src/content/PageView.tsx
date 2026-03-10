@@ -18,11 +18,11 @@ function normalizeYoutubeEmbedUrl(url: string): string {
     try {
         const parsed = new URL(url);
         const host = parsed.hostname.toLowerCase();
-        if (host.includes('youtu.be')) {
+        if (host === 'youtu.be' || host.endsWith('.youtu.be')) {
             const id = parsed.pathname.replace(/^\//, '');
             if (id) return `https://www.youtube.com/embed/${id}`;
         }
-        if (host.includes('youtube.com')) {
+        if (host === 'youtube.com' || host.endsWith('.youtube.com')) {
             const id = parsed.searchParams.get('v');
             if (id) return `https://www.youtube.com/embed/${id}`;
             if (parsed.pathname.startsWith('/embed/')) {
