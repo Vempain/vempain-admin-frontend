@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     preset: 'ts-jest/presets/js-with-ts',
     testEnvironment: 'jest-environment-jsdom',
     moduleNameMapper: {
@@ -14,4 +14,4 @@ module.exports = {
     transformIgnorePatterns: [
         '/node_modules/(?!@vempain/vempain-auth-frontend)'
     ]
-}
+};

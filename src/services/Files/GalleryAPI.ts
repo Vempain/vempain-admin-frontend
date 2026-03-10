@@ -24,13 +24,13 @@ class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryVO> {
         return response.data;
     }
 
-    public async publishAll(params?: Record<string, any>): Promise<ActionVO> {
+    public async publishAll(params?: Record<string, string>): Promise<ActionVO> {
         this.setAuthorizationHeader();
         const response = await this.axiosInstance.get<ActionVO>("/publish", {params: params});
         return response.data;
     }
 
-    public async searchGalleries(params: Record<string, any>): Promise<GalleryPageResponse> {
+    public async searchGalleries(params: Record<string, string | number | boolean | undefined>): Promise<GalleryPageResponse> {
         this.setAuthorizationHeader();
         const response = await this.axiosInstance.get<GalleryPageResponse>("/search", {params: params});
         return response.data;

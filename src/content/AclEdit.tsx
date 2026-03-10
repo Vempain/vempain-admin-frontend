@@ -1,12 +1,12 @@
 import {useEffect, useState} from "react";
-import {Button, Col, Form, Row, Select, Switch} from "antd";
+import {Button, Col, Form, type FormInstance, Row, Select, Switch} from "antd";
 import {MinusCircleFilled, PlusCircleFilled} from "@ant-design/icons";
 import {unitAPI, userAPI} from "../services";
 import type {AclVO, UnitVO, UserVO} from "@vempain/vempain-auth-frontend";
 
 interface AclEditProps {
     acls: AclVO[];
-    parentForm: any;
+    parentForm: FormInstance;
 }
 
 export function AclEdit({acls, parentForm}: AclEditProps) {
@@ -33,15 +33,21 @@ export function AclEdit({acls, parentForm}: AclEditProps) {
                 });
     }, []);
 
-    function validateAclRow(rule: any, _value: any, index: number): Promise<void> {
-        const fieldName = rule.field.split(".")[2];
+    function parseOptionalId(value: unknown): number | undefined {
+        if (value === undefined || value === null || value === "empty" || value === "") {
+            return undefined;
+        }
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : undefined;
+    }
 
+    function validateAclRow(fieldName: string, _value: unknown, index: number): Promise<void> {
         if (fieldName === "user" || fieldName === "unit") {
             const userValue = parentForm.getFieldValue(["acls", index, "user"]);
             const unitValue = parentForm.getFieldValue(["acls", index, "unit"]);
 
-            const userId: number | undefined = (userValue === undefined || userValue === null || userValue === "empty" || userValue === "") ? undefined : parseInt(userValue, 10);
-            const unitId: number | undefined = (unitValue === undefined || unitValue === null || unitValue === "empty" || unitValue === "") ? undefined : parseInt(unitValue, 10);
+            const userId = parseOptionalId(userValue);
+            const unitId = parseOptionalId(unitValue);
 
             // One of the two must be selected
             if ((userId === undefined) && (unitId === undefined)) {
@@ -97,7 +103,7 @@ export function AclEdit({acls, parentForm}: AclEditProps) {
                                                             <Form.Item name={[field.name, "user"]}
                                                                        rules={[
                                                                            {
-                                                                               validator: (rule, value) => validateAclRow(rule, value, index)
+                                                                               validator: (_rule, value) => validateAclRow("user", value, index)
                                                                            }
                                                                        ]}
                                                             >
@@ -124,7 +130,7 @@ export function AclEdit({acls, parentForm}: AclEditProps) {
                                                             <Form.Item name={[field.name, "unit"]}
                                                                        rules={[
                                                                            {
-                                                                               validator: (rule, value) => validateAclRow(rule, value, index)
+                                                                               validator: (_rule, value) => validateAclRow("unit", value, index)
                                                                            }
                                                                        ]}
                                                             >
@@ -150,7 +156,7 @@ export function AclEdit({acls, parentForm}: AclEditProps) {
                                                                             valuePropName="checked"
                                                                             rules={[
                                                                                 {
-                                                                                    validator: (rule, value) => validateAclRow(rule, value, index)
+                                                                                    validator: (_rule, value) => validateAclRow(privilege, value, index)
                                                                                 }
                                                                             ]}
                                                                     >

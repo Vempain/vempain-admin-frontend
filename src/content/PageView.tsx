@@ -14,6 +14,27 @@ function fileUrl(id: number): string {
     return `${FILE_BASE_URL}/files/${id}`;
 }
 
+function normalizeYoutubeEmbedUrl(url: string): string {
+    try {
+        const parsed = new URL(url);
+        const host = parsed.hostname.toLowerCase();
+        if (host === 'youtu.be' || host.endsWith('.youtu.be')) {
+            const id = parsed.pathname.replace(/^\//, '');
+            if (id) return `https://www.youtube.com/embed/${id}`;
+        }
+        if (host === 'youtube.com' || host.endsWith('.youtube.com')) {
+            const id = parsed.searchParams.get('v');
+            if (id) return `https://www.youtube.com/embed/${id}`;
+            if (parsed.pathname.startsWith('/embed/')) {
+                return `https://www.youtube.com${parsed.pathname}`;
+            }
+        }
+    } catch {
+        // keep original url if parsing fails
+    }
+    return url;
+}
+
 interface EmbedImageProps {
     id: number;
 }
@@ -111,6 +132,61 @@ function EmbedCarousel({items, params}: EmbedCarouselProps) {
     );
 }
 
+function EmbedVideo({id}: { id: number }) {
+    return (
+            <div style={{margin: '8px 0'}}>
+                <video controls style={{width: '100%', maxWidth: '100%'}}>
+                    <source src={fileUrl(id)}/>
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+    );
+}
+
+function EmbedAudio({id}: { id: number }) {
+    return (
+            <div style={{margin: '8px 0'}}>
+                <audio controls style={{width: '100%'}}>
+                    <source src={fileUrl(id)}/>
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+    );
+}
+
+function EmbedYoutube({url}: { url: string }) {
+    const embedUrl = normalizeYoutubeEmbedUrl(url);
+    return (
+            <div style={{margin: '8px 0'}}>
+                <iframe
+                        title="YouTube Embed"
+                        src={embedUrl}
+                        style={{width: '100%', aspectRatio: '16 / 9', border: 0}}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        allowFullScreen
+                />
+            </div>
+    );
+}
+
+function EmbedLast({itemType, count}: { itemType: string; count: number }) {
+    return (
+            <div
+                    style={{
+                        padding: '16px',
+                        background: '#1a1a2e',
+                        border: '1px dashed #4a90d9',
+                        borderRadius: 4,
+                        color: '#90c4f8',
+                        margin: '8px 0',
+                    }}
+            >
+                🧾 last:{itemType}:{count}
+            </div>
+    );
+}
+
 /**
  * PageView – renders a page by its ID, replacing VPS embed tags with
  * the appropriate Ant Design components.
@@ -119,8 +195,12 @@ function EmbedCarousel({items, params}: EmbedCarouselProps) {
  *   <!--vps:embed:gallery:%d-->
  *   <!--vps:embed:image:%d-->
  *   <!--vps:embed:hero:%d-->
- *   <!--vps:embed:collapse:<url-encoded-json>-->
- *   <!--vps:embed:carousel:<url-encoded-json>:<autoplay>:<dotDuration>:<speed>-->
+ *   <!--vps:embed:video:%d-->
+ *   <!--vps:embed:audio:%d-->
+ *   <!--vps:embed:youtube:%s-->
+ *   <!--vps:embed:last:{type}:{count}-->
+ *   <!--vps:embed:collapse:<url-encoded-json>>
+ *   <!--vps:embed:carousel:<url-encoded-json>:<autoplay>:<dotDuration>:<speed>>
  */
 export function PageView() {
     const {paramId} = useParams<{paramId: string}>();
@@ -200,6 +280,14 @@ export function PageView() {
                             : {autoplay: false, dotDuration: false, speed: 500};
                         return <EmbedCarousel key={index} items={descriptor.items} params={carouselParams}/>;
                     }
+                    case 'video':
+                        return <EmbedVideo key={index} id={descriptor.id}/>;
+                    case 'audio':
+                        return <EmbedAudio key={index} id={descriptor.id}/>;
+                    case 'youtube':
+                        return <EmbedYoutube key={index} url={descriptor.url}/>;
+                    case 'last':
+                        return <EmbedLast key={index} itemType={descriptor.itemType} count={descriptor.count}/>;
                     default:
                         return null;
                 }

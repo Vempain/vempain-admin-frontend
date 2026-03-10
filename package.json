@@ -5,6 +5,7 @@
   "author": "Paul-Erik Törrönen",
   "homepage": "https://vempain.poltsi.fi",
   "license": "GPL-2.0",
+  "type" : "module",
   "packageManager": "yarn@4.12.0",
   "scripts": {
     "prebuild": "node generateBuildInfo.js",
@@ -17,7 +18,9 @@
     "test:coverage": "jest --coverage .",
     "test:debug": "jest --inspect-brk --runInBand --no-cache",
     "preview": "vite preview",
-    "build:production": "yarn prebuild && env-cmd -f .env.prod vite build"
+    "build:production" : "yarn prebuild && env-cmd -f .env.prod vite build",
+    "lint" : "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix" : "eslint . --ext ts,tsx --fix"
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",

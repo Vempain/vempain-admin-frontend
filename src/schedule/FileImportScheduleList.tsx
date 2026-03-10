@@ -35,11 +35,9 @@ function FileImportScheduleList() {
             title: "Generate gallery",
             dataIndex: "generate_gallery",
             key: "generate_gallery",
-            render: (_text: any, record: any) => {
-                if (record.generate_gallery) {
-                    return <CheckOutlined/>;
-                }
-            }
+            render: (_text, record: FileImportScheduleResponse) => (
+                    record.generate_gallery ? <CheckOutlined/> : null
+            )
         },
         {
             title: "Gallery shortname",
@@ -52,18 +50,16 @@ function FileImportScheduleList() {
             title: "Generate page",
             dataIndex: "generate_page",
             key: "generate_page",
-            render: (_text: any, record: any) => {
-                if (record.generate_page) {
-                    return <CheckOutlined/>;
-                }
-            }
+            render: (_text, record: FileImportScheduleResponse) => (
+                    record.generate_page ? <CheckOutlined/> : null
+            )
         },
         {
             title: "Page title",
             dataIndex: "page_title",
             key: "page_title",
             defaultSortOrder: "descend",
-            sorter: (a, b) => a.gallery_shortname.localeCompare(b.gallery_shortname),
+            sorter: (a, b) => a.page_title.localeCompare(b.page_title),
         },
         {
             title: "Page path",

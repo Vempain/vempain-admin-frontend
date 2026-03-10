@@ -6,6 +6,7 @@ import {EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {userAPI} from "../services";
 import {getPaginationConfig} from "../tools";
 import type {UserVO} from "@vempain/vempain-auth-frontend";
+import dayjs from "dayjs";
 
 export function UserList() {
     const [loading, setLoading] = useState<boolean>(false);
@@ -83,24 +84,29 @@ export function UserList() {
             title: "Created",
             dataIndex: "created",
             key: "created",
-            sorter: (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
+            sorter: (a, b) => dayjs(a.created).unix() - dayjs(b.created).unix()
         },
         {
             title: "Modifier",
             dataIndex: "modifier",
             key: "modifier",
-            sorter: (a, b) => a.modifier - b.modifier
+            sorter: (a, b) => (a.modifier ?? 0) - (b.modifier ?? 0)
         },
         {
             title: "Modified",
             dataIndex: "modified",
             key: "modified",
-            sorter: (a, b) => new Date(a.modified).getTime() - new Date(b.modified).getTime()
+            sorter: (a, b) => {
+                if (a.modified === null && b.modified === null) return 0;
+                if (a.modified === null) return -1;
+                if (b.modified === null) return 1;
+                return dayjs(a.modified).unix() - dayjs(b.modified).unix();
+            }
         },
         {
             title: "Action",
             key: "action",
-            render: (_text: any, record: UserVO) => (
+            render: (_text: Record<string, unknown>, record: UserVO) => (
                     <Button type="primary" href={`/users/${record.id}/edit`}><EditOutlined/></Button>
             ),
         },

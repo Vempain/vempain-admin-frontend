@@ -20,7 +20,7 @@ class PageAPI extends AbstractAPI<PageResponse, PageResponse> {
         return response.data;
     }
 
-    public async publishAll(params?: Record<string, any>): Promise<ActionVO> {
+    public async publishAll(params?: Record<string, string>): Promise<ActionVO> {
         this.setAuthorizationHeader();
         const response = await this.axiosInstance.get<ActionVO>("/publish", {params: params});
         return response.data;

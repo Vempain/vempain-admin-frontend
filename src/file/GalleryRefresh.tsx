@@ -19,7 +19,7 @@ export function GalleryRefresh() {
 
     useEffect(() => {
         setLoadingMessage("Loading gallery files");
-        let tmpGalleryId: number = validateParamId(paramId);
+        const tmpGalleryId: number = validateParamId(paramId);
 
         if (tmpGalleryId < 0) {
             setLoadResults({

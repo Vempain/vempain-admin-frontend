@@ -33,8 +33,8 @@ function SystemScheduleList() {
             title: "Action",
             dataIndex: "action",
             key: "action",
-            render: (_text: any, record: any) => (
-                    <Button type="primary" href={`/schedule/system/${record.schedule_name}/trigger`} key={record.id + "-triggerButton"}>Trigger</Button>
+            render: (_text, record: ScheduleTriggerResponse) => (
+                    <Button type="primary" href={`/schedule/system/${record.schedule_name}/trigger`} key={`${record.id}-triggerButton`}>Trigger</Button>
             )
         }
     ];

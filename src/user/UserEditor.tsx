@@ -5,6 +5,7 @@ import {SubmitResultHandler} from "../main";
 import {AclEdit} from "../content";
 import {userAPI} from "../services";
 import {aclTool, type AclVO, ActionResult, type SubmitResult, type UserVO, validateParamId} from "@vempain/vempain-auth-frontend";
+import dayjs from "dayjs";
 
 export function UserEditor() {
     const {paramId} = useParams();
@@ -30,20 +31,20 @@ export function UserEditor() {
             email: "",
             street: "",
             pob: "",
-            birthday: new Date(),
+            birthday: dayjs().toDate(),
             description: "",
             password: "",
             acls: [],
             creator: 0,
-            created: new Date(),
+            created: dayjs(),
             modifier: 0,
-            modified: new Date(),
+            modified: dayjs(),
             locked: false
         };
 
         setLoading(true);
 
-        let tmpUserId: number = validateParamId(paramId);
+        const tmpUserId: number = validateParamId(paramId);
 
         if (tmpUserId < 0) {
             setLoadResults({

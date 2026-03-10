@@ -73,7 +73,7 @@ function ItemPublishTrigger() {
     useEffect(() => {
         setSpinTip(spinMessages.loadingItemSchedule);
         setLoading(true);
-        let tmpPageId: number = validateParamId(paramId);
+        const tmpPageId: number = validateParamId(paramId);
 
         if (tmpPageId > 0) {
             setItemId(tmpPageId);
@@ -90,7 +90,7 @@ function ItemPublishTrigger() {
                         setLoading(false);
                     });
         }
-    }, []);
+    }, [paramId]);
 
     function triggerPublish() {
         if (publishSchedule !== null) {
@@ -137,7 +137,7 @@ function ItemPublishTrigger() {
                             <DatePicker key={"publishDatePicker"}
                                         value={publishDate}
                                         showTime={{format: 'HH:mm', defaultValue: dayjs()}}
-                                        minuteStep={15 as 15}
+                                        minuteStep={15 as const}
                                         format={'YYYY-DD-MM HH:mm'}
                                         onChange={(value, _dateString) => {
                                             setPublishDate(dayjs(value));

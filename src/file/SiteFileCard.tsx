@@ -1,9 +1,10 @@
 import {Card, Collapse, Descriptions, Input, Tag} from "antd";
 import type {SiteFileResponse} from "../models";
 import {formatDateTimeWithMs, formatFileSize} from "../tools";
+import React from "react";
 
 interface SiteFileCardProps {
-  siteFile: SiteFileResponse & Record<string, any>;
+    siteFile: SiteFileResponse;
 }
 
 const summaryKeys = new Set(["id", "file_name", "file_type", "size"]);
@@ -26,7 +27,7 @@ function isSizeKey(key: string) {
   return k === "size" || k.endsWith("size") || k.endsWith("_filesize");
 }
 
-function renderValue(key: string, value: any) {
+function renderValue(key: string, value: unknown) {
   if (value == null) return "";
   if (key === "file_class") return <Tag>{String(value)}</Tag>;
   if (isSizeKey(key) && typeof value === "number") return formatFileSize(value);
@@ -56,9 +57,10 @@ export function SiteFileCard({siteFile}: SiteFileCardProps) {
     let metadataItems: { key: string; label: string; children: React.ReactNode }[] | undefined;
 
   if (metadata !== undefined) {
-    let metaObj: any;
+      let metaObj: Record<string, unknown>;
     try {
-      metaObj = typeof metadata === "string" ? JSON.parse(metadata) : metadata;
+        const parsed: unknown = typeof metadata === "string" ? JSON.parse(metadata) : metadata;
+        metaObj = (parsed !== null && typeof parsed === "object") ? parsed as Record<string, unknown> : {};
     } catch {
         metaObj = {raw: String(metadata)};
     }

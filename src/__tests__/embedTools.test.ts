@@ -45,6 +45,23 @@ describe('buildEmbedTag', () => {
         expect(buildEmbedTag({type: 'hero', id: 3})).toBe('<!--vps:embed:hero:3-->');
     });
 
+    it('builds video tag', () => {
+        expect(buildEmbedTag({type: 'video', id: 22})).toBe('<!--vps:embed:video:22-->');
+    });
+
+    it('builds audio tag', () => {
+        expect(buildEmbedTag({type: 'audio', id: 23})).toBe('<!--vps:embed:audio:23-->');
+    });
+
+    it('builds youtube tag', () => {
+        const url = 'https://www.youtube.com/watch?v=abc123';
+        expect(buildEmbedTag({type: 'youtube', url})).toBe(`<!--vps:embed:youtube:${url}-->`);
+    });
+
+    it('builds last tag', () => {
+        expect(buildEmbedTag({type: 'last', itemType: 'videos', count: 7})).toBe('<!--vps:embed:last:videos:7-->');
+    });
+
     it('builds collapse tag with plain JSON items', () => {
         const items = [{title: 'Title 1', body: 'Body 1'}];
         expect(buildEmbedTag({type: 'collapse', items})).toBe(collapseTag(items));
@@ -80,6 +97,34 @@ describe('parseEmbeds', () => {
         if (segments[0].kind === 'embed') {
             expect(segments[0].descriptor.type).toBe('gallery');
             expect(segments[0].descriptor).toMatchObject({type: 'gallery', id: 5});
+        }
+    });
+
+    it('parses video, audio and youtube embeds', () => {
+        const html = [
+            '<!--vps:embed:video:90-->',
+            '<!--vps:embed:audio:91-->',
+            '<!--vps:embed:youtube:https://youtu.be/abc123-->',
+        ].join('');
+        const segments = parseEmbeds(html);
+        expect(segments).toHaveLength(3);
+        if (segments[0].kind === 'embed') {
+            expect(segments[0].descriptor).toMatchObject({type: 'video', id: 90});
+        }
+        if (segments[1].kind === 'embed') {
+            expect(segments[1].descriptor).toMatchObject({type: 'audio', id: 91});
+        }
+        if (segments[2].kind === 'embed') {
+            expect(segments[2].descriptor).toMatchObject({type: 'youtube', url: 'https://youtu.be/abc123'});
+        }
+    });
+
+    it('parses last embed', () => {
+        const segments = parseEmbeds('<!--vps:embed:last:documents:15-->');
+        expect(segments).toHaveLength(1);
+        expect(segments[0].kind).toBe('embed');
+        if (segments[0].kind === 'embed') {
+            expect(segments[0].descriptor).toMatchObject({type: 'last', itemType: 'documents', count: 15});
         }
     });
 
@@ -236,6 +281,15 @@ describe('convertTagsToPlaceholders', () => {
         expect(result).toContain('data-id="5"');
     });
 
+    it('converts youtube and last tags to content placeholders', () => {
+        const html = '<!--vps:embed:youtube:https://youtu.be/abc123--><!--vps:embed:last:pages:3-->';
+        const result = convertTagsToPlaceholders(html);
+        expect(result).toContain('data-type="youtube"');
+        expect(result).toContain('data-type="last"');
+        expect(result).toContain('data-content="https://youtu.be/abc123"');
+        expect(result).toContain('data-content="pages:3"');
+    });
+
     it('converts collapse tag with plain JSON items to placeholder span', () => {
         const tag = collapseTag(SAMPLE_ITEMS);
         const result = convertTagsToPlaceholders(tag);
@@ -280,6 +334,13 @@ describe('convertTagsToPlaceholders', () => {
 describe('convertPlaceholdersToTags', () => {
     it('is the inverse of convertTagsToPlaceholders for gallery', () => {
         const original = '<!--vps:embed:gallery:5-->';
+        const placeholder = convertTagsToPlaceholders(original);
+        const result = convertPlaceholdersToTags(placeholder);
+        expect(result).toBe(original);
+    });
+
+    it('is the inverse of convertTagsToPlaceholders for youtube and last', () => {
+        const original = '<!--vps:embed:youtube:https://www.youtube.com/watch?v=abc123--><!--vps:embed:last:images:6-->';
         const placeholder = convertTagsToPlaceholders(original);
         const result = convertPlaceholdersToTags(placeholder);
         expect(result).toBe(original);

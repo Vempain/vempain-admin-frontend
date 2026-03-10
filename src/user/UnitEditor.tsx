@@ -5,6 +5,7 @@ import {SubmitResultHandler} from "../main";
 import {AclEdit} from "../content";
 import {unitAPI} from "../services";
 import {aclTool, type AclVO, ActionResult, type SubmitResult, type UnitVO, validateParamId} from "@vempain/vempain-auth-frontend";
+import dayjs from "dayjs";
 
 export function UnitEditor() {
     const {paramId} = useParams();
@@ -20,7 +21,7 @@ export function UnitEditor() {
     useEffect(() => {
         setLoading(true);
 
-        let tmpUnitId: number = validateParamId(paramId);
+        const tmpUnitId: number = validateParamId(paramId);
 
         if (tmpUnitId < 0) {
             setLoadResults({
@@ -52,9 +53,9 @@ export function UnitEditor() {
                 description: "",
                 acls: [],
                 creator: 0,
-                created: new Date(),
+                created: dayjs(),
                 modifier: 0,
-                modified: new Date(),
+                modified: dayjs(),
                 locked: false
             });
             setLoading(false);

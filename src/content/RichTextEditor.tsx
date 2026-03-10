@@ -5,6 +5,7 @@ import {
     convertPlaceholdersToTags,
     convertTagsToPlaceholders,
     type EmbedType,
+    type LastEmbedType,
     parseCarouselParams
 } from '../tools/embedTools';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
@@ -24,7 +25,17 @@ import {
     UnorderedListOutlined,
 } from '@ant-design/icons';
 import DOMPurify from 'dompurify';
-import {RichEmbedCarouselEditor, RichEmbedCollapseEditor, RichEmbedGalleryEditor, RichEmbedHeroEditor, RichEmbedImageEditor} from './embeds';
+import {
+    RichEmbedAudioEditor,
+    RichEmbedCarouselEditor,
+    RichEmbedCollapseEditor,
+    RichEmbedGalleryEditor,
+    RichEmbedHeroEditor,
+    RichEmbedImageEditor,
+    RichEmbedLastEditor,
+    RichEmbedVideoEditor,
+    RichEmbedYoutubeEditor
+} from './embeds';
 
 interface RichTextEditorProps {
     value?: string;
@@ -36,12 +47,17 @@ interface RichTextEditorProps {
 interface EmbedDialogState {
     open: boolean;
     type: EmbedType | null;
-    /** ID of the embed being edited — used for gallery, image and hero types */
+    /** ID of the embed being edited — used for gallery/image/hero/video/audio types */
     initialId?: number;
     /** Extra params string for carousel edits (e.g. "true:false:500") */
     initialExtra?: string;
     /** JSON items for collapse and carousel embed types */
     initialItems?: CollapseCarouselItem[];
+    /** URL for youtube embed edits */
+    initialUrl?: string;
+    /** last embed edits */
+    initialLastType?: LastEmbedType;
+    initialCount?: number;
 }
 
 /**
@@ -54,7 +70,7 @@ interface EmbedDialogState {
  * - Lists (ordered, unordered)
  * - Link insertion
  * - Table insertion
- * - Embed tag insertion (gallery, image, hero, collapse, carousel)
+ * - Embed tag insertion (gallery, image, hero, video, audio, youtube, last, collapse, carousel)
  * - Toggle between WYSIWYG and HTML source view
  * - Click-to-edit for existing embed placeholders
  */
@@ -129,36 +145,185 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
         setSourceMode(toSource);
     };
 
-    // Execute document.execCommand for basic formatting.
-    // Note: execCommand is deprecated in the HTML spec but remains the only
-    // native way to implement rich text editing without an external library.
-    // All major browsers continue to support it and no removal timeline has
-    // been announced as of 2024.
-    const execCmd = useCallback((command: string, cmdValue?: string) => {
+    // Execute rich text commands using Selection/Range APIs (execCommand replacement).
+    const withEditorRange = useCallback((action: (range: Range) => void): boolean => {
         editorRef.current?.focus();
-        document.execCommand(command, false, cmdValue);
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0 || !editorRef.current) return false;
+        const range = sel.getRangeAt(0);
+        if (!editorRef.current.contains(range.commonAncestorContainer)) return false;
+        action(range);
         handleEditorInput();
+        return true;
     }, [handleEditorInput]);
 
+    const insertHtmlAtRange = useCallback((range: Range, html: string) => {
+        const template = document.createElement('template');
+        template.innerHTML = html;
+        const fragment = template.content;
+        const lastNode = fragment.lastChild;
+        range.deleteContents();
+        range.insertNode(fragment);
+        if (lastNode) {
+            const after = document.createRange();
+            after.setStartAfter(lastNode);
+            after.collapse(true);
+            const sel = window.getSelection();
+            if (sel) {
+                sel.removeAllRanges();
+                sel.addRange(after);
+            }
+        }
+    }, []);
+
+    const wrapSelectionWithTag = useCallback((tagName: 'b' | 'i' | 'u' | 's') => {
+        withEditorRange((range) => {
+            const wrapper = document.createElement(tagName);
+            if (range.collapsed) {
+                wrapper.appendChild(document.createTextNode('\u200b'));
+                range.insertNode(wrapper);
+                const caret = document.createRange();
+                caret.setStart(wrapper.firstChild as Node, 1);
+                caret.collapse(true);
+                const sel = window.getSelection();
+                if (sel) {
+                    sel.removeAllRanges();
+                    sel.addRange(caret);
+                }
+                return;
+            }
+
+            const content = range.extractContents();
+            wrapper.appendChild(content);
+            range.insertNode(wrapper);
+            const sel = window.getSelection();
+            if (sel) {
+                const after = document.createRange();
+                after.setStartAfter(wrapper);
+                after.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(after);
+            }
+        });
+    }, [withEditorRange]);
+
+    const findBlockElement = useCallback((node: Node | null): HTMLElement | null => {
+        let current: Node | null = node;
+        while (current && current !== editorRef.current) {
+            if (
+                    current instanceof HTMLElement &&
+                    ['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI'].includes(current.tagName)
+            ) {
+                return current;
+            }
+            current = current.parentNode;
+        }
+        return null;
+    }, []);
+
+    const replaceBlockTag = useCallback((tagName: string) => {
+        withEditorRange((range) => {
+            const block = findBlockElement(range.startContainer) ?? editorRef.current;
+            if (!block || !(block instanceof HTMLElement) || !editorRef.current) return;
+            if (block === editorRef.current) {
+                insertHtmlAtRange(range, `<${tagName}></${tagName}>`);
+                return;
+            }
+            if (block.tagName.toLowerCase() === tagName.toLowerCase()) return;
+
+            const replacement = document.createElement(tagName);
+            replacement.innerHTML = block.innerHTML;
+            block.replaceWith(replacement);
+
+            const sel = window.getSelection();
+            if (sel) {
+                const caret = document.createRange();
+                caret.selectNodeContents(replacement);
+                caret.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(caret);
+            }
+        });
+    }, [findBlockElement, insertHtmlAtRange, withEditorRange]);
+
+    const toggleList = useCallback((listTag: 'ol' | 'ul') => {
+        withEditorRange((range) => {
+            const block = findBlockElement(range.startContainer);
+            if (!block || !editorRef.current) return;
+
+            const parent = block.parentElement;
+            if (parent && parent.tagName.toLowerCase() === listTag && block.tagName.toLowerCase() === 'li') {
+                const p = document.createElement('p');
+                p.innerHTML = block.innerHTML;
+                parent.replaceWith(p);
+                return;
+            }
+
+            const list = document.createElement(listTag);
+            const li = document.createElement('li');
+            li.innerHTML = block.innerHTML || '\u200b';
+            list.appendChild(li);
+            block.replaceWith(list);
+
+            const sel = window.getSelection();
+            if (sel) {
+                const caret = document.createRange();
+                caret.selectNodeContents(li);
+                caret.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(caret);
+            }
+        });
+    }, [findBlockElement, withEditorRange]);
+
+    const createLinkAtSelection = useCallback((href: string, text: string) => {
+        withEditorRange((range) => {
+            const link = document.createElement('a');
+            link.setAttribute('href', href);
+
+            if (!range.collapsed) {
+                const content = range.extractContents();
+                link.appendChild(content);
+                range.insertNode(link);
+            } else {
+                link.textContent = text;
+                range.insertNode(link);
+            }
+
+            const sel = window.getSelection();
+            if (sel) {
+                const after = document.createRange();
+                after.setStartAfter(link);
+                after.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(after);
+            }
+        });
+    }, [withEditorRange]);
+
+    const insertHtmlAtSelection = useCallback((html: string) => {
+        withEditorRange((range) => insertHtmlAtRange(range, html));
+    }, [insertHtmlAtRange, withEditorRange]);
+
     const insertHeading = (level: string) => {
-        editorRef.current?.focus();
-        document.execCommand('formatBlock', false, level);
-        handleEditorInput();
+        replaceBlockTag(level);
     };
 
     const insertTable = () => {
         const rows = 3;
         const cols = 3;
-        let html = '<table border="1" style="border-collapse:collapse;width:100%"><tbody>';
+        let html = '<table style="border-collapse:collapse;width:100%;border:1px solid #666"><tbody>';
         for (let r = 0; r < rows; r++) {
             html += '<tr>';
             for (let c = 0; c < cols; c++) {
-                html += r === 0 ? '<th style="padding:4px;"></th>' : '<td style="padding:4px;"></td>';
+                html += r === 0
+                        ? '<th style="padding:4px;border:1px solid #666"></th>'
+                        : '<td style="padding:4px;border:1px solid #666"></td>';
             }
             html += '</tr>';
         }
         html += '</tbody></table><p></p>';
-        execCmd('insertHTML', html);
+        insertHtmlAtSelection(html);
     };
 
     const insertLink = (url: string, text: string) => {
@@ -168,14 +333,9 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
         const trimmedUrl = url.trim().toLowerCase();
         const dangerousSchemes = ['javascript:', 'data:', 'vbscript:'];
         const safeUrl = dangerousSchemes.some(s => trimmedUrl.startsWith(s)) ? '#' : url;
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0 && !selection.isCollapsed) {
-            execCmd('createLink', safeUrl);
-        } else {
-            const escapedUrl = DOMPurify.sanitize(safeUrl, {ALLOWED_TAGS: []});
-            const escapedText = DOMPurify.sanitize(text || safeUrl, {ALLOWED_TAGS: []});
-            execCmd('insertHTML', `<a href="${escapedUrl}">${escapedText}</a>`);
-        }
+        const escapedUrl = DOMPurify.sanitize(safeUrl, {ALLOWED_TAGS: []});
+        const escapedText = DOMPurify.sanitize(text || safeUrl, {ALLOWED_TAGS: []});
+        createLinkAtSelection(escapedUrl, escapedText);
     };
 
     const saveSelection = useCallback(() => {
@@ -249,9 +409,8 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
             console.debug('[RTE] selection restored?', restored);
 
             if (restored) {
-                document.execCommand('insertHTML', false, newHtml);
-                handleEditorInput();
-                console.debug('[RTE] inserted via document.execCommand at restored cursor position');
+                insertHtmlAtSelection(newHtml);
+                console.debug('[RTE] inserted via Range API at restored cursor position');
             } else {
                 // Fallback: append at the end of the editor content
                 console.debug('[RTE] fallback — appending at end of editor');
@@ -295,6 +454,30 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
         setEmbedDialog({open: false, type: null});
     };
 
+    const handleVideoConfirm = (id: number) => {
+        const tag = buildEmbedTag({type: 'video', id});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
+    const handleAudioConfirm = (id: number) => {
+        const tag = buildEmbedTag({type: 'audio', id});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
+    const handleYoutubeConfirm = (url: string) => {
+        const tag = buildEmbedTag({type: 'youtube', url});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
+    const handleLastConfirm = (itemType: LastEmbedType, count: number) => {
+        const tag = buildEmbedTag({type: 'last', itemType, count});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
     const handleEmbedCancel = () => {
         editingPlaceholderRef.current = null;
         setEmbedDialog({open: false, type: null});
@@ -325,10 +508,7 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
 
                 const trimmed = rawContent.trimStart();
                 if (trimmed.startsWith('[')) {
-                    // Parse JSON array — find end using bracket-depth tracking
-                    // (imported from embedTools indirectly via parseEmbedContent logic)
                     try {
-                        // Find the matching ] by tracking depth
                         let depth = 0;
                         let inStr = false;
                         let esc = false;
@@ -365,22 +545,44 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                             const rest = trimmed.substring(jsonEnd + 1);
                             extra = rest.startsWith(':') ? rest.substring(1) : undefined;
                         }
-                    } catch { /* ignore malformed JSON */
+                    } catch {
+                        // ignore malformed JSON
                     }
                 }
-                // For legacy numeric format, items stays [] and we open editor empty
 
                 editingPlaceholderRef.current = placeholder;
                 setEmbedDialog({open: true, type, initialItems: items, initialExtra: extra});
-            } else {
-                // Gallery/image/hero placeholders use data-id and data-extra
-                const rawId = placeholder.dataset.id;
-                const id = rawId ? parseInt(rawId, 10) : NaN;
-                if (isNaN(id)) return;
-                const extra = placeholder.dataset.extra || '';
-                editingPlaceholderRef.current = placeholder;
-                setEmbedDialog({open: true, type, initialId: id, initialExtra: extra || undefined});
+                return;
             }
+
+            if (type === 'youtube') {
+                editingPlaceholderRef.current = placeholder;
+                setEmbedDialog({open: true, type, initialUrl: placeholder.dataset.content || ''});
+                return;
+            }
+
+            if (type === 'last') {
+                const rawContent = placeholder.dataset.content || '';
+                const parts = rawContent.split(':');
+                const parsedType = (parts[0] ?? 'pages').toLowerCase() as LastEmbedType;
+                const count = parseInt(parts[1] ?? '1', 10);
+                editingPlaceholderRef.current = placeholder;
+                setEmbedDialog({
+                    open: true,
+                    type,
+                    initialLastType: parsedType,
+                    initialCount: Number.isFinite(count) && count > 0 ? count : 1,
+                });
+                return;
+            }
+
+            // Gallery/image/hero/video/audio placeholders use data-id and data-extra
+            const rawId = placeholder.dataset.id;
+            const id = rawId ? parseInt(rawId, 10) : NaN;
+            if (isNaN(id)) return;
+            const extra = placeholder.dataset.extra || '';
+            editingPlaceholderRef.current = placeholder;
+            setEmbedDialog({open: true, type, initialId: id, initialExtra: extra || undefined});
         }
     };
 
@@ -462,25 +664,25 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                     <Tooltip title="Bold (Ctrl+B)">
                         <Button size="small" icon={<BoldOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
-                            execCmd('bold');
+                            wrapSelectionWithTag('b');
                         }}/>
                     </Tooltip>
                     <Tooltip title="Italic (Ctrl+I)">
                         <Button size="small" icon={<ItalicOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
-                            execCmd('italic');
+                            wrapSelectionWithTag('i');
                         }}/>
                     </Tooltip>
                     <Tooltip title="Underline (Ctrl+U)">
                         <Button size="small" icon={<UnderlineOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
-                            execCmd('underline');
+                            wrapSelectionWithTag('u');
                         }}/>
                     </Tooltip>
                     <Tooltip title="Strikethrough">
                         <Button size="small" icon={<StrikethroughOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
-                            execCmd('strikeThrough');
+                            wrapSelectionWithTag('s');
                         }}/>
                     </Tooltip>
                 </Space.Compact>
@@ -489,13 +691,13 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                     <Tooltip title="Ordered List">
                         <Button size="small" icon={<OrderedListOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
-                            execCmd('insertOrderedList');
+                            toggleList('ol');
                         }}/>
                     </Tooltip>
                     <Tooltip title="Unordered List">
                         <Button size="small" icon={<UnorderedListOutlined/>} onMouseDown={(e) => {
                             e.preventDefault();
-                            execCmd('insertUnorderedList');
+                            toggleList('ul');
                         }}/>
                     </Tooltip>
                 </Space.Compact>
@@ -537,6 +739,30 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                                     e.preventDefault();
                                     openEmbedDialog('hero');
                                 }}>Hero</Button>
+                    </Tooltip>
+                    <Tooltip title="Insert Video Embed">
+                        <Button size="small" style={embedButtonStyle} onMouseDown={(e) => {
+                            e.preventDefault();
+                            openEmbedDialog('video');
+                        }}>Video</Button>
+                    </Tooltip>
+                    <Tooltip title="Insert Audio Embed">
+                        <Button size="small" style={embedButtonStyle} onMouseDown={(e) => {
+                            e.preventDefault();
+                            openEmbedDialog('audio');
+                        }}>Audio</Button>
+                    </Tooltip>
+                    <Tooltip title="Insert YouTube Embed">
+                        <Button size="small" style={embedButtonStyle} onMouseDown={(e) => {
+                            e.preventDefault();
+                            openEmbedDialog('youtube');
+                        }}>YouTube</Button>
+                    </Tooltip>
+                    <Tooltip title="Insert Last Items Embed">
+                        <Button size="small" style={embedButtonStyle} onMouseDown={(e) => {
+                            e.preventDefault();
+                            openEmbedDialog('last');
+                        }}>Last</Button>
                     </Tooltip>
                     <Tooltip title="Insert Collapse Embed">
                         <Button size="small" style={embedButtonStyle} onMouseDown={(e) => {
@@ -648,6 +874,31 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                 initialSpeed={carouselParams?.speed}
                 onConfirm={handleCarouselConfirm}
                 onCancel={handleEmbedCancel}
+            />
+                            <RichEmbedVideoEditor
+                                    open={embedDialog.open && embedDialog.type === 'video'}
+                                    initialId={embedDialog.initialId}
+                                    onConfirm={handleVideoConfirm}
+                                    onCancel={handleEmbedCancel}
+                            />
+                            <RichEmbedAudioEditor
+                                    open={embedDialog.open && embedDialog.type === 'audio'}
+                                    initialId={embedDialog.initialId}
+                                    onConfirm={handleAudioConfirm}
+                                    onCancel={handleEmbedCancel}
+                            />
+                            <RichEmbedYoutubeEditor
+                                    open={embedDialog.open && embedDialog.type === 'youtube'}
+                                    initialUrl={embedDialog.initialUrl}
+                                    onConfirm={handleYoutubeConfirm}
+                                    onCancel={handleEmbedCancel}
+                            />
+                            <RichEmbedLastEditor
+                                    open={embedDialog.open && embedDialog.type === 'last'}
+                                    initialType={embedDialog.initialLastType}
+                                    initialCount={embedDialog.initialCount}
+                                    onConfirm={handleLastConfirm}
+                                    onCancel={handleEmbedCancel}
             />
                         </>
                 )}

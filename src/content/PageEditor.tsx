@@ -1,6 +1,7 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
+import type {RuleObject} from "antd/es/form";
 import {AclEdit} from "./AclEdit";
 import {RichTextEditor} from "./RichTextEditor";
 import {MetadataForm, SubmitResultHandler} from "../main";
@@ -47,7 +48,7 @@ export function PageEditor() {
         setSpinTip(spinMessages.loadingPageData);
         setLoading(true);
 
-        let tmpPageId: number = validateParamId(paramId);
+        const tmpPageId: number = validateParamId(paramId);
         setPageTitle(tmpPageId.toString());
 
         if (tmpPageId < 0) {
@@ -160,7 +161,7 @@ export function PageEditor() {
         setSpinTip(spinMessages.savingGalleryData);
         setLoading(true);
 
-        let galleryIds: number[] = values.galleries.map(gallery => gallery.value);
+        const galleryIds: number[] = values.galleries.map(gallery => gallery.value);
 
         galleryAPI.updatePageGalleries(pageId, galleryIds)
                 .then((response) => {
@@ -181,7 +182,7 @@ export function PageEditor() {
                 });
     }
 
-    function formValidation(_rule: any, value: number): Promise<void> {
+    function formValidation(_rule: RuleObject, value: number): Promise<void> {
         if (value > 0 && formList.filter(form => form.id === value).length > 0) {
             return Promise.resolve();
         }

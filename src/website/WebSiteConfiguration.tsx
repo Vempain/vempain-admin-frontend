@@ -29,7 +29,7 @@ const serializeConfigValue = (value: string | number | boolean | undefined, type
 };
 
 const isValueDirty = (config: WebSiteConfigurationResponse, valueMap: Record<string, string | number | boolean | undefined>) => {
-    const stored = valueMap.hasOwnProperty(config.id) ? valueMap[config.id] : parseConfigValue(config);
+    const stored = Object.prototype.hasOwnProperty.call(valueMap, config.id) ? valueMap[config.id] : parseConfigValue(config);
     const original = parseConfigValue(config);
     return stored !== original;
 };
@@ -114,7 +114,7 @@ export function WebSiteConfiguration() {
             dataIndex: "config_value",
             key: "config_value",
             render: (_, config) => {
-                const currentValue = values.hasOwnProperty(config.id) ? values[config.id] : parseConfigValue(config);
+                const currentValue = Object.prototype.hasOwnProperty.call(values, config.id) ? values[config.id] : parseConfigValue(config);
                 switch (config.config_type) {
                     case WebSiteConfigurationTypeEnum.NUMBER: {
                         const numberValue: number = typeof currentValue === "number" ? currentValue : (currentValue ? Number(currentValue) : 0);

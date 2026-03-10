@@ -108,7 +108,6 @@ export function PageList() {
         ),
         onFilter: (value, record) => {
             if (record !== null && dataIndex !== null && record[dataIndex] !== null && value !== null) {
-                // @ts-ignore
                 return record[dataIndex]
                         .toString()
                         .toLowerCase()
@@ -196,13 +195,18 @@ export function PageList() {
             title: "Modifier",
             dataIndex: "modifier",
             key: "modifier",
-            sorter: (a, b) => a.modifier !== null && b.modifier !== null ? a.modifier - b.modifier : (a.modifier === null ? -1 : 1),
+            sorter: (a, b) => (a.modifier ?? 0) - (b.modifier ?? 0),
         },
         {
             title: "Modified",
             dataIndex: "modified",
             key: "modified",
-            sorter: (a, b) => a.modified !== null && b.modified !== null ? (dayjs(a.modified).unix() - dayjs(b.modified).unix()) : (a.modified === null ? -1 : 1),
+            sorter: (a, b) => {
+                if (a.modified === null && b.modified === null) return 0;
+                if (a.modified === null) return -1;
+                if (b.modified === null) return 1;
+                return dayjs(a.modified).unix() - dayjs(b.modified).unix();
+            },
             render: (_text: string, record: PageResponse) => {
                 if (record.modified === null) {
                     return (<>-</>);
@@ -241,7 +245,7 @@ export function PageList() {
         {
             title: "Action",
             key: "action",
-            render: (_text: any, record: PageResponse) => (
+            render: (_text: Record<string, unknown>, record: PageResponse) => (
                     <Space>
                         <Button type="primary" href={`/pages/${record.id}/edit`}><EditOutlined/></Button>
                         <Button type={"primary"} danger href={`/pages/${record.id}/delete`}><DeleteOutlined/></Button>
@@ -278,7 +282,7 @@ export function PageList() {
         setSpinMessage(spinMessages.publishing);
         setLoading(true);
 
-        let publishParams: Record<string, any> | undefined = undefined;
+        let publishParams: Record<string, string> | undefined = undefined;
 
         if (schedulePublish && publishDate !== null) {
             publishParams = {publish_date: publishDate.format("YYYY-MM-DDTHH:mm:ssZ")};

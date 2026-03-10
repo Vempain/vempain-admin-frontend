@@ -2,10 +2,15 @@ import {useEffect, useRef, useState} from "react";
 import {Spin, Table, type TablePaginationConfig} from "antd";
 import type {ColumnsType} from "antd/es/table";
 import type {FilterValue, SorterResult} from "antd/es/table/interface";
+import type {PagedResponse} from "@vempain/vempain-auth-frontend";
+
+interface PageableApi<T> {
+    findPageable(params?: Record<string, unknown>): Promise<PagedResponse<T>>;
+}
 
 interface Props<T extends { id: number }> {
     valueObjectColumns: ColumnsType<T>;
-    api: any; // Define the type for your API
+    api: PageableApi<T>;
     // New: optional extra request params to send along with the pageable request
     requestParams?: Record<string, unknown>;
 }
@@ -18,7 +23,7 @@ export function GenericFileList<T extends { id: number }>({valueObjectColumns, a
     const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>({
         current: 1,
         pageSize: 10,
-        position: ["topRight", "bottomRight"],
+        placement: ['topEnd', 'bottomEnd'],
         defaultPageSize: 15,
         total: 0,
         showSizeChanger: true,
@@ -87,10 +92,10 @@ export function GenericFileList<T extends { id: number }>({valueObjectColumns, a
             // New: include any extra params (e.g. file_type)
             ...(requestParams ?? {})
         })
-                .then((response: any) => {
+                .then((response) => {
                     setValueObjectList(response.content);
                 })
-                .catch((error: any) => {
+                .catch((error: unknown) => {
                     console.error(error);
                 })
                 .finally(() => {

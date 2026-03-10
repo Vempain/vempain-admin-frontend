@@ -138,14 +138,14 @@ export function GalleryEdit() {
                 .finally(() => {
                     setSiteFilesLoading(false);
                 });
-    }, [siteFilesSortBy, siteFilesSortDirection, siteFilesFilter, siteFilesCaseSensitive, selectedFileType]);
+    }, [siteFilesSortBy, siteFilesSortDirection, siteFilesFilter, siteFilesFilterColumn, siteFilesCaseSensitive, selectedFileType]);
 
     useEffect(() => {
         void fetchSiteFiles(0, false);
     }, [fetchSiteFiles]);
 
     useEffect(() => {
-        let userId = userSession?.id ?? 0;
+        const userId = userSession?.id ?? 0;
         const tmpGalleryId = validateParamId(paramId);
 
         if (tmpGalleryId < 0) {

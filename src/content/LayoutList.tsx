@@ -7,6 +7,7 @@ import {type LayoutVO} from "../models";
 import {getPaginationConfig} from "../tools";
 import {layoutAPI} from "../services";
 import {aclTool, PrivilegeEnum, useSession} from "@vempain/vempain-auth-frontend";
+import dayjs from "dayjs";
 
 export function LayoutList() {
     const [loading, setLoading] = useState<boolean>(false);
@@ -39,24 +40,29 @@ export function LayoutList() {
             title: "Created",
             dataIndex: "created",
             key: "created",
-            sorter: (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
+            sorter: (a: LayoutVO, b: LayoutVO) => dayjs(a.created).unix() - dayjs(b.created).unix()
         },
         {
             title: "Modifier",
             dataIndex: "modifier",
             key: "modifier",
-            sorter: (a, b) => a.modifier - b.modifier,
+            sorter: (a: LayoutVO, b: LayoutVO) => (a.modifier ?? 0) - (b.modifier ?? 0),
         },
         {
             title: "Modified",
             dataIndex: "modified",
             key: "modified",
-            sorter: (a, b) => new Date(a.modified).getTime() - new Date(b.modified).getTime()
+            sorter: (a: LayoutVO, b: LayoutVO) => {
+                if (a.modified === null && b.modified === null) return 0;
+                if (a.modified === null) return -1;
+                if (b.modified === null) return 1;
+                return dayjs(a.modified).unix() - dayjs(b.modified).unix();
+            }
         },
         {
             title: "Action",
             key: "action",
-            render: (_text: any, record: any) => (
+            render: (_text: Record<string, unknown>, record: LayoutVO) => (
                     <Space>
                         <Button type={"primary"} href={`/layouts/${record.id}/edit`}><EditOutlined/></Button>
                         {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&

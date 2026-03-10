@@ -16,7 +16,7 @@ export function FormDelete() {
     const [pages, setPages] = useState<PageResponse[]>([]);
 
     useEffect(() => {
-        let tmpFormId: number = validateParamId(paramId);
+        const tmpFormId: number = validateParamId(paramId);
 
         if (tmpFormId < 0) {
             setLoadResults({
