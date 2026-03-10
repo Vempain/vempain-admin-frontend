@@ -21,7 +21,7 @@ jobs:
       - name: Set up NodeJS
         uses: actions/setup-node@v6.3.0
         with:
-          node-version: '22'
+          node-version: '24'
         env:
           VEMPAIN_ACTION_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
 
@@ -49,7 +49,7 @@ jobs:
       - name: Set up NodeJS
         uses: actions/setup-node@v6.3.0
         with:
-          node-version: '22'
+          node-version: '24'
         env:
           VEMPAIN_ACTION_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
 
