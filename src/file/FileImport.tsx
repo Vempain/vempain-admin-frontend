@@ -86,7 +86,7 @@ export function FileImport() {
             formAPI.findAll({details: QueryDetailEnum.MINIMAL})
         ])
                 .then((response) => {
-                    let listOfRootDirs: TreeNode[] = [];
+                    const listOfRootDirs: TreeNode[] = [];
                     // Loop through the list received in the response
                     for (let i = 0; i < response[0].length; i++) {
                         // We only add the root directories to the list which contain children
@@ -97,7 +97,7 @@ export function FileImport() {
 
                     setDirectoryTree(listOfRootDirs);
 
-                    let tmpFormList: { label: string, value: number }[] = [];
+                    const tmpFormList: { label: string, value: number }[] = [];
 
                     for (let i = 0; i < response[1].length; i++) {
                         tmpFormList.push({label: response[1][i].name, value: response[1][i].id});
@@ -140,7 +140,7 @@ export function FileImport() {
                 });
     }
 
-    function handleFormValuesChange(something: any, allValues: FileImportFormProps) {
+    function handleFormValuesChange(something: Record<string, unknown>, allValues: FileImportFormProps) {
         const formField = Object.keys(something)[0];
         switch (formField) {
             case "site_directory":

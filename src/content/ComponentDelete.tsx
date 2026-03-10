@@ -17,7 +17,7 @@ export function ComponentDelete() {
     const [pages, setPages] = useState<PageResponse[]>([]);
 
     useEffect(() => {
-        let tmpComponentId: number = validateParamId(paramId);
+        const tmpComponentId = validateParamId(paramId);
 
         if (tmpComponentId < 0) {
             setLoadResults({
@@ -38,7 +38,7 @@ export function ComponentDelete() {
             componentAPI.findById(tmpComponentId, null)
                     .then((response) => {
                         setComponent(response);
-                        let tmpPageList: PageResponse[] = [];
+                        const tmpPageList: PageResponse[] = [];
 
                         formAPI.findFormsByComponentId(response.id)
                                 .then((formResponse) => {

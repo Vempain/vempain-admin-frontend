@@ -20,7 +20,7 @@ export function UnitEditor() {
     useEffect(() => {
         setLoading(true);
 
-        let tmpUnitId: number = validateParamId(paramId);
+        const tmpUnitId: number = validateParamId(paramId);
 
         if (tmpUnitId < 0) {
             setLoadResults({

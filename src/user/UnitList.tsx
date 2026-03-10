@@ -58,7 +58,7 @@ export function UnitList() {
         {
             title: "Action",
             key: "action",
-            render: (_text: any, record: UnitVO) => (
+            render: (_text: Record<string, unknown>, record: UnitVO) => (
                     <Button type="primary" href={`/units/${record.id}/edit`}><EditOutlined/></Button>
             ),
         },

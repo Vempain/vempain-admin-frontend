@@ -1,12 +1,12 @@
 import {useEffect, useState} from "react";
-import {Button, Col, Form, Row, Select, Switch} from "antd";
+import {Button, Col, Form, type FormInstance, Row, Select, Switch} from "antd";
 import {MinusCircleFilled, PlusCircleFilled} from "@ant-design/icons";
 import {unitAPI, userAPI} from "../services";
 import type {AclVO, UnitVO, UserVO} from "@vempain/vempain-auth-frontend";
 
 interface AclEditProps {
     acls: AclVO[];
-    parentForm: any;
+    parentForm: FormInstance;
 }
 
 export function AclEdit({acls, parentForm}: AclEditProps) {
@@ -33,7 +33,7 @@ export function AclEdit({acls, parentForm}: AclEditProps) {
                 });
     }, []);
 
-    function validateAclRow(rule: any, _value: any, index: number): Promise<void> {
+    function validateAclRow(rule: Record<string, unknown>, _value: unknown, index: number): Promise<void> {
         const fieldName = rule.field.split(".")[2];
 
         if (fieldName === "user" || fieldName === "unit") {

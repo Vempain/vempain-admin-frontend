@@ -5,7 +5,7 @@ import type {FilterValue, SorterResult} from "antd/es/table/interface";
 
 interface Props<T extends { id: number }> {
     valueObjectColumns: ColumnsType<T>;
-    api: any; // Define the type for your API
+    api: Readonly<Record<string, (...args: unknown[]) => Promise<unknown>>>;
     // New: optional extra request params to send along with the pageable request
     requestParams?: Record<string, unknown>;
 }
@@ -87,10 +87,10 @@ export function GenericFileList<T extends { id: number }>({valueObjectColumns, a
             // New: include any extra params (e.g. file_type)
             ...(requestParams ?? {})
         })
-                .then((response: any) => {
-                    setValueObjectList(response.content);
+                .then((response: Record<string, unknown>) => {
+                    setValueObjectList((response as { content: T[] }).content);
                 })
-                .catch((error: any) => {
+                .catch((error: Record<string, unknown>) => {
                     console.error(error);
                 })
                 .finally(() => {

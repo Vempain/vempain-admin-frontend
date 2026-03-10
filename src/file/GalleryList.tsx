@@ -1,6 +1,6 @@
 import {type Key, useCallback, useEffect, useState} from "react";
 import {Button, Input, message, Space, Spin, Switch, Table, type TablePaginationConfig} from "antd";
-import type {ColumnsType, SorterResult, SortOrder} from "antd/es/table/interface";
+import type {ColumnsType, FilterValue, SorterResult, SortOrder} from "antd/es/table/interface";
 import {type GalleryVO} from "../models";
 import type {GalleryPublishRequest} from "../models/Requests/Files";
 import {fileSystemAPI, galleryAPI} from "../services";
@@ -71,7 +71,7 @@ export function GalleryList() {
         {
             title: "Action",
             key: "action",
-            render: (_text: any, record: GalleryListItem) => (
+            render: (_text: Record<string, unknown>, record: GalleryListItem) => (
                     <Space key={`${record.id}-buttonSpace`}>
                         <Button
                                 type="primary"
@@ -131,7 +131,7 @@ export function GalleryList() {
         preserveSelectedRowKeys: true,
     };
 
-    function convertResponseToGalleryListItems(response: GalleryVO[]) {
+    const convertResponseToGalleryListItems = useCallback((response: GalleryVO[]) => {
         const tmpGalleryList: GalleryListItem[] = response.map((gallery) => {
                     return {
                         id: gallery.id,
@@ -145,7 +145,7 @@ export function GalleryList() {
                 }
         );
         setGalleryList(tmpGalleryList);
-    }
+    }, [userSession]);
 
     const fetchGalleries = useCallback(() => {
         if (!userSession) {
@@ -170,7 +170,7 @@ export function GalleryList() {
                 .finally(() => {
                     setLoading(false);
                 });
-    }, [caseSensitive, currentPage, pageSize, searchTerm, sortField, sortOrder, userSession]);
+    }, [caseSensitive, currentPage, pageSize, searchTerm, sortField, sortOrder, userSession, convertResponseToGalleryListItems]);
 
     useEffect(() => {
         fetchGalleries();
@@ -178,7 +178,7 @@ export function GalleryList() {
 
     function handleTableChange(
             tablePagination: TablePaginationConfig,
-            _filters: Record<string, any>,
+            _filters: Record<string, FilterValue | null>,
             sorter: SorterResult<GalleryListItem> | SorterResult<GalleryListItem>[]
     ) {
         setCurrentPage(tablePagination.current ?? 1);
@@ -207,7 +207,7 @@ export function GalleryList() {
 
         setLoading(true);
 
-        let publishParams: Record<string, any> | undefined = undefined;
+        let publishParams: Record<string, string> | undefined = undefined;
 
         if (schedulePublish && publishDate !== null) {
             publishParams = {publish_date: publishDate.format("YYYY-MM-DDTHH:mm:ssZ")};

@@ -174,7 +174,7 @@ export function WebSiteUserList() {
         void loadResources(0, false);
     };
 
-    const openEditModal = (user: WebSiteUserResponse): void => {
+    const openEditModal = useCallback((user: WebSiteUserResponse): void => {
         setEditingUser(user);
         form.setFieldsValue({username: user.username, password: "", global_permission: user.global_permission ?? false});
         setResourceType(undefined);
@@ -189,7 +189,7 @@ export function WebSiteUserList() {
         if (userId !== null) {
             void loadUserResources(userId);
         }
-    };
+    }, [form, loadResources, loadUserResources]);
 
     const closeModal = (): void => {
         setModalOpen(false);
@@ -313,7 +313,7 @@ export function WebSiteUserList() {
         }
     };
 
-    const handleDelete = (user: WebSiteUserResponse): void => {
+    const handleDelete = useCallback((user: WebSiteUserResponse): void => {
         const userId = resolveUserId(user);
         if (userId === null) {
             message.error("Missing user identifier");
@@ -335,7 +335,7 @@ export function WebSiteUserList() {
                 }
             }
         });
-    };
+    }, [loadUsers]);
 
     const columns: ColumnsType<WebSiteUserResponse> = useMemo(() => [
         {
@@ -381,7 +381,7 @@ export function WebSiteUserList() {
                     </Space>
             )
         }
-    ], [token]);
+    ], [token, handleDelete, openEditModal]);
 
     const renderTransferItem = (item: TransferItem) => (
             <span>{item.title}</span>

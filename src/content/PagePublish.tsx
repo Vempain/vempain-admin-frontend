@@ -39,7 +39,7 @@ export function PagePublish() {
     ];
 
     useEffect(() => {
-        let tmpPageId: number = validateParamId(paramId);
+        const tmpPageId: number = validateParamId(paramId);
 
         if (tmpPageId < 0) {
             setLoadResults({

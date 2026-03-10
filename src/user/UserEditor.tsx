@@ -43,7 +43,7 @@ export function UserEditor() {
 
         setLoading(true);
 
-        let tmpUserId: number = validateParamId(paramId);
+        const tmpUserId: number = validateParamId(paramId);
 
         if (tmpUserId < 0) {
             setLoadResults({

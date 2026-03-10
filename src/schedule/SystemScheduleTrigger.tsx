@@ -43,7 +43,7 @@ function SystemScheduleTrigger() {
             return;
         }
 
-        let tmpScheduleName: string = paramName;
+        const tmpScheduleName: string = paramName;
         setScheduleName(paramName);
 
         scheduleAPI.getSystemSchedule(tmpScheduleName)
@@ -56,7 +56,7 @@ function SystemScheduleTrigger() {
                 .finally(() => {
                     setLoading(false);
                 });
-    }, []);
+    }, [paramName]);
 
     function triggerSchedule() {
         if (schedule === null) {

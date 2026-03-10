@@ -47,7 +47,7 @@ export function PageEditor() {
         setSpinTip(spinMessages.loadingPageData);
         setLoading(true);
 
-        let tmpPageId: number = validateParamId(paramId);
+        const tmpPageId: number = validateParamId(paramId);
         setPageTitle(tmpPageId.toString());
 
         if (tmpPageId < 0) {
@@ -160,7 +160,7 @@ export function PageEditor() {
         setSpinTip(spinMessages.savingGalleryData);
         setLoading(true);
 
-        let galleryIds: number[] = values.galleries.map(gallery => gallery.value);
+        const galleryIds: number[] = values.galleries.map(gallery => gallery.value);
 
         galleryAPI.updatePageGalleries(pageId, galleryIds)
                 .then((response) => {
@@ -181,7 +181,7 @@ export function PageEditor() {
                 });
     }
 
-    function formValidation(_rule: any, value: number): Promise<void> {
+    function formValidation(_rule: Record<string, unknown>, value: number): Promise<void> {
         if (value > 0 && formList.filter(form => form.id === value).length > 0) {
             return Promise.resolve();
         }

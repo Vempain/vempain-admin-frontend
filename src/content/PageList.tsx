@@ -108,7 +108,7 @@ export function PageList() {
         ),
         onFilter: (value, record) => {
             if (record !== null && dataIndex !== null && record[dataIndex] !== null && value !== null) {
-                // @ts-ignore
+                // @ts-expect-error - dynamic dataIndex access
                 return record[dataIndex]
                         .toString()
                         .toLowerCase()
@@ -241,7 +241,7 @@ export function PageList() {
         {
             title: "Action",
             key: "action",
-            render: (_text: any, record: PageResponse) => (
+            render: (_text: Record<string, unknown>, record: PageResponse) => (
                     <Space>
                         <Button type="primary" href={`/pages/${record.id}/edit`}><EditOutlined/></Button>
                         <Button type={"primary"} danger href={`/pages/${record.id}/delete`}><DeleteOutlined/></Button>
@@ -278,7 +278,7 @@ export function PageList() {
         setSpinMessage(spinMessages.publishing);
         setLoading(true);
 
-        let publishParams: Record<string, any> | undefined = undefined;
+        let publishParams: Record<string, string> | undefined = undefined;
 
         if (schedulePublish && publishDate !== null) {
             publishParams = {publish_date: publishDate.format("YYYY-MM-DDTHH:mm:ssZ")};

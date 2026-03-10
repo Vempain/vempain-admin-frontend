@@ -61,7 +61,7 @@ export function ComponentList() {
         {
             title: "Action",
             key: "action",
-            render: (_text: any, record: ComponentVO) => (
+            render: (_text: Record<string, unknown>, record: ComponentVO) => (
                     <Space>
                         <Button type="primary" href={`/components/${record.id}/edit`}><EditOutlined/></Button>
                         {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&

@@ -34,7 +34,7 @@ export function PublishSchedule(publishScheduleProps: PublishScheduleProps) {
                         <DatePicker
                                 key="publishDatePicker"
                                 showTime={{format: 'HH:mm', defaultValue: dayjs()}}
-                                minuteStep={15 as 15}
+                                minuteStep={15 as const}
                                 format="YYYY-DD-MM HH:mm"
                                 onChange={handleDatePickerChange}
                         />

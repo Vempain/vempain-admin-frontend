@@ -27,7 +27,7 @@ export function GalleryPublish() {
 
     useEffect(() => {
         setLoadingMessage("Loading directories");
-        let tmpGalleryId: number = validateParamId(paramId);
+        const tmpGalleryId: number = validateParamId(paramId);
 
         if (tmpGalleryId < 0) {
             setLoadResults({

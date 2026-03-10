@@ -20,7 +20,7 @@ export function LayoutEditor() {
 
     useEffect(() => {
         setLoading(true);
-        let tmpLayoutId: number = validateParamId(paramId);
+        const tmpLayoutId: number = validateParamId(paramId);
         setLayoutId(tmpLayoutId);
         if (tmpLayoutId < 0) {
             setLoadResults({

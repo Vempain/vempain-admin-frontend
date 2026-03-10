@@ -19,7 +19,7 @@ export function ComponentEditor() {
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     useEffect(() => {
-        let tmpComponentId: number = validateParamId(paramId);
+        const tmpComponentId: number = validateParamId(paramId);
 
         if (tmpComponentId < 0) {
             setLoadResults({

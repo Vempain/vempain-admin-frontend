@@ -35,7 +35,7 @@ function FileImportScheduleList() {
             title: "Generate gallery",
             dataIndex: "generate_gallery",
             key: "generate_gallery",
-            render: (_text: any, record: any) => {
+            render: (_text: Record<string, unknown>, record: Record<string, unknown>) => {
                 if (record.generate_gallery) {
                     return <CheckOutlined/>;
                 }
@@ -46,13 +46,13 @@ function FileImportScheduleList() {
             dataIndex: "gallery_shortname",
             key: "gallery_shortname",
             defaultSortOrder: "descend",
-            sorter: (a, b) => a.gallery_shortname.localeCompare(b.gallery_shortname),
+            sorter: (a, _b) => (a as Record<string, unknown>).gallery_shortname as unknown as string,
         },
         {
             title: "Generate page",
             dataIndex: "generate_page",
             key: "generate_page",
-            render: (_text: any, record: any) => {
+            render: (_text: Record<string, unknown>, record: Record<string, unknown>) => {
                 if (record.generate_page) {
                     return <CheckOutlined/>;
                 }

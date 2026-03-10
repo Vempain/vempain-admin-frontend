@@ -15,7 +15,7 @@ export function PageDelete() {
     const [page, setPage] = useState<PageResponse | null>(null);
 
     useEffect(() => {
-        let tmpPageId: number = validateParamId(paramId);
+        const tmpPageId: number = validateParamId(paramId);
 
         if (tmpPageId < 0) {
             setLoadResults({

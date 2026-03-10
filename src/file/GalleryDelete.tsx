@@ -53,7 +53,7 @@ export function GalleryDelete() {
 
 
     useEffect(() => {
-        let tmpGalleryId: number = validateParamId(paramId);
+        const tmpGalleryId: number = validateParamId(paramId);
 
         if (tmpGalleryId < 0) {
             setLoadResults({

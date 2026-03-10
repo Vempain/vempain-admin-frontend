@@ -19,7 +19,7 @@ export function LayoutDelete() {
 
 
     useEffect(() => {
-        let tmpLayoutId: number = validateParamId(paramId);
+        const tmpLayoutId: number = validateParamId(paramId);
 
         if (tmpLayoutId < 0) {
             setLoadResults({
@@ -40,7 +40,7 @@ export function LayoutDelete() {
             layoutAPI.findById(tmpLayoutId, null)
                     .then((response) => {
                         setLayout(response);
-                        let tmpPageList: PageResponse[] = [];
+                        const tmpPageList: PageResponse[] = [];
 
 
                         formAPI.findFormsByLayoutId(response.id)

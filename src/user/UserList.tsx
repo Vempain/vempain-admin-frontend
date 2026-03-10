@@ -100,7 +100,7 @@ export function UserList() {
         {
             title: "Action",
             key: "action",
-            render: (_text: any, record: UserVO) => (
+            render: (_text: Record<string, unknown>, record: UserVO) => (
                     <Button type="primary" href={`/users/${record.id}/edit`}><EditOutlined/></Button>
             ),
         },

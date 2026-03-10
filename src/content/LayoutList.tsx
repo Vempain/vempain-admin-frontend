@@ -56,7 +56,7 @@ export function LayoutList() {
         {
             title: "Action",
             key: "action",
-            render: (_text: any, record: any) => (
+            render: (_text: Record<string, unknown>, record: Record<string, unknown>) => (
                     <Space>
                         <Button type={"primary"} href={`/layouts/${record.id}/edit`}><EditOutlined/></Button>
                         {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&

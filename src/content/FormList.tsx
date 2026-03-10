@@ -85,7 +85,7 @@ export function FormList() {
         {
             title: "Action",
             key: "action",
-            render: (_text: any, record: FormVO) => (
+            render: (_text: Record<string, unknown>, record: FormVO) => (
                     <Space>
                         <Button type="primary" href={`/forms/${record.id}/edit`}><EditOutlined/></Button>
                         {aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, record.acls) &&

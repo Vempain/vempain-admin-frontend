@@ -3,7 +3,7 @@ import type {SiteFileResponse} from "../models";
 import {formatDateTimeWithMs, formatFileSize} from "../tools";
 
 interface SiteFileCardProps {
-  siteFile: SiteFileResponse & Record<string, any>;
+    siteFile: SiteFileResponse & Record<string, unknown>;
 }
 
 const summaryKeys = new Set(["id", "file_name", "file_type", "size"]);
@@ -26,7 +26,7 @@ function isSizeKey(key: string) {
   return k === "size" || k.endsWith("size") || k.endsWith("_filesize");
 }
 
-function renderValue(key: string, value: any) {
+function renderValue(key: string, value: unknown) {
   if (value == null) return "";
   if (key === "file_class") return <Tag>{String(value)}</Tag>;
   if (isSizeKey(key) && typeof value === "number") return formatFileSize(value);
@@ -56,9 +56,9 @@ export function SiteFileCard({siteFile}: SiteFileCardProps) {
     let metadataItems: { key: string; label: string; children: React.ReactNode }[] | undefined;
 
   if (metadata !== undefined) {
-    let metaObj: any;
+      let metaObj: Record<string, unknown>;
     try {
-      metaObj = typeof metadata === "string" ? JSON.parse(metadata) : metadata;
+        metaObj = typeof metadata === "string" ? JSON.parse(metadata as string) : metadata as Record<string, unknown>;
     } catch {
         metaObj = {raw: String(metadata)};
     }

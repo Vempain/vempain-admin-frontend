@@ -39,7 +39,7 @@ export function FormEditor() {
                     setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the component and layout list, try again later"});
                 });
 
-        let tmpFormId: number = validateParamId(paramId);
+        const tmpFormId: number = validateParamId(paramId);
 
         if (tmpFormId < 0) {
             setLoadResults({
