@@ -422,7 +422,7 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
         }
         editingPlaceholderRef.current = null;
         savedRangeRef.current = null;
-    }, [handleEditorInput, restoreSelection]);
+    }, [handleEditorInput, insertHtmlAtSelection, restoreSelection]);
 
     const handleGalleryConfirm = (id: number) => {
         const tag = buildEmbedTag({type: 'gallery', id});
