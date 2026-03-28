@@ -22,3 +22,5 @@ Copy and modify appropriately the `.env` to `.env.local`, `.env.stage` and `.env
 Run `yarn install` to install the necessary npm packages.
 
 Now you can start up the local development environment with the command `yarn start`.
+
+[AGENTS.md](docs/AGENTS.md) has more detailed orientation and workflow guidance for agents working in this codebase.

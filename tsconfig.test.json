@@ -1,0 +1,19 @@
+{
+  "extends" : "./tsconfig.app.json",
+  "compilerOptions" : {
+    "module" : "commonjs",
+    "moduleResolution" : "node",
+    "verbatimModuleSyntax" : false,
+    "types" : [
+      "jest",
+      "node"
+    ],
+    "noEmit" : true
+  },
+  "include" : [
+    "src",
+    "__mocks__",
+    "jest.config.js"
+  ]
+}
+
