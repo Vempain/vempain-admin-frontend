@@ -1,4 +1,6 @@
 name: CI
+permissions:
+  contents: read
 on:
   pull_request:
   push:
@@ -15,15 +17,29 @@ concurrency: build
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
     steps:
       - name: Check out code
         uses: actions/checkout@v6
+
       - name: Set up NodeJS
         uses: actions/setup-node@v6.3.0
         with:
           node-version: '24'
-        env:
-          VEMPAIN_ACTION_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
+
+      - name: Resolve package token
+        shell: bash
+        run: |
+          if [ -n "${{ secrets.VEMPAIN_ACTION_TOKEN }}" ]; then
+            echo "Using VEMPAIN_ACTION_TOKEN for package registry authentication"
+            VEMPAIN_ACTION_TOKEN="${{ secrets.VEMPAIN_ACTION_TOKEN }}"
+          else
+            echo "VEMPAIN_ACTION_TOKEN not found, falling back to GITHUB_TOKEN for package registry authentication"
+            VEMPAIN_ACTION_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          fi
+          echo "VEMPAIN_ACTION_TOKEN=${VEMPAIN_ACTION_TOKEN}" >> $GITHUB_ENV
 
       - name: Test
         run: |
@@ -43,15 +59,29 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Check out code
         uses: actions/checkout@v6
+
       - name: Set up NodeJS
         uses: actions/setup-node@v6.3.0
         with:
           node-version: '24'
-        env:
-          VEMPAIN_ACTION_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
+
+      - name: Resolve package token
+        shell: bash
+        run: |
+          if [ -n "${{ secrets.VEMPAIN_ACTION_TOKEN }}" ]; then
+            echo "Using VEMPAIN_ACTION_TOKEN for package registry authentication"
+            VEMPAIN_ACTION_TOKEN="${{ secrets.VEMPAIN_ACTION_TOKEN }}"
+          else
+            echo "VEMPAIN_ACTION_TOKEN not found, falling back to GITHUB_TOKEN for package registry authentication"
+            VEMPAIN_ACTION_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+          fi
+          echo "VEMPAIN_ACTION_TOKEN=${VEMPAIN_ACTION_TOKEN}" >> $GITHUB_ENV
 
       - name: Get main and base version
         id: basemain
@@ -96,17 +126,6 @@ jobs:
         env:
           VEMPAIN_ACTION_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
 
-      - name: Upload package to GitHub
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
-        uses: actions/upload-artifact@v7
-        with:
-          name: "vempain-admin-frontend-${{ steps.newVer.outputs.newVersion }}"
-          path: dist/*
-          retention-days: 30
-          compression-level: 9
-          overwrite: true
-          if-no-files-found: warn
-
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
       - name: Log into registry ${{ env.REGISTRY }}
@@ -134,7 +153,7 @@ jobs:
 
       - name: Create tag
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/'))
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
           script: |
@@ -146,7 +165,7 @@ jobs:
             })
 
       - name: Create GitHub Release
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.VEMPAIN_ACTION_TOKEN }}
           script: |
