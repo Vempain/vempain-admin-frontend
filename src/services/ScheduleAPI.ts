@@ -1,4 +1,4 @@
-import type {FileImportScheduleResponse, PublishScheduleRequest, PublishScheduleResponse, ScheduleTriggerRequest, ScheduleTriggerResponse} from "../models";
+import type {PublishScheduleRequest, PublishScheduleResponse, ScheduleTriggerRequest, ScheduleTriggerResponse} from "../models";
 import {AbstractAPI} from "@vempain/vempain-auth-frontend";
 
 class ScheduleAPI extends AbstractAPI<ScheduleTriggerRequest, ScheduleTriggerResponse> {
@@ -42,20 +42,6 @@ class ScheduleAPI extends AbstractAPI<ScheduleTriggerRequest, ScheduleTriggerRes
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
         const response = await this.axiosInstance.post<ScheduleTriggerResponse>("/publishing", publishScheduleRequest);
-        return response.data;
-    }
-
-    public async getFileImportSchedules(): Promise<FileImportScheduleResponse[]> {
-        this.setAuthorizationHeader();
-        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.get<FileImportScheduleResponse[]>("/file-imports");
-        return response.data;
-    }
-
-    public async getFileImportScheduleByName(scheduleName: string): Promise<FileImportScheduleResponse[]> {
-        this.setAuthorizationHeader();
-        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.get<FileImportScheduleResponse[]>("/file-imports/" + scheduleName);
         return response.data;
     }
 }
