@@ -19,7 +19,7 @@ import {
 } from "./content";
 import {UnitEditor, UnitList, UserEditor, UserList} from "./user";
 import {LayoutDelete} from "./content/LayoutDelete";
-import {FileImport, GalleryDelete, GalleryEdit, GalleryList, GalleryPublish, GalleryRefresh} from "./file";
+import {GalleryDelete, GalleryEdit, GalleryList, GalleryPublish, GalleryRefresh} from "./file";
 import {FileImportScheduleList, FileImportScheduleTrigger, ItemPublishingList, ItemPublishTrigger, SystemScheduleList, SystemScheduleTrigger} from "./schedule";
 import {Login, Logout} from "@vempain/vempain-auth-frontend";
 import {FileTypeEnum} from "./models";
@@ -89,7 +89,6 @@ function App() {
                                 <Route path={"/galleries/:paramId/edit"} element={<GalleryEdit/>}/>
                                 <Route path={"/galleries/:paramId/publish"} element={<GalleryPublish/>}/>
                                 <Route path={"/galleries/:paramId/refresh"} element={<GalleryRefresh/>}/>
-                                <Route path={"/import"} element={<FileImport/>}/>
                                 {/* Schedules */}
                                 <Route path={"/schedule/system"} element={<SystemScheduleList/>}/>
                                 <Route path={"/schedule/system/:paramName/trigger"} element={<SystemScheduleTrigger/>}/>

@@ -16,7 +16,6 @@ import {
     FontSizeOutlined,
     FormOutlined,
     ForwardOutlined,
-    ImportOutlined,
     InfoCircleOutlined,
     LogoutOutlined,
     MenuOutlined,
@@ -153,12 +152,7 @@ export function TopBar() {
                         label: (<Link to={"/galleries"}>Gallery</Link>),
                         key: "gallery",
                         icon: <PictureOutlined/>
-                    },
-                    {
-                        label: (<Link to={"/import"}>File import</Link>),
-                        key: "import",
-                        icon: <ImportOutlined/>
-                    },
+                    }
                 ],
             },
             {
