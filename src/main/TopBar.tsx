@@ -6,6 +6,7 @@ import {
     AudioOutlined,
     ClockCircleOutlined,
     ContainerOutlined,
+    DatabaseOutlined,
     FieldTimeOutlined,
     FileImageOutlined,
     FileOutlined,
@@ -185,6 +186,11 @@ export function TopBar() {
                         label: (<Link to={"/administration/web-users"}>Web users</Link>),
                         key: "web-users",
                         icon: <UsergroupAddOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/administration/data-publish"}>Data publish</Link>),
+                        key: "data-publish",
+                        icon: <DatabaseOutlined/>
                     }
                 ],
             },

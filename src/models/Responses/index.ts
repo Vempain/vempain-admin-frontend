@@ -1,4 +1,6 @@
 export type {ComponentVO} from './ComponentVO';
+export type {DataResponse} from './DataResponse';
+export type {DataSummaryResponse} from './DataSummaryResponse';
 export type {FormVO} from './FormVO';
 export type {LayoutVO} from './LayoutVO';
 export type {LocationResponse} from './LocationResponse';

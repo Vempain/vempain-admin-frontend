@@ -24,7 +24,7 @@ import {ItemPublishingList, ItemPublishTrigger, SystemScheduleList, SystemSchedu
 import {Login, Logout} from "@vempain/vempain-auth-frontend";
 import {FileTypeEnum} from "./models";
 import {SiteFileList} from "./file/SiteFileList.tsx";
-import {WebSiteConfiguration, WebSiteUserList} from "./website";
+import {WebSiteConfiguration, WebSiteDataPublish, WebSiteUserList} from "./website";
 
 const {Content} = Layout;
 
@@ -102,6 +102,7 @@ function App() {
                                 {/* Web site Administration */}
                                 <Route path={"/administration/web-users"} element={<WebSiteUserList/>}/>
                                 <Route path={"/administration/web-site-configuration"} element={<WebSiteConfiguration/>}/>
+                                <Route path={"/administration/data-publish"} element={<WebSiteDataPublish/>}/>
                             </Routes>
                         </div>
                         <BottomFooter/>
