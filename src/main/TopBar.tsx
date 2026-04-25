@@ -25,7 +25,6 @@ import {
     SettingOutlined,
     SnippetsOutlined,
     SwapOutlined,
-    UploadOutlined,
     UserAddOutlined,
     UsergroupAddOutlined,
     UserOutlined,
@@ -164,11 +163,6 @@ export function TopBar() {
                         label: (<Link to={"/schedule/system"}>System schedules</Link>),
                         key: "systemSchedules",
                         icon: <AppstoreOutlined/>
-                    },
-                    {
-                        label: (<Link to={"/schedule/file-imports"}>File imports</Link>),
-                        key: "fileImports",
-                        icon: <UploadOutlined/>
                     },
                     {
                         label: (<Link to={"/schedule/publishing"}>Publishing</Link>),
