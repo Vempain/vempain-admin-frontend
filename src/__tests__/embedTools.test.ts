@@ -58,6 +58,15 @@ describe('buildEmbedTag', () => {
         expect(buildEmbedTag({type: 'youtube', url})).toBe(`<!--vps:embed:youtube:${url}-->`);
     });
 
+    it('builds music data tag', () => {
+        expect(buildEmbedTag({type: 'music', identifier: 'music_library'})).toBe('<!--vps:embed:music:music_library-->');
+    });
+
+    it('builds gps time series tag', () => {
+        expect(buildEmbedTag({type: 'gps_timeseries', identifier: 'gps_timeseries_holidays_2024'}))
+            .toBe('<!--vps:embed:gps_timeseries:gps_timeseries_holidays_2024-->');
+    });
+
     it('builds last tag', () => {
         expect(buildEmbedTag({type: 'last', itemType: 'videos', count: 7})).toBe('<!--vps:embed:last:videos:7-->');
     });
@@ -116,6 +125,21 @@ describe('parseEmbeds', () => {
         }
         if (segments[2].kind === 'embed') {
             expect(segments[2].descriptor).toMatchObject({type: 'youtube', url: 'https://youtu.be/abc123'});
+        }
+    });
+
+    it('parses music and gps dataset embeds', () => {
+        const html = [
+            '<!--vps:embed:music:music_library-->',
+            '<!--vps:embed:gps_timeseries:gps_timeseries_holidays_2024-->',
+        ].join('');
+        const segments = parseEmbeds(html);
+        expect(segments).toHaveLength(2);
+        if (segments[0].kind === 'embed') {
+            expect(segments[0].descriptor).toMatchObject({type: 'music', identifier: 'music_library'});
+        }
+        if (segments[1].kind === 'embed') {
+            expect(segments[1].descriptor).toMatchObject({type: 'gps_timeseries', identifier: 'gps_timeseries_holidays_2024'});
         }
     });
 
@@ -290,6 +314,15 @@ describe('convertTagsToPlaceholders', () => {
         expect(result).toContain('data-content="pages:3"');
     });
 
+    it('converts music and gps dataset tags to content placeholders', () => {
+        const html = '<!--vps:embed:music:music_library--><!--vps:embed:gps_timeseries:gps_timeseries_holidays_2024-->';
+        const result = convertTagsToPlaceholders(html);
+        expect(result).toContain('data-type="music"');
+        expect(result).toContain('data-content="music_library"');
+        expect(result).toContain('data-type="gps_timeseries"');
+        expect(result).toContain('data-content="gps_timeseries_holidays_2024"');
+    });
+
     it('converts collapse tag with plain JSON items to placeholder span', () => {
         const tag = collapseTag(SAMPLE_ITEMS);
         const result = convertTagsToPlaceholders(tag);
@@ -341,6 +374,13 @@ describe('convertPlaceholdersToTags', () => {
 
     it('is the inverse of convertTagsToPlaceholders for youtube and last', () => {
         const original = '<!--vps:embed:youtube:https://www.youtube.com/watch?v=abc123--><!--vps:embed:last:images:6-->';
+        const placeholder = convertTagsToPlaceholders(original);
+        const result = convertPlaceholdersToTags(placeholder);
+        expect(result).toBe(original);
+    });
+
+    it('is the inverse of convertTagsToPlaceholders for music and gps embeds', () => {
+        const original = '<!--vps:embed:music:music_library--><!--vps:embed:gps_timeseries:gps_timeseries_holidays_2024-->';
         const placeholder = convertTagsToPlaceholders(original);
         const result = convertPlaceholdersToTags(placeholder);
         expect(result).toBe(original);

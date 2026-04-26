@@ -11,6 +11,9 @@ export default {
     modulePaths: [
         '<rootDir>/src'
     ],
+    setupFilesAfterEnv: [
+        '<rootDir>/src/setupTests.ts'
+    ],
     moduleDirectories: [
         'node_modules'
     ],

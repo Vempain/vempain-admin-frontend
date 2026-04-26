@@ -128,7 +128,7 @@ export function WebSiteDataPublish() {
     return (
             <div>
                 <Typography.Title level={3}>Website data publishing</Typography.Title>
-                <Space direction="vertical" size={6}>
+                <Space orientation="vertical" size={6}>
                     <Typography.Text>
                         Music data available for publishing: {musicDataSets.length > 0 ? "Yes" : "No"}
                     </Typography.Text>
