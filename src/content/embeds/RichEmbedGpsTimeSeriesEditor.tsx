@@ -18,9 +18,9 @@ export function RichEmbedGpsTimeSeriesEditor({
                     open={open}
                     title="Insert GPS Time Series Embed"
                     datasetType="time_series"
-                    identifierPrefix="gps_timeseries_"
+                    serverSearchTerm="gps"
                     initialIdentifier={initialIdentifier}
-                    searchPlaceholder="Search GPS time series data sets"
+                    searchPlaceholder="Select or search a GPS time series data set"
                     emptyText="No GPS time series data sets found"
                     onConfirm={onConfirm}
                     onCancel={onCancel}

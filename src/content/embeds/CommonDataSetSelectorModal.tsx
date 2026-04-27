@@ -1,17 +1,14 @@
-import {Alert, Input, Modal, Spin} from 'antd';
-import VirtualList from 'rc-virtual-list';
+import {Alert, Modal, Select, Spin} from 'antd';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import type {DataSummaryResponse} from '../../models';
 import {dataAPI} from '../../services';
-
-const LIST_HEIGHT = 320;
-const ITEM_HEIGHT = 48;
 
 interface CommonDataSetSelectorModalProps {
     open: boolean;
     title: string;
     datasetType?: string;
     identifierPrefix?: string;
+    serverSearchTerm?: string;
     initialIdentifier?: string;
     searchPlaceholder: string;
     emptyText: string;
@@ -24,6 +21,7 @@ export function CommonDataSetSelectorModal({
                                                title,
                                                datasetType,
                                                identifierPrefix,
+                                               serverSearchTerm,
                                                initialIdentifier,
                                                searchPlaceholder,
                                                emptyText,
@@ -36,7 +34,7 @@ export function CommonDataSetSelectorModal({
     const [selectedIdentifier, setSelectedIdentifier] = useState<string | undefined>(initialIdentifier);
     const [searchQuery, setSearchQuery] = useState('');
 
-    const fetchItems = useCallback(async (query = '') => {
+    const fetchItems = useCallback(async () => {
         setLoading(true);
         setLoadError(null);
 
@@ -44,7 +42,7 @@ export function CommonDataSetSelectorModal({
             const response = await dataAPI.getAllDataSets({
                 type: datasetType,
                 identifier_prefix: identifierPrefix,
-                search: query.trim() || undefined,
+                search: serverSearchTerm?.trim() || undefined,
             });
             setItems(response);
         } catch (error) {
@@ -53,7 +51,7 @@ export function CommonDataSetSelectorModal({
         } finally {
             setLoading(false);
         }
-    }, [datasetType, identifierPrefix]);
+    }, [datasetType, identifierPrefix, serverSearchTerm]);
 
     useEffect(() => {
         if (!open) {
@@ -61,8 +59,23 @@ export function CommonDataSetSelectorModal({
         }
         setSelectedIdentifier(initialIdentifier);
         setSearchQuery('');
-        void fetchItems('');
+        void fetchItems();
     }, [open, initialIdentifier, fetchItems]);
+
+    const filteredItems = useMemo(() => {
+        const normalizedQuery = searchQuery.trim().toLowerCase();
+        if (normalizedQuery === '') {
+            return items;
+        }
+
+        return items.filter((item) => {
+            const haystack = [item.identifier, item.description, item.type]
+                    .filter((value): value is string => Boolean(value))
+                    .join(' ')
+                    .toLowerCase();
+            return haystack.includes(normalizedQuery);
+        });
+    }, [items, searchQuery]);
 
     const selectedLabel = useMemo(() => {
         const found = items.find((item) => item.identifier === selectedIdentifier);
@@ -85,44 +98,32 @@ export function CommonDataSetSelectorModal({
                                 <strong>Selected:</strong> {selectedLabel}
                             </div>
                     )}
-                    <Input.Search
+                    <Select
+                            value={selectedIdentifier}
+                            onChange={setSelectedIdentifier}
+                            showSearch
+                            searchValue={searchQuery}
+                            onSearch={setSearchQuery}
+                            filterOption={false}
+                            style={{width: '100%'}}
                             placeholder={searchPlaceholder}
-                            value={searchQuery}
-                            onChange={(event) => {
-                                const next = event.target.value;
-                                setSearchQuery(next);
-                                void fetchItems(next);
-                            }}
-                            allowClear
-                            style={{marginBottom: 8}}
-                    />
-                    <VirtualList
-                            data={items}
-                            height={LIST_HEIGHT}
-                            itemHeight={ITEM_HEIGHT}
-                            itemKey="identifier"
+                            disabled={loadError != null}
+                            notFoundContent={!loading ? emptyText : null}
+                            optionLabelProp="label"
                     >
-                        {(item) => (
-                                <div
+                        {filteredItems.map((item) => (
+                                <Select.Option
                                         key={item.identifier}
-                                        style={{
-                                            padding: '8px 12px',
-                                            cursor: 'pointer',
-                                            background: item.identifier === selectedIdentifier ? '#1a3a5c' : undefined,
-                                            borderBottom: '1px solid #303030',
-                                        }}
-                                        onClick={() => setSelectedIdentifier(item.identifier)}
+                                        value={item.identifier}
+                                        label={item.identifier}
                                 >
                                     <div>{item.identifier}</div>
                                     {item.description && (
                                             <div style={{fontSize: '0.85em', color: '#999'}}>{item.description}</div>
                                     )}
-                                </div>
-                        )}
-                    </VirtualList>
-                    {!loading && items.length === 0 && (
-                            <div style={{padding: '8px 12px', color: '#999'}}>{emptyText}</div>
-                    )}
+                                </Select.Option>
+                        ))}
+                    </Select>
                 </Spin>
             </Modal>
     );
