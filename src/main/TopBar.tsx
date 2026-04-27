@@ -6,6 +6,7 @@ import {
     AudioOutlined,
     ClockCircleOutlined,
     ContainerOutlined,
+    DatabaseOutlined,
     FieldTimeOutlined,
     FileImageOutlined,
     FileOutlined,
@@ -16,7 +17,6 @@ import {
     FontSizeOutlined,
     FormOutlined,
     ForwardOutlined,
-    ImportOutlined,
     InfoCircleOutlined,
     LogoutOutlined,
     MenuOutlined,
@@ -26,7 +26,6 @@ import {
     SettingOutlined,
     SnippetsOutlined,
     SwapOutlined,
-    UploadOutlined,
     UserAddOutlined,
     UsergroupAddOutlined,
     UserOutlined,
@@ -153,12 +152,7 @@ export function TopBar() {
                         label: (<Link to={"/galleries"}>Gallery</Link>),
                         key: "gallery",
                         icon: <PictureOutlined/>
-                    },
-                    {
-                        label: (<Link to={"/import"}>File import</Link>),
-                        key: "import",
-                        icon: <ImportOutlined/>
-                    },
+                    }
                 ],
             },
             {
@@ -170,11 +164,6 @@ export function TopBar() {
                         label: (<Link to={"/schedule/system"}>System schedules</Link>),
                         key: "systemSchedules",
                         icon: <AppstoreOutlined/>
-                    },
-                    {
-                        label: (<Link to={"/schedule/file-imports"}>File imports</Link>),
-                        key: "fileImports",
-                        icon: <UploadOutlined/>
                     },
                     {
                         label: (<Link to={"/schedule/publishing"}>Publishing</Link>),
@@ -197,6 +186,11 @@ export function TopBar() {
                         label: (<Link to={"/administration/web-users"}>Web users</Link>),
                         key: "web-users",
                         icon: <UsergroupAddOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/administration/data-publish"}>Data publish</Link>),
+                        key: "data-publish",
+                        icon: <DatabaseOutlined/>
                     }
                 ],
             },

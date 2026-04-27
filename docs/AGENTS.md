@@ -50,6 +50,10 @@
 - Page body editing is not a plain textarea: `src/content/RichTextEditor.tsx` is a custom editor that round-trips Vempain embed tags through placeholder HTML.
 - Embed parsing/rendering rules live in `src/tools/embedTools.ts`; if you change embed formats, update both the parser and placeholder conversion logic.
 - Existing embed coverage is concentrated in `src/__tests__/embedTools.test.ts`; extend those tests whenever embed syntax or placeholder behavior changes.
+- GPS time-series embeds are selected through `src/content/embeds/RichEmbedGpsTimeSeriesEditor.tsx` and `CommonDataSetSelectorModal.tsx`.
+    - The selector is a dropdown-style picker, not a freeform identifier input.
+    - It loads datasets from Admin with `type=time_series` and server search `gps`, then filters the already-loaded list client-side while the user types.
+    - Do not reintroduce an identifier-prefix-only lookup there; the selector must continue to surface legacy unprefixed GPS dataset identifiers.
 
 ## Testing & debugging notes
 
@@ -57,6 +61,8 @@
   imports by mocking unless the test really needs a mock.
 - Current tests are utility-focused (`src/__tests__/numberTools.test.ts`, `timeTools.test.ts`, `embedTools.test.ts`); new feature work often benefits from
   adding small tool/parser tests rather than only UI tests.
+- GPS embed selector coverage now lives in `src/__tests__/RichEmbedGpsTimeSeriesEditor.test.tsx`; keep that test aligned with the fetch-on-open +
+  client-side-filter behavior.
 - Footer/version output depends on generated build info plus env vars (`src/main/BottomFooter.tsx`), so if footer output looks stale, rerun a script that
   triggers `prebuild`/`prestart`.
 

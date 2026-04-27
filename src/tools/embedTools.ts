@@ -23,6 +23,8 @@ export type EmbedType =
     | 'video'
     | 'audio'
     | 'youtube'
+    | 'music'
+    | 'gps_timeseries'
     | 'last'
     | 'collapse'
     | 'carousel';
@@ -45,6 +47,8 @@ export type EmbedDescriptor =
     | { type: 'video'; id: number; extra?: string }
     | { type: 'audio'; id: number; extra?: string }
     | { type: 'youtube'; url: string }
+    | { type: 'music'; identifier: string }
+    | { type: 'gps_timeseries'; identifier: string }
     | { type: 'last'; itemType: LastEmbedType; count: number }
     | { type: 'collapse'; items: CollapseCarouselItem[] }
     | { type: 'carousel'; items: CollapseCarouselItem[]; extra?: string };
@@ -60,9 +64,9 @@ export interface CarouselParams {
  * These contain plain values and optional extra params — no newlines or
  * dangerous `-->` sequences in their content.
  */
-const SIMPLE_EMBED_REGEX = /<!--vps:embed:(gallery|image|hero|video|audio|youtube|last):([\s\S]*?)-->/g;
+const SIMPLE_EMBED_REGEX = /<!--vps:embed:(gallery|image|hero|video|audio|youtube|music|gps_timeseries|last):([\s\S]*?)-->/g;
 
-const CONTENT_EMBED_TYPES = new Set<EmbedType>(['collapse', 'carousel', 'youtube', 'last']);
+const CONTENT_EMBED_TYPES = new Set<EmbedType>(['collapse', 'carousel', 'youtube', 'music', 'gps_timeseries', 'last']);
 const LAST_TYPES: LastEmbedType[] = ['pages', 'galleries', 'images', 'videos', 'audio', 'documents'];
 
 /**
@@ -270,6 +274,9 @@ export function buildEmbedTag(descriptor: EmbedDescriptor): string {
     if (descriptor.type === 'youtube') {
         return `<!--vps:embed:youtube:${stripCommentTags(descriptor.url)}-->`;
     }
+    if (descriptor.type === 'music' || descriptor.type === 'gps_timeseries') {
+        return `<!--vps:embed:${descriptor.type}:${stripCommentTags(descriptor.identifier)}-->`;
+    }
     if (descriptor.type === 'last') {
         return `<!--vps:embed:last:${descriptor.itemType}:${descriptor.count}-->`;
     }
@@ -364,6 +371,10 @@ function parseEmbedContent(type: EmbedType, raw: string): EmbedDescriptor {
 
     if (type === 'youtube') {
         return {type, url: raw};
+    }
+
+    if (type === 'music' || type === 'gps_timeseries') {
+        return {type, identifier: raw.trim()};
     }
 
     if (type === 'last') {
@@ -480,6 +491,10 @@ function buildPlaceholderLabel(type: EmbedType, content: string): string {
             const short = content.length > 40 ? `${content.substring(0, 40)}...` : content;
             return `▶ youtube:${short}`;
         }
+        case 'music':
+            return `🎼 music:${content}`;
+        case 'gps_timeseries':
+            return `🗺 gps:${content}`;
         case 'last': {
             const parts = content.split(':');
             const itemType = (parts[0] ?? 'pages').toLowerCase();

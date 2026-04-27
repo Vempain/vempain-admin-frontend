@@ -14,6 +14,8 @@ import {
     BoldOutlined,
     CaretRightOutlined,
     CodeOutlined,
+    DatabaseOutlined,
+    EnvironmentOutlined,
     ItalicOutlined,
     LinkOutlined,
     OrderedListOutlined,
@@ -30,9 +32,11 @@ import {
     RichEmbedCarouselEditor,
     RichEmbedCollapseEditor,
     RichEmbedGalleryEditor,
+    RichEmbedGpsTimeSeriesEditor,
     RichEmbedHeroEditor,
     RichEmbedImageEditor,
     RichEmbedLastEditor,
+    RichEmbedMusicEditor,
     RichEmbedVideoEditor,
     RichEmbedYoutubeEditor
 } from './embeds';
@@ -55,6 +59,8 @@ interface EmbedDialogState {
     initialItems?: CollapseCarouselItem[];
     /** URL for youtube embed edits */
     initialUrl?: string;
+    /** Identifier for music and GPS time-series embeds */
+    initialIdentifier?: string;
     /** last embed edits */
     initialLastType?: LastEmbedType;
     initialCount?: number;
@@ -70,13 +76,14 @@ interface EmbedDialogState {
  * - Lists (ordered, unordered)
  * - Link insertion
  * - Table insertion
- * - Embed tag insertion (gallery, image, hero, video, audio, youtube, last, collapse, carousel)
+ * - Embed tag insertion (gallery, image, hero, video, audio, youtube, music, gps_timeseries, last, collapse, carousel)
  * - Toggle between WYSIWYG and HTML source view
  * - Click-to-edit for existing embed placeholders
  */
 export function RichTextEditor({value, onChange, readOnly = false}: RichTextEditorProps) {
     const editorRef = useRef<HTMLDivElement>(null);
     const [sourceMode, setSourceMode] = useState(false);
+    const [sourceValue, setSourceValue] = useState(value || '');
     // htmlContent mirrors the canonical HTML without placeholders
     const htmlContentRef = useRef<string>(value || '');
     // Reference to the placeholder span being edited (null = new insertion)
@@ -92,6 +99,7 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
     // Initialise htmlContentRef on mount
     useEffect(() => {
         htmlContentRef.current = value || '';
+        setSourceValue(value || '');
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -110,6 +118,7 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
         if (value !== prevValueRef.current && value !== htmlContentRef.current) {
             prevValueRef.current = value || '';
             htmlContentRef.current = value || '';
+            setSourceValue(value || '');
             if (!sourceMode && editorRef.current) {
                 editorRef.current.innerHTML = convertTagsToPlaceholders(value || '');
             }
@@ -124,12 +133,14 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
     const handleEditorInput = useCallback(() => {
         const html = getEditorHtml();
         htmlContentRef.current = html;
+        setSourceValue(html);
         prevValueRef.current = html;
         onChange?.(html);
     }, [getEditorHtml, onChange]);
 
     const handleSourceChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         htmlContentRef.current = e.target.value;
+        setSourceValue(e.target.value);
         prevValueRef.current = e.target.value;
         onChange?.(e.target.value);
     };
@@ -139,6 +150,7 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
             // Capture current WYSIWYG content before switching to source view
             const html = getEditorHtml();
             htmlContentRef.current = html;
+            setSourceValue(html);
             prevValueRef.current = html;
         }
         // When switching back to WYSIWYG the useEffect on sourceMode restores the content
@@ -472,6 +484,18 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
         setEmbedDialog({open: false, type: null});
     };
 
+    const handleMusicConfirm = (identifier: string) => {
+        const tag = buildEmbedTag({type: 'music', identifier});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
+    const handleGpsTimeSeriesConfirm = (identifier: string) => {
+        const tag = buildEmbedTag({type: 'gps_timeseries', identifier});
+        insertOrReplacePlaceholder(tag);
+        setEmbedDialog({open: false, type: null});
+    };
+
     const handleLastConfirm = (itemType: LastEmbedType, count: number) => {
         const tag = buildEmbedTag({type: 'last', itemType, count});
         insertOrReplacePlaceholder(tag);
@@ -558,6 +582,12 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
             if (type === 'youtube') {
                 editingPlaceholderRef.current = placeholder;
                 setEmbedDialog({open: true, type, initialUrl: placeholder.dataset.content || ''});
+                return;
+            }
+
+            if (type === 'music' || type === 'gps_timeseries') {
+                editingPlaceholderRef.current = placeholder;
+                setEmbedDialog({open: true, type, initialIdentifier: placeholder.dataset.content || ''});
                 return;
             }
 
@@ -758,6 +788,18 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                             openEmbedDialog('youtube');
                         }}>YouTube</Button>
                     </Tooltip>
+                    <Tooltip title="Insert Music Data Embed">
+                        <Button size="small" style={embedButtonStyle} icon={<DatabaseOutlined/>} onMouseDown={(e) => {
+                            e.preventDefault();
+                            openEmbedDialog('music');
+                        }}>Music</Button>
+                    </Tooltip>
+                    <Tooltip title="Insert GPS Time Series Embed">
+                        <Button size="small" style={embedButtonStyle} icon={<EnvironmentOutlined/>} onMouseDown={(e) => {
+                            e.preventDefault();
+                            openEmbedDialog('gps_timeseries');
+                        }}>GPS</Button>
+                    </Tooltip>
                     <Tooltip title="Insert Last Items Embed">
                         <Button size="small" style={embedButtonStyle} onMouseDown={(e) => {
                             e.preventDefault();
@@ -804,7 +846,7 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                     {sourceMode && !readOnly ? (
                     <textarea
                         style={sourceStyle}
-                        value={htmlContentRef.current}
+                        value={sourceValue}
                         onChange={handleSourceChange}
                     />
                 ) : (
@@ -891,6 +933,18 @@ export function RichTextEditor({value, onChange, readOnly = false}: RichTextEdit
                                     open={embedDialog.open && embedDialog.type === 'youtube'}
                                     initialUrl={embedDialog.initialUrl}
                                     onConfirm={handleYoutubeConfirm}
+                                    onCancel={handleEmbedCancel}
+                            />
+                            <RichEmbedMusicEditor
+                                    open={embedDialog.open && embedDialog.type === 'music'}
+                                    initialIdentifier={embedDialog.initialIdentifier}
+                                    onConfirm={handleMusicConfirm}
+                                    onCancel={handleEmbedCancel}
+                            />
+                            <RichEmbedGpsTimeSeriesEditor
+                                    open={embedDialog.open && embedDialog.type === 'gps_timeseries'}
+                                    initialIdentifier={embedDialog.initialIdentifier}
+                                    onConfirm={handleGpsTimeSeriesConfirm}
                                     onCancel={handleEmbedCancel}
                             />
                             <RichEmbedLastEditor

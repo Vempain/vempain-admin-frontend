@@ -1,6 +1,7 @@
 export {aclAPI} from './AclAPI';
 export {authHeader} from './AuthHeader';
 export {componentAPI} from './ComponentAPI';
+export {dataAPI} from './DataAPI';
 export {formAPI} from './FormAPI';
 export {layoutAPI} from './LayoutAPI';
 export {pageAPI} from './PageAPI';
