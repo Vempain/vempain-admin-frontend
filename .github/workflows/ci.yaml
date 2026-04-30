@@ -13,4 +13,7 @@ on:
 jobs:
   ci:
     uses: Vempain/vempain-workflows/.github/workflows/frontend-spa.yaml@main
+    with:
+      use_scoped_registry: true
+      use_immutable_install: true
     secrets: inherit
