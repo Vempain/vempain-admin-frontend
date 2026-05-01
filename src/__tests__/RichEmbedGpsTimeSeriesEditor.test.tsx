@@ -1,19 +1,44 @@
 import React from 'react';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {RichEmbedGpsTimeSeriesEditor} from '../content/embeds/RichEmbedGpsTimeSeriesEditor';
+import {RichEmbedGpsTimeSeriesEditor} from '../content/embeds';
 import type {DataSummaryResponse} from '../models';
 
 jest.mock('antd', () => {
-    const ReactModule = require('react');
-
     const Option = () => null;
 
-    const Select = ({children, onChange, onSearch, searchValue, value, placeholder}: any) => {
-        const options = ReactModule.Children.toArray(children).map((child: any) => ({
-            value: child.props.value,
-            label: child.props.label ?? child.props.value,
-        }));
+    type SelectOptionChild = {
+        props: {
+            value: string;
+            label?: string;
+        };
+    };
+
+    type SelectMockProps = {
+        children?: React.ReactNode;
+        onChange?: (value?: string) => void;
+        onSearch?: (value: string) => void;
+        searchValue?: string;
+        value?: string;
+        placeholder?: string;
+    };
+
+    type ModalMockProps = {
+        title?: React.ReactNode;
+        open?: boolean;
+        onOk?: () => void;
+        onCancel?: () => void;
+        children?: React.ReactNode;
+    };
+
+    const Select = ({children, onChange, onSearch, searchValue, value, placeholder}: SelectMockProps) => {
+        const options = React.Children.toArray(children).map((child) => {
+            const optionChild = child as SelectOptionChild;
+            return {
+                value: optionChild.props.value,
+                label: optionChild.props.label ?? optionChild.props.value,
+            };
+        });
 
         return (
                 <div>
@@ -41,7 +66,7 @@ jest.mock('antd', () => {
 
     return {
         Alert: ({message}: { message: string }) => <div>{message}</div>,
-        Modal: ({title, open, onOk, onCancel, children}: any) => open ? (
+        Modal: ({title, open, onOk, onCancel, children}: ModalMockProps) => open ? (
                 <div>
                     <h1>{title}</h1>
                     {children}
@@ -126,8 +151,3 @@ describe('RichEmbedGpsTimeSeriesEditor', () => {
         expect(onCancel).not.toHaveBeenCalled();
     });
 });
-
-
-
-
-
