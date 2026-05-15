@@ -38,6 +38,8 @@
 
 - This codebase avoids TS `enum`; use the existing `as const` object pattern (example: `src/models/FileTypeEnum.ts`) because `tsconfig.app.json` enables
   `erasableSyntaxOnly`.
+- API JSON field names are mandatory snake_case across Vempain; keep frontend request/response model keys snake_case and do not introduce camelCase JSON keys in
+  API payload handling.
 - UI is Ant Design with a global dark theme in `src/App.tsx`. Reuse Ant components and existing theme tokens before introducing custom styling.
 - Feature folders keep screens close to their helpers; use barrel exports like `src/content/index.ts` and `src/file/index.ts` when adding new screens.
 - Table-heavy pages often use Ant `Table` with typed columns. Generic paged file tables go through `src/file/GenericFileList.tsx`, which translates Ant table
