@@ -18,6 +18,6 @@ export default {
         'node_modules'
     ],
     transformIgnorePatterns: [
-        '/node_modules/(?!@vempain/vempain-auth-frontend)'
+        '/node_modules/(?!(@vempain/vempain-auth-frontend|@ant-design|antd|rc-virtual-list))'
     ]
 };
