@@ -1,16 +1,22 @@
 import {useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import type {GalleryVO, PublishItemRequest} from "../models";
 import {type PageResponse, QueryDetailEnum} from "../models";
-import {galleryAPI, pageAPI} from "../services";
+import {dataAPI, galleryAPI, pageAPI, siteFileAPI} from "../services";
 import {Button, Divider, Space, Spin, Table} from "antd";
 import {SubmitResultHandler} from "../main";
-import {RichTextEditor} from "./RichTextEditor";
+import {type EmbedDataProviders, RichTextEditor as RtEditor,} from '@vempain/vempain-rt-editor';
 import TextArea from "antd/es/input/TextArea";
 import dayjs, {Dayjs} from "dayjs";
 import {PublishSchedule} from "./PublishSchedule";
 import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 import type {ColumnsType} from "antd/lib/table";
+
+const defaultDataProviders: EmbedDataProviders = {
+    findGalleries: (params) => galleryAPI.findAll({details: params.details}),
+    getPagedSiteFiles: (params) => siteFileAPI.getPagedSiteFiles(params),
+    getAllDataSets: (params) => dataAPI.getAllDataSets(params),
+};
 
 export function PagePublish() {
     const {paramId} = useParams();
@@ -22,6 +28,11 @@ export function PagePublish() {
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<Dayjs | null>(null);
     const [publishMessage, setPublishMessage] = useState<string>("");
+
+    const mergedDataProviders = useMemo<EmbedDataProviders>(
+            () => defaultDataProviders,
+            [],
+    );
 
     const galleryColumns:  ColumnsType<GalleryVO> = [
         {
@@ -106,9 +117,10 @@ export function PagePublish() {
                 <Spin spinning={loading} description={"Uploading page and files..."}>
                     {page !== null && page.body !== undefined && <div>
                         <Space vertical={true} size={"large"}>
-                            <RichTextEditor key={"pageBody"}
+                            <RtEditor key={"pageBody"}
                                       value={page.body}
-                                            readOnly={true}
+                                      readOnly={true}
+                                      dataProviders={mergedDataProviders}
                             />
                             {galleryList.length > 0 && <Table key={"galleryList"}
                                                               columns={galleryColumns}
