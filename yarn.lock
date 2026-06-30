@@ -2613,10 +2613,11 @@ __metadata:
     "@types/react": "npm:^19.2.17"
     "@types/react-dom": "npm:^19.2.3"
     "@types/react-highlight-words": "npm:^0.20.1"
-    "@vempain/vempain-auth-frontend": "npm:^1.0.13"
+    "@vempain/vempain-auth-frontend": "npm:^1.0.14"
+    "@vempain/vempain-rt-editor": "npm:1.0.5"
     "@vitejs/plugin-react": "npm:^6.0.3"
     "@vitejs/plugin-react-swc": "npm:^4.3.1"
-    antd: "npm:^6.4.5"
+    antd: "npm:^6.5.0"
     axios: "npm:^1.18.1"
     dayjs: "npm:^1.11.21"
     dompurify: "npm:^3.4.11"
@@ -2640,18 +2641,32 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@vempain/vempain-auth-frontend@npm:^1.0.13":
-  version: 1.0.13
-  resolution: "@vempain/vempain-auth-frontend@npm:1.0.13::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-auth-frontend%2F1.0.13%2F77c98483c199147673ba2f6f40c6ab781f834eb2"
+"@vempain/vempain-auth-frontend@npm:^1.0.14":
+  version: 1.0.14
+  resolution: "@vempain/vempain-auth-frontend@npm:1.0.14::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-auth-frontend%2F1.0.14%2F6aec8a15a6775c4c8ed7d000d333712beaebc6bd"
   dependencies:
-    antd: "npm:^6.4.3"
+    antd: "npm:^6.5.0"
     dayjs: "npm:^1.11.21"
   peerDependencies:
     axios: 1.18.0
     react: ^19.2.5
     react-dom: ^19.2.5
     react-router-dom: ^7.14.1
-  checksum: 10c0/e14ca9b6a818535fadf18437f554fdfdf767db97629d0003ea49f12ef982b1e5da42e13a23dfbc840dbbd03b0f45a0e9ed0fa255f8c1a411b8a58ddd99e6f288
+  checksum: 10c0/6379598a7454ad955ecfc7ee6510458f62cf59798f781ce5f67e2d0bed4afcf98d8292d38481a09b8a043f6a0ea2642aed1b5bb59f6d95aafe2d41f0ba7c7972
+  languageName: node
+  linkType: hard
+
+"@vempain/vempain-rt-editor@npm:1.0.5":
+  version: 1.0.5
+  resolution: "@vempain/vempain-rt-editor@npm:1.0.5::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-rt-editor%2F1.0.5%2Ffad64227bcd092d4db669f2d9abf4b05f9d36aa1"
+  peerDependencies:
+    "@ant-design/icons": ^6.2.3
+    antd: ^6.4.3
+    dompurify: ^3.4.5
+    rc-virtual-list: ^3.19.2
+    react: ^19.2.0
+    react-dom: ^19.2.0
+  checksum: 10c0/727a155eb969141bc1a55c49fc52a1c0f67f61aa8d46f3c1dbf3c16475123968064b36f40cc3a4a4b8ddd2c4dcdb96bfdd603ae3f072313c1367aadf3ddc232e
   languageName: node
   linkType: hard
 
@@ -2784,7 +2799,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"antd@npm:^6.4.3, antd@npm:^6.4.5":
+"antd@npm:^6.5.0":
   version: 6.5.0
   resolution: "antd@npm:6.5.0"
   dependencies:
@@ -3029,11 +3044,11 @@ __metadata:
   linkType: hard
 
 "brace-expansion@npm:^5.0.5":
-  version: 5.0.6
-  resolution: "brace-expansion@npm:5.0.6"
+  version: 5.0.7
+  resolution: "brace-expansion@npm:5.0.7"
   dependencies:
     balanced-match: "npm:^4.0.2"
-  checksum: 10c0/8c919869b90f61d533b341d3340be5ee4413232ea89b8246cbc2f38eb014f1d8182785c98a006eaf6111d02dc9eeffefdc240d5ac158625b2ed084dccd4bbf9b
+  checksum: 10c0/4769109c3c082de178e449a371bcad50d51ab468f644bce2dd9188efe0cf0a080ed102105d7fc8577382cedc45bad7e6443a91bf3d8102264ee8cf927dbaf205
   languageName: node
   linkType: hard
 
@@ -3422,9 +3437,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.376":
-  version: 1.5.380
-  resolution: "electron-to-chromium@npm:1.5.380"
-  checksum: 10c0/9132e2d69a1829708894507bacf59f02d881b95113eb9139fcb27c92d026f4504dd1b2a74f024224641d1fb6112b0fcb914ce27acfef9aeb150cdb4c8ae35895
+  version: 1.5.381
+  resolution: "electron-to-chromium@npm:1.5.381"
+  checksum: 10c0/34f518754e3fa8a92375b8c5a2a9d41625891927629c595be570c37bf85a3a9de02eb9a783ee419a17300a9c7931a47eb2b2b1190cf9c1c2049e4a8530b73719
   languageName: node
   linkType: hard
 
@@ -5512,13 +5527,13 @@ __metadata:
   linkType: hard
 
 "postcss@npm:^8.5.15":
-  version: 8.5.15
-  resolution: "postcss@npm:8.5.15"
+  version: 8.5.16
+  resolution: "postcss@npm:8.5.16"
   dependencies:
     nanoid: "npm:^3.3.12"
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.1"
-  checksum: 10c0/7f2e63ae22fbe43aace1bf652bd99da4e90737c64194d49e51ddc9cd0f9e51ff2861a7d734379b494deffa03a880a5c65eec70bc29ee9ebaa7136dde3eee8f31
+  checksum: 10c0/625de7a02f662f3a340964d14b487bd5097adf16f5f171e257d19005ba37aea8768ee446557500e88e91ca46b4d14d6cb4a0bf033c6ec0c8c0b660d85719f1ef
   languageName: node
   linkType: hard
 
@@ -6070,15 +6085,15 @@ __metadata:
   linkType: hard
 
 "tar@npm:^7.5.4":
-  version: 7.5.17
-  resolution: "tar@npm:7.5.17"
+  version: 7.5.19
+  resolution: "tar@npm:7.5.19"
   dependencies:
     "@isaacs/fs-minipass": "npm:^4.0.0"
     chownr: "npm:^3.0.0"
     minipass: "npm:^7.1.2"
     minizlib: "npm:^3.1.0"
     yallist: "npm:^5.0.0"
-  checksum: 10c0/794e80834d6fa29a526d7c6dc82684cd1d0fbc4b7dd4a86c730946a996314149b60e29f1bff8623936bb1442da7de241890c16ce6268f16cc5ef2aa5b9615953
+  checksum: 10c0/7022e8cb04a8ceccc0689f2c731743fa2aab2e3c3f559f7dbc37b65ef7d5913049b427284eded2ec0765c5db5ff72dd7939fe2ae15785ff422cef2116c95d798
   languageName: node
   linkType: hard
 

@@ -1,11 +1,11 @@
 import {useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
 import type {RuleObject} from "antd/es/form";
 import {AclEdit} from "./AclEdit";
-import {RichTextEditor} from "./RichTextEditor";
+import {type EmbedDataProviders, RichTextEditor as RtEditor,} from '@vempain/vempain-rt-editor';
 import {MetadataForm, SubmitResultHandler} from "../main";
-import {formAPI, galleryAPI, pageAPI} from "../services";
+import {dataAPI, formAPI, galleryAPI, pageAPI, siteFileAPI} from "../services";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-design/icons";
 import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 import {type FormVO, type PageResponse, QueryDetailEnum} from "../models";
@@ -16,6 +16,12 @@ const spinMessages: Record<string, string> = {
     loadingPageData: "Loading page data...",
     savingPageData: "Saving page data...",
     savingGalleryData: "Saving gallery data..."
+};
+
+const defaultDataProviders: EmbedDataProviders = {
+    findGalleries: (params) => galleryAPI.findAll({details: params.details}),
+    getPagedSiteFiles: (params) => siteFileAPI.getPagedSiteFiles(params),
+    getAllDataSets: (params) => dataAPI.getAllDataSets(params),
 };
 
 interface GalleryList {
@@ -43,6 +49,11 @@ export function PageEditor() {
     const [pageList, setPageList] = useState<PageResponse[]>([]);
     const [selectedGalleries, setSelectedGalleries] = useState<GalleryList>({galleries: []});
     const [galleryList, setGalleryList] = useState<{ label: string, value: number }[]>([]);
+
+    const mergedDataProviders = useMemo<EmbedDataProviders>(
+            () => defaultDataProviders,
+            [],
+    );
 
     useEffect(() => {
         setSpinTip(spinMessages.loadingPageData);
@@ -265,7 +276,7 @@ export function PageEditor() {
                             <Input/>
                         </Form.Item>
                         <Form.Item name={"body"} label={"Body"}>
-                            <RichTextEditor/>
+                            <RtEditor dataProviders={mergedDataProviders}/>
                         </Form.Item>
                         <Form.Item name={"page_path"} label={"Path"}>
                             <Input/>

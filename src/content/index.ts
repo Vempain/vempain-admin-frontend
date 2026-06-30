@@ -13,4 +13,3 @@ export {PageList} from './PageList';
 export {PagePublish} from './PagePublish';
 export {PageView} from './PageView';
 export {PublishSchedule} from './PublishSchedule';
-export {RichTextEditor} from './RichTextEditor';
