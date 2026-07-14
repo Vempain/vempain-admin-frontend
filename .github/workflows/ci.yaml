@@ -16,4 +16,5 @@ jobs:
     with:
       use_scoped_registry: true
       use_immutable_install: true
-    secrets: inherit
+    secrets:
+      VEMPAIN_ACTION_TOKEN: ${{ secrets.VEMPAIN_ACTION_TOKEN || github.token }}
