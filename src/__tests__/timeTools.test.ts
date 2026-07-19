@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import {formatDateTime, formatDateTimeWithMs, padTo2Digits, padTo3Digits} from '../tools';
 
 describe('padTo2Digits', () => {
@@ -22,8 +23,8 @@ describe('padTo3Digits', () => {
 });
 
 describe('formatDateTime', () => {
-    it('formats Date object', () => {
-        const date = new Date('2023-05-01T14:23:00');
+    it('formats Dayjs object', () => {
+        const date = dayjs('2023-05-01T14:23:00');
         expect(formatDateTime(date)).toBe('2023-05-01 14:23');
     });
     it('formats ISO string', () => {
@@ -32,8 +33,8 @@ describe('formatDateTime', () => {
 });
 
 describe('formatDateTimeWithMs', () => {
-    it('formats Date object with ms', () => {
-        const date = new Date('2023-05-01T14:23:45.123');
+    it('formats Dayjs object with ms', () => {
+        const date = dayjs('2023-05-01T14:23:45.123');
         expect(formatDateTimeWithMs(date)).toBe('2023-05-01 14:23:45:123');
     });
     it('formats ISO string with ms', () => {

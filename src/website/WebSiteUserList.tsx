@@ -381,7 +381,7 @@ export function WebSiteUserList() {
                     </Space>
             )
         }
-    ], [token, handleDelete, openEditModal]);
+    ], [handleDelete, openEditModal, token.colorPrimary]);
 
     const renderTransferItem = (item: TransferItem) => (
             <span>{item.title}</span>

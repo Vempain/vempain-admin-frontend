@@ -98,7 +98,7 @@ function ItemPublishTrigger() {
             setSpinTip(spinMessages.triggerItemSchedule);
             const publishTriggerRequest: PublishScheduleRequest = {
                 id: publishSchedule.id,
-                publish_time: publishDate.toDate(),
+                publish_time: publishDate,
                 publish_status: publishSchedule.publish_status,
                 publish_message: publishSchedule.publish_message,
                 publish_type: publishSchedule.publish_type,

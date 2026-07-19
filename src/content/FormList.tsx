@@ -4,7 +4,7 @@ import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {type FormVO, QueryDetailEnum} from "../models";
-import {getPaginationConfig} from "../tools";
+import {formatDateTime, getPaginationConfig} from "../tools";
 import {formAPI} from "../services";
 import {aclTool, PrivilegeEnum, useSession} from "@vempain/vempain-auth-frontend";
 import dayjs from "dayjs";
@@ -68,7 +68,10 @@ export function FormList() {
             title: "Created",
             dataIndex: "created",
             key: "created",
-            sorter: (a, b) => dayjs(a.created).unix() - dayjs(b.created).unix()
+            sorter: (a, b) => dayjs(a.created).unix() - dayjs(b.created).unix(),
+            render: (_: Record<string, unknown>, record: FormVO) => {
+                return formatDateTime(record.created);
+            }
         },
         {
             title: "Modifier",
@@ -85,6 +88,12 @@ export function FormList() {
                 if (a.modified === null) return -1;
                 if (b.modified === null) return 1;
                 return dayjs(a.modified).unix() - dayjs(b.modified).unix();
+            },
+            render: (_: Record<string, unknown>, record: FormVO) => {
+                if (record.modified === null) {
+                    return "-";
+                }
+                return formatDateTime(record.modified);
             }
         },
         {

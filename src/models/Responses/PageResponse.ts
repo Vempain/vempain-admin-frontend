@@ -1,3 +1,4 @@
+import type {Dayjs} from "dayjs";
 import type {AbstractResponse} from "@vempain/vempain-auth-frontend";
 
 export interface PageResponse extends AbstractResponse {
@@ -10,5 +11,5 @@ export interface PageResponse extends AbstractResponse {
     title: string;
     header: string;
     body: string;
-    published: Date | null;
+    published: Dayjs | null;
 }

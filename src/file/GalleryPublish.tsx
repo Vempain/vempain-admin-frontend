@@ -56,7 +56,7 @@ export function GalleryPublish() {
         if (gallery !== null && gallery !== undefined && gallery.id > 0) {
             setLoading(true);
             setLoadingMessage("Publishing gallery");
-            const selectedPublishDate: Date = publishDate !== null ? publishDate.toDate() : dayjs().toDate();
+            const selectedPublishDate: Dayjs = publishDate !== null ? publishDate : dayjs();
 
             const publishRequest: PublishItemRequest = {
                 id: gallery.id,
