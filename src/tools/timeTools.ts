@@ -1,3 +1,5 @@
+import dayjs, {type Dayjs} from "dayjs";
+
 function padTo2Digits(num: number) {
     return num.toString().padStart(2, '0');
 }
@@ -6,37 +8,22 @@ function padTo3Digits(num: number) {
     return num.toString().padStart(3, '0');
 }
 
-function formatDateTime(date: Date | string) {
-    if (!(date instanceof Date)) {
-        date = new Date(date);
-    }
+function formatDateTime(date: Dayjs | string) {
+    const d = dayjs.isDayjs(date) ? date : dayjs(date);
 
-    return (
-        [
-            date.getFullYear(),
-            padTo2Digits(date.getMonth() + 1),
-            padTo2Digits(date.getDate())
-        ].join('-') +
-        ' ' +
-        [
-            padTo2Digits(date.getHours()),
-            padTo2Digits(date.getMinutes())
-        ].join(':')
-    );
+    return d.format('YYYY-MM-DD HH:mm');
 }
 
-function formatDateTimeWithMs(date: Date | string) {
-    if (!(date instanceof Date)) {
-        date = new Date(date);
-    }
+function formatDate(date: Dayjs | string) {
+    const d = dayjs.isDayjs(date) ? date : dayjs(date);
 
-    return (
-        formatDateTime(date) + ':' +
-        [
-            padTo2Digits(date.getSeconds()),
-            padTo3Digits(date.getMilliseconds())
-        ].join(':')
-    );
+    return d.format('YYYY-MM-DD');
 }
 
-export {padTo2Digits, padTo3Digits, formatDateTime, formatDateTimeWithMs};
+function formatDateTimeWithMs(date: Dayjs | string) {
+    const d = dayjs.isDayjs(date) ? date : dayjs(date);
+
+    return d.format('YYYY-MM-DD HH:mm:ss') + ':' + padTo3Digits(d.millisecond());
+}
+
+export {padTo2Digits, padTo3Digits, formatDateTime, formatDateTimeWithMs, formatDate};

@@ -4,7 +4,7 @@ import {Button, Space, Spin, Table, type TablePaginationConfig} from "antd";
 import {DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {Link} from "react-router-dom";
 import {type ComponentVO} from "../models";
-import {getPaginationConfig} from "../tools";
+import {formatDateTime, getPaginationConfig} from "../tools";
 import {componentAPI} from "../services";
 import {aclTool, PrivilegeEnum, useSession} from "@vempain/vempain-auth-frontend";
 import dayjs from "dayjs";
@@ -44,7 +44,10 @@ export function ComponentList() {
             title: "Created",
             dataIndex: "created",
             key: "created",
-            sorter: (a, b) => dayjs(a.created).unix() - dayjs(b.created).unix()
+            sorter: (a, b) => dayjs(a.created).unix() - dayjs(b.created).unix(),
+            render: (_: Record<string, unknown>, record: ComponentVO) => {
+                return formatDateTime(record.created);
+            }
         },
         {
             title: "Modifier",
@@ -61,6 +64,12 @@ export function ComponentList() {
                 if (a.modified === null) return -1;
                 if (b.modified === null) return 1;
                 return dayjs(a.modified).unix() - dayjs(b.modified).unix();
+            },
+            render: (_: Record<string, unknown>, record: ComponentVO) => {
+                if (record.modified === null) {
+                    return "-";
+                }
+                return formatDateTime(record.modified);
             }
         },
         {

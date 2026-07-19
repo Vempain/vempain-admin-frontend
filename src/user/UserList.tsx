@@ -4,7 +4,7 @@ import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {userAPI} from "../services";
-import {getPaginationConfig} from "../tools";
+import {formatDate, formatDateTime, getPaginationConfig} from "../tools";
 import type {UserVO} from "@vempain/vempain-auth-frontend";
 import dayjs from "dayjs";
 
@@ -54,7 +54,10 @@ export function UserList() {
             title: "Birthday",
             dataIndex: "birthday",
             key: "birthday",
-            sorter: (a, b) => new Date(a.birthday).getTime() - new Date(b.birthday).getTime()
+            sorter: (a, b) => dayjs(a.birthday).unix() - dayjs(b.birthday).unix(),
+            render: (_: Record<string, unknown>, record: UserVO) => {
+                return formatDate(dayjs(record.birthday));
+            }
         },
         {
             title: "Name",
@@ -84,7 +87,10 @@ export function UserList() {
             title: "Created",
             dataIndex: "created",
             key: "created",
-            sorter: (a, b) => dayjs(a.created).unix() - dayjs(b.created).unix()
+            sorter: (a, b) => dayjs(a.created).unix() - dayjs(b.created).unix(),
+            render: (_: Record<string, unknown>, record: UserVO) => {
+                return formatDateTime(dayjs(record.created));
+            }
         },
         {
             title: "Modifier",
@@ -101,6 +107,13 @@ export function UserList() {
                 if (a.modified === null) return -1;
                 if (b.modified === null) return 1;
                 return dayjs(a.modified).unix() - dayjs(b.modified).unix();
+            },
+            render: (_: Record<string, unknown>, record: UserVO) => {
+                if (record.modified === null) {
+                    return "-";
+                }
+
+                return formatDateTime(dayjs(record.modified));
             }
         },
         {

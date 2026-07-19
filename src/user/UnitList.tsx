@@ -4,7 +4,7 @@ import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {unitAPI} from "../services";
-import {getPaginationConfig} from "../tools";
+import {formatDateTime, getPaginationConfig} from "../tools";
 import type {UnitVO} from "@vempain/vempain-auth-frontend";
 import dayjs from "dayjs";
 
@@ -43,6 +43,9 @@ export function UnitList() {
             dataIndex: "created",
             key: "created",
             sorter: (a, b) => dayjs(a.created).unix() - dayjs(b.created).unix(),
+            render: (_: Record<string, unknown>, record: UnitVO) => {
+                return formatDateTime(dayjs(record.created));
+            }
         },
         {
             title: "Modifier",
@@ -60,6 +63,13 @@ export function UnitList() {
                 if (b.modified === null) return 1;
                 return dayjs(a.modified).unix() - dayjs(b.modified).unix();
             },
+            render: (_: Record<string, unknown>, record: UnitVO) => {
+                if (record.modified === null) {
+                    return "-";
+                }
+
+                return formatDateTime(dayjs(record.modified));
+            }
         },
         {
             title: "Action",

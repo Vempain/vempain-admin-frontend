@@ -9,7 +9,8 @@ import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, Rel
 import {SubmitResultHandler} from "../main";
 import {PublishSchedule} from "../content";
 import {aclTool, ActionResult, PrivilegeEnum, type SubmitResult, useSession} from "@vempain/vempain-auth-frontend";
-import dayjs from "dayjs";
+import dayjs, {type Dayjs} from "dayjs";
+import {formatDateTime} from "../tools";
 
 interface GalleryListItem {
     id: number;
@@ -19,6 +20,8 @@ interface GalleryListItem {
     createPrivilege: boolean,
     modifyPrivilege: boolean,
     deletePrivilege: boolean,
+    created: Dayjs,
+    modified: Dayjs | null
 }
 
 export function GalleryList() {
@@ -66,6 +69,30 @@ export function GalleryList() {
             key: "fileCount",
             render: (_, record: GalleryListItem) => {
                 return (<div key={`${record.id}-fileCount`}>{record.fileCount}</div>);
+            }
+        },
+        {
+            title: "Created",
+            dataIndex: "created",
+            key: "created",
+            sorter: true,
+            sortOrder: sortField === "created" ? sortOrder : undefined,
+            render: (_text, record) => {
+                return formatDateTime(record.created);
+            }
+        },
+        {
+            title: "Modified",
+            dataIndex: "modified",
+            key: "modified",
+            sorter: true,
+            sortOrder: sortField === "modified" ? sortOrder : undefined,
+            render: (_text, record) => {
+                if (record.modified === null) {
+                    return "-";
+                }
+
+                return formatDateTime(record.modified);
             }
         },
         {
@@ -136,6 +163,8 @@ export function GalleryList() {
                     return {
                         id: gallery.id,
                         name: gallery.short_name,
+                        created: gallery.created,
+                        modified: gallery.modified,
                         description: gallery.description,
                         fileCount: gallery.site_files.length,
                         createPrivilege: aclTool.hasPrivilege(PrivilegeEnum.CREATE, userSession?.id, userSession?.units, gallery.acls),
@@ -145,7 +174,7 @@ export function GalleryList() {
                 }
         );
         setGalleryList(tmpGalleryList);
-    }, [userSession]);
+    }, [userSession?.id, userSession?.units]);
 
     const fetchGalleries = useCallback(() => {
         if (!userSession) {

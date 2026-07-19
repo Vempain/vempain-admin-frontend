@@ -1,9 +1,11 @@
-import {Button, Spin, Table, Tag} from "antd";
+import {Button, Spin, Table} from "antd";
 import {useEffect, useState} from "react";
 import type {PublishScheduleResponse} from "../models";
+import {ContentTypeEnum} from "../models";
 import type {ColumnsType} from "antd/lib/table";
 import {scheduleAPI} from "../services";
-import {ContentTypeEnum} from "../models/ContentTypeEnum";
+import dayjs from "dayjs";
+import {contentTypeEnumToTag, formatDateTime, publishStatusEnumToTag} from "../tools";
 
 function ItemPublishingList() {
     const [loading, setLoading] = useState<boolean>(true);
@@ -22,13 +24,19 @@ function ItemPublishingList() {
             dataIndex: "publish_time",
             key: "publish_time",
             defaultSortOrder: "descend",
-            sorter: (a, b) => new Date(a.publish_time).getTime() - new Date(b.publish_time).getTime(),
+            sorter: (a, b) => dayjs(a.publish_time).unix() - dayjs(b.publish_time).unix(),
+            render: (_: Record<string, unknown>, response: PublishScheduleResponse) => {
+                return formatDateTime(response.publish_time);
+            }
         },
         {
             title: "Status",
             dataIndex: "publish_status",
             key: "publish_status",
             sorter: (a, b) => a.publish_status.localeCompare(b.publish_status),
+            render: (_: Record<string, unknown>, response: PublishScheduleResponse) => {
+                return publishStatusEnumToTag(response.publish_status as ContentTypeEnum, response.id);
+            }
         },
         {
             title: "Message",
@@ -42,41 +50,7 @@ function ItemPublishingList() {
             key: "publish_type",
             sorter: (a, b) => a.publish_type.localeCompare(b.publish_type),
             render: (_: Record<string, unknown>, response: PublishScheduleResponse) => {
-                let color: string;
-                let typeLabel: string;
-
-                switch (response.publish_type) {
-                    case ContentTypeEnum.GALLERY:
-                        color = "blue";
-                        typeLabel = "Gallery";
-                        break;
-                    case ContentTypeEnum.COMPONENT:
-                        color = "green";
-                        typeLabel = "Component";
-                        break;
-                    case ContentTypeEnum.LAYOUT:
-                        color = "purple";
-                        typeLabel = "Layout";
-                        break;
-                    case ContentTypeEnum.FORM:
-                        color = "orange";
-                        typeLabel = "Form";
-                        break;
-                    case ContentTypeEnum.PAGE:
-                        color = "red";
-                        typeLabel = "Page";
-                        break;
-                    default:
-                        color = "gray";
-                        typeLabel = "Unknown";
-                        break;
-                }
-
-                return (
-                        <Tag color={color} key={typeLabel + response.id}>
-                            {typeLabel}
-                        </Tag>
-                );
+                return contentTypeEnumToTag(response.publish_type as ContentTypeEnum, response.id);
             }
         },
         {

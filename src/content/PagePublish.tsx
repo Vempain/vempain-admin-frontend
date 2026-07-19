@@ -81,7 +81,7 @@ export function PagePublish() {
     function publishPage() {
         if (page !== null) {
             setLoading(true);
-            const selectedPublishDate: Date = publishDate !== null ? publishDate.toDate() : dayjs().toDate();
+            const selectedPublishDate: Dayjs = publishDate !== null ? publishDate : dayjs();
 
             const publishRequest: PublishItemRequest = {
                 id: page.id,

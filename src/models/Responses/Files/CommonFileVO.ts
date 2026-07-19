@@ -1,3 +1,4 @@
+import type {Dayjs} from "dayjs";
 import type {AbstractResponse} from "@vempain/vempain-auth-frontend";
 
 export interface CommonFileVO extends AbstractResponse {
@@ -6,7 +7,7 @@ export interface CommonFileVO extends AbstractResponse {
     id: number;
     metadata: string;
     mimetype: string;
-    original_date_time: Date;
+    original_date_time: Dayjs;
     original_document_id: number;
     original_second_fraction: number;
     site_filename: string;

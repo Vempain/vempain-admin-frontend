@@ -4,7 +4,7 @@ import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {type LayoutVO} from "../models";
-import {getPaginationConfig} from "../tools";
+import {formatDateTime, getPaginationConfig} from "../tools";
 import {layoutAPI} from "../services";
 import {aclTool, PrivilegeEnum, useSession} from "@vempain/vempain-auth-frontend";
 import dayjs from "dayjs";
@@ -40,7 +40,10 @@ export function LayoutList() {
             title: "Created",
             dataIndex: "created",
             key: "created",
-            sorter: (a: LayoutVO, b: LayoutVO) => dayjs(a.created).unix() - dayjs(b.created).unix()
+            sorter: (a: LayoutVO, b: LayoutVO) => dayjs(a.created).unix() - dayjs(b.created).unix(),
+            render: (_: Record<string, unknown>, record: LayoutVO) => {
+                return formatDateTime(record.created);
+            }
         },
         {
             title: "Modifier",
@@ -57,6 +60,12 @@ export function LayoutList() {
                 if (a.modified === null) return -1;
                 if (b.modified === null) return 1;
                 return dayjs(a.modified).unix() - dayjs(b.modified).unix();
+            },
+            render: (_: Record<string, unknown>, record: LayoutVO) => {
+                if (record.modified === null) {
+                    return "-";
+                }
+                return formatDateTime(record.modified);
             }
         },
         {

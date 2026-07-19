@@ -232,7 +232,7 @@ export function PageList() {
                     return 1;
                 }
 
-                return (new Date(a.published).getTime() - new Date(b.published).getTime());
+                return dayjs(a.published).unix() - dayjs(b.published).unix();
             },
             render: (_text: string, record: PageResponse) => {
                 if (record.published === null) {
