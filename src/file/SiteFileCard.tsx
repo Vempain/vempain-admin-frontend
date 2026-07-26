@@ -18,22 +18,22 @@ function formatLabel(key: string) {
 }
 
 function isDateKey(key: string) {
-  const k = key.toLowerCase();
-  return k === "created" || k === "modified" || k.endsWith("date") || k.endsWith("datetime") || k.endsWith("time");
+    const k = key.toLowerCase();
+    return k === "created" || k === "modified" || k.endsWith("date") || k.endsWith("datetime") || k.endsWith("time");
 }
 
 function isSizeKey(key: string) {
-  const k = key.toLowerCase();
-  return k === "size" || k.endsWith("size") || k.endsWith("_filesize");
+    const k = key.toLowerCase();
+    return k === "size" || k.endsWith("size") || k.endsWith("_filesize");
 }
 
 function renderValue(key: string, value: unknown) {
-  if (value == null) return "";
-  if (key === "file_class") return <Tag>{String(value)}</Tag>;
-  if (isSizeKey(key) && typeof value === "number") return formatFileSize(value);
-  if (isDateKey(key) && typeof value === "string") return formatDateTimeWithMs(value);
+    if (value == null) return "";
+    if (key === "file_class") return <Tag>{String(value)}</Tag>;
+    if (isSizeKey(key) && typeof value === "number") return formatFileSize(value);
+    if (isDateKey(key) && typeof value === "string") return formatDateTimeWithMs(value);
     if (typeof value === "object") return <pre style={{margin: 0}}>{JSON.stringify(value, null, 2)}</pre>;
-  return String(value);
+    return String(value);
 }
 
 export function SiteFileCard({siteFile}: SiteFileCardProps) {
@@ -52,70 +52,70 @@ export function SiteFileCard({siteFile}: SiteFileCardProps) {
             <Descriptions.Item key={key} label={formatLabel(key)}>
                 {renderValue(key, value)}
             </Descriptions.Item>
-  ));
+    ));
 
     let metadataItems: { key: string; label: string; children: React.ReactNode }[] | undefined;
 
-  if (metadata !== undefined) {
-      let metaObj: Record<string, unknown>;
-    try {
-        const parsed: unknown = typeof metadata === "string" ? JSON.parse(metadata) : metadata;
-        metaObj = (parsed !== null && typeof parsed === "object") ? parsed as Record<string, unknown> : {};
-    } catch {
-        metaObj = {raw: String(metadata)};
-    }
+    if (metadata !== undefined) {
+        let metaObj: Record<string, unknown>;
+        try {
+            const parsed: unknown = typeof metadata === "string" ? JSON.parse(metadata) : metadata;
+            metaObj = (parsed !== null && typeof parsed === "object") ? parsed as Record<string, unknown> : {};
+        } catch {
+            metaObj = {raw: String(metadata)};
+        }
 
-    if (Array.isArray(metaObj)) {
-      metaObj = metaObj[0] ?? {};
-    }
+        if (Array.isArray(metaObj)) {
+            metaObj = metaObj[0] ?? {};
+        }
 
-    metadataItems = Object.keys(metaObj || {}).map((key) => {
-      const val = metaObj[key];
-      const children =
-              typeof val === "string" ? (
-                      <Input value={val}/>
-              ) : (
-                      <Descriptions bordered column={1}>
-                          {Object.entries(val || {}).map(([subKey, subVal]) => (
-                                  <Descriptions.Item label={formatLabel(subKey)} key={`${key}.${subKey}`}>
-                                      {String(subVal)}
-                                  </Descriptions.Item>
-                          ))}
-                      </Descriptions>
-              );
-        return {key, label: formatLabel(key), children};
-    });
-  }
+        metadataItems = Object.keys(metaObj || {}).map((key) => {
+            const val = metaObj[key];
+            const children =
+                    typeof val === "string" ? (
+                            <Input value={val}/>
+                    ) : (
+                            <Descriptions bordered column={1}>
+                                {Object.entries(val || {}).map(([subKey, subVal]) => (
+                                        <Descriptions.Item label={formatLabel(subKey)} key={`${key}.${subKey}`}>
+                                            {String(subVal)}
+                                        </Descriptions.Item>
+                                ))}
+                            </Descriptions>
+                    );
+            return {key, label: formatLabel(key), children};
+        });
+    }
 
     const hasDetails = detailDescriptions.length > 0 || (metadataItems && metadataItems.length > 0);
 
-  return (
-          <Card size="small" style={{marginBottom: 12}} bodyStyle={{padding: 12}}>
-              <Descriptions bordered column={4} size="small">
-                  {summaryItems.map(item => (
-                          <Descriptions.Item key={item.key} label={item.label}>
-                              {item.value}
-                          </Descriptions.Item>
-                  ))}
-              </Descriptions>
-              {hasDetails && (
-                      <Collapse ghost>
-                          <Collapse.Panel header={"Details"} key="details">
-                              <Descriptions bordered column={1} size="small">
-                                  {detailDescriptions}
-                              </Descriptions>
-                              {metadataItems && metadataItems.length > 0 && (
-                                      <Collapse.Panel header={"Metadata"} key="metadata">
-                                          <Collapse ghost>
-                                              <Collapse.Panel header={"Values"} key="values">
-                                                  {metadataItems.map(item => item.children)}
-                                              </Collapse.Panel>
-                                          </Collapse>
-                                      </Collapse.Panel>
-                              )}
-                          </Collapse.Panel>
-                      </Collapse>
-              )}
-          </Card>
-  );
+    return (
+            <Card size="small" style={{marginBottom: 12}} bodyStyle={{padding: 12}}>
+                <Descriptions bordered column={4} size="small">
+                    {summaryItems.map(item => (
+                            <Descriptions.Item key={item.key} label={item.label}>
+                                {item.value}
+                            </Descriptions.Item>
+                    ))}
+                </Descriptions>
+                {hasDetails && (
+                        <Collapse ghost>
+                            <Collapse.Panel header={"Details"} key="details">
+                                <Descriptions bordered column={1} size="small">
+                                    {detailDescriptions}
+                                </Descriptions>
+                                {metadataItems && metadataItems.length > 0 && (
+                                        <Collapse.Panel header={"Metadata"} key="metadata">
+                                            <Collapse ghost>
+                                                <Collapse.Panel header={"Values"} key="values">
+                                                    {metadataItems.map(item => item.children)}
+                                                </Collapse.Panel>
+                                            </Collapse>
+                                        </Collapse.Panel>
+                                )}
+                            </Collapse.Panel>
+                        </Collapse>
+                )}
+            </Card>
+    );
 }

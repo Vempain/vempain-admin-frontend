@@ -30,49 +30,49 @@ export function RichEmbedCollapseEditor({open, initialItems, onConfirm, onCancel
     };
 
     return (
-        <Modal
-            title="Insert Collapse Embed"
-            open={open}
-            onOk={handleOk}
-            onCancel={onCancel}
-            destroyOnHidden
-            width={600}
-        >
-            <Form form={form}>
-                <Form.List name="items">
-                    {(fields, {add, remove}) => (
-                        <>
-                            {fields.map(({key, name, ...restField}) => (
-                                <Space key={key} style={{display: 'flex', marginBottom: 8}} align="baseline">
-                                    <Form.Item
-                                        {...restField}
-                                        name={[name, 'title']}
-                                        rules={[{required: true, message: 'Please enter a title'}]}
-                                        style={{marginBottom: 0, flex: 1}}
-                                    >
-                                        <Input placeholder="Title"/>
+            <Modal
+                    title="Insert Collapse Embed"
+                    open={open}
+                    onOk={handleOk}
+                    onCancel={onCancel}
+                    destroyOnHidden
+                    width={600}
+            >
+                <Form form={form}>
+                    <Form.List name="items">
+                        {(fields, {add, remove}) => (
+                                <>
+                                    {fields.map(({key, name, ...restField}) => (
+                                            <Space key={key} style={{display: 'flex', marginBottom: 8}} align="baseline">
+                                                <Form.Item
+                                                        {...restField}
+                                                        name={[name, 'title']}
+                                                        rules={[{required: true, message: 'Please enter a title'}]}
+                                                        style={{marginBottom: 0, flex: 1}}
+                                                >
+                                                    <Input placeholder="Title"/>
+                                                </Form.Item>
+                                                <Form.Item
+                                                        {...restField}
+                                                        name={[name, 'body']}
+                                                        rules={[{required: true, message: 'Please enter body text'}]}
+                                                        style={{marginBottom: 0, flex: 2}}
+                                                >
+                                                    <Input.TextArea placeholder="Body" autoSize={{minRows: 1, maxRows: 4}}/>
+                                                </Form.Item>
+                                                <MinusCircleOutlined onClick={() => remove(name)}/>
+                                            </Space>
+                                    ))}
+                                    <Form.Item>
+                                        <Button type="dashed" onClick={() => add({title: '', body: ''})} block
+                                                icon={<PlusOutlined/>}>
+                                            Add Item
+                                        </Button>
                                     </Form.Item>
-                                    <Form.Item
-                                        {...restField}
-                                        name={[name, 'body']}
-                                        rules={[{required: true, message: 'Please enter body text'}]}
-                                        style={{marginBottom: 0, flex: 2}}
-                                    >
-                                        <Input.TextArea placeholder="Body" autoSize={{minRows: 1, maxRows: 4}}/>
-                                    </Form.Item>
-                                    <MinusCircleOutlined onClick={() => remove(name)}/>
-                                </Space>
-                            ))}
-                            <Form.Item>
-                                <Button type="dashed" onClick={() => add({title: '', body: ''})} block
-                                        icon={<PlusOutlined/>}>
-                                    Add Item
-                                </Button>
-                            </Form.Item>
-                        </>
-                    )}
-                </Form.List>
-            </Form>
-        </Modal>
+                                </>
+                        )}
+                    </Form.List>
+                </Form>
+            </Modal>
     );
 }
