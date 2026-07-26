@@ -34,7 +34,7 @@ export function PagePublish() {
             [],
     );
 
-    const galleryColumns:  ColumnsType<GalleryVO> = [
+    const galleryColumns: ColumnsType<GalleryVO> = [
         {
             title: "Galleries that will be published with the page",
             dataIndex: "short_name",

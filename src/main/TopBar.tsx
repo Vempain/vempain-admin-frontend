@@ -131,12 +131,12 @@ export function TopBar() {
                     {
                         label: (<Link to={"/thumbs"}>Thumbnail</Link>),
                         key: "thumb",
-                        icon: <FileImageOutlined />
+                        icon: <FileImageOutlined/>
                     },
                     {
                         label: (<Link to={"/unknowns"}>Unknown</Link>),
                         key: "unknown",
-                        icon: <FileUnknownOutlined />
+                        icon: <FileUnknownOutlined/>
                     },
                     {
                         label: (<Link to={"/vectors"}>Vector</Link>),

@@ -11,14 +11,14 @@ interface RichEmbedImageEditorProps {
 export function RichEmbedImageEditor({open, initialId, onConfirm, onCancel}: RichEmbedImageEditorProps) {
     return (
             <CommonSiteFileSelectorModal
-            open={open}
-            title="Insert Image Embed"
-            fileType={FileTypeEnum.IMAGE}
-            initialId={initialId}
-            searchPlaceholder="Search by image file name..."
-            emptyText="No images found"
-            onConfirm={onConfirm}
-            onCancel={onCancel}
+                    open={open}
+                    title="Insert Image Embed"
+                    fileType={FileTypeEnum.IMAGE}
+                    initialId={initialId}
+                    searchPlaceholder="Search by image file name..."
+                    emptyText="No images found"
+                    onConfirm={onConfirm}
+                    onCancel={onCancel}
             />
     );
 }

@@ -41,13 +41,13 @@ interface EmbedImageProps {
 
 function EmbedImage({id}: EmbedImageProps) {
     return (
-        <div style={{margin: '8px 0'}}>
-            <Image
-                src={fileUrl(id)}
-                style={{maxWidth: '100%', height: 'auto'}}
-                alt={`Embedded image ${id}`}
-            />
-        </div>
+            <div style={{margin: '8px 0'}}>
+                <Image
+                        src={fileUrl(id)}
+                        style={{maxWidth: '100%', height: 'auto'}}
+                        alt={`Embedded image ${id}`}
+                />
+            </div>
     );
 }
 
@@ -58,26 +58,26 @@ interface EmbedHeroProps {
 
 function EmbedHero({id, pageTitle}: EmbedHeroProps) {
     return (
-        <div style={{position: 'relative', width: '100%', margin: '8px 0'}}>
-            <Image
-                src={fileUrl(id)}
-                preview={false}
-                style={{width: '100%', height: 'auto', display: 'block'}}
-                alt={`Hero image ${id}`}
-            />
-            <div
-                style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'rgba(0,0,0,0.45)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                <h1 style={{color: '#fff', margin: 0, textAlign: 'center', textShadow: '0 2px 8px rgba(0,0,0,0.8)'}}>{pageTitle}</h1>
+            <div style={{position: 'relative', width: '100%', margin: '8px 0'}}>
+                <Image
+                        src={fileUrl(id)}
+                        preview={false}
+                        style={{width: '100%', height: 'auto', display: 'block'}}
+                        alt={`Hero image ${id}`}
+                />
+                <div
+                        style={{
+                            position: 'absolute',
+                            inset: 0,
+                            background: 'rgba(0,0,0,0.45)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                >
+                    <h1 style={{color: '#fff', margin: 0, textAlign: 'center', textShadow: '0 2px 8px rgba(0,0,0,0.8)'}}>{pageTitle}</h1>
+                </div>
             </div>
-        </div>
     );
 }
 
@@ -87,19 +87,19 @@ interface EmbedCollapseProps {
 
 function EmbedCollapse({items}: EmbedCollapseProps) {
     return (
-        <Collapse
-            items={items.map((item, index) => ({
-                key: String(index),
-                label: item.title,
-                children: (
-                    <div
-                        dangerouslySetInnerHTML={{
-                            __html: DOMPurify.sanitize(item.body),
-                        }}
-                    />
-                ),
-            }))}
-        />
+            <Collapse
+                    items={items.map((item, index) => ({
+                        key: String(index),
+                        label: item.title,
+                        children: (
+                                <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: DOMPurify.sanitize(item.body),
+                                        }}
+                                />
+                        ),
+                    }))}
+            />
     );
 }
 
@@ -110,25 +110,25 @@ interface EmbedCarouselProps {
 
 function EmbedCarousel({items, params}: EmbedCarouselProps) {
     return (
-        <Carousel
-            autoplay={params.autoplay}
-            autoplaySpeed={params.dotDuration ? undefined : params.speed}
-            speed={params.speed}
-            dots={true}
-            style={{background: '#1a1a2e', padding: '8px 0'}}
-        >
-            {items.map((item, index) => (
-                <div key={index}>
-                    <h3 style={{textAlign: 'center', color: '#E0E0E0', padding: '8px'}}>{item.title}</h3>
-                    <div
-                        style={{padding: '0 16px'}}
-                        dangerouslySetInnerHTML={{
-                            __html: DOMPurify.sanitize(item.body),
-                        }}
-                    />
-                </div>
-            ))}
-        </Carousel>
+            <Carousel
+                    autoplay={params.autoplay}
+                    autoplaySpeed={params.dotDuration ? undefined : params.speed}
+                    speed={params.speed}
+                    dots={true}
+                    style={{background: '#1a1a2e', padding: '8px 0'}}
+            >
+                {items.map((item, index) => (
+                        <div key={index}>
+                            <h3 style={{textAlign: 'center', color: '#E0E0E0', padding: '8px'}}>{item.title}</h3>
+                            <div
+                                    style={{padding: '0 16px'}}
+                                    dangerouslySetInnerHTML={{
+                                        __html: DOMPurify.sanitize(item.body),
+                                    }}
+                            />
+                        </div>
+                ))}
+            </Carousel>
     );
 }
 
@@ -203,7 +203,7 @@ function EmbedLast({itemType, count}: { itemType: string; count: number }) {
  *   <!--vps:embed:carousel:<url-encoded-json>:<autoplay>:<dotDuration>:<speed>>
  */
 export function PageView() {
-    const {paramId} = useParams<{paramId: string}>();
+    const {paramId} = useParams<{ paramId: string }>();
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState<PageResponse | null>(null);
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ''});
@@ -216,9 +216,9 @@ export function PageView() {
             return;
         }
         pageAPI.findById(id, null)
-            .then((p) => setPage(p))
-            .catch(() => setLoadResults({status: ActionResult.FAIL, message: 'Failed to load page'}))
-            .finally(() => setLoading(false));
+                .then((p) => setPage(p))
+                .catch(() => setLoadResults({status: ActionResult.FAIL, message: 'Failed to load page'}))
+                .finally(() => setLoading(false));
     }, [paramId]);
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
@@ -236,62 +236,62 @@ export function PageView() {
     const segments = parseEmbeds(page.body ?? '');
 
     return (
-        <div className="DarkDiv">
-            <h1>{page.title}</h1>
-            {segments.map((segment, index) => {
-                if (segment.kind === 'html') {
-                    return (
-                        <div
-                            key={index}
-                            dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(segment.content)}}
-                        />
-                    );
-                }
-
-                const {descriptor} = segment;
-                switch (descriptor.type) {
-                    case 'gallery':
-                        // Gallery rendering is handled by the site frontend; in admin preview
-                        // we just show a placeholder label.
+            <div className="DarkDiv">
+                <h1>{page.title}</h1>
+                {segments.map((segment, index) => {
+                    if (segment.kind === 'html') {
                         return (
-                            <div
-                                key={index}
-                                style={{
-                                    padding: '16px',
-                                    background: '#1a1a2e',
-                                    border: '1px dashed #4a90d9',
-                                    borderRadius: 4,
-                                    color: '#90c4f8',
-                                    margin: '8px 0',
-                                }}
-                            >
-                                🖼 Gallery #{descriptor.id}
-                            </div>
+                                <div
+                                        key={index}
+                                        dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(segment.content)}}
+                                />
                         );
-                    case 'image':
-                        return <EmbedImage key={index} id={descriptor.id}/>;
-                    case 'hero':
-                        return <EmbedHero key={index} id={descriptor.id} pageTitle={page.title}/>;
-                    case 'collapse':
-                        return <EmbedCollapse key={index} items={descriptor.items}/>;
-                    case 'carousel': {
-                        const carouselParams = descriptor.extra
-                            ? parseCarouselParams(descriptor.extra)
-                            : {autoplay: false, dotDuration: false, speed: 500};
-                        return <EmbedCarousel key={index} items={descriptor.items} params={carouselParams}/>;
                     }
-                    case 'video':
-                        return <EmbedVideo key={index} id={descriptor.id}/>;
-                    case 'audio':
-                        return <EmbedAudio key={index} id={descriptor.id}/>;
-                    case 'youtube':
-                        return <EmbedYoutube key={index} url={descriptor.url}/>;
-                    case 'last':
-                        return <EmbedLast key={index} itemType={descriptor.itemType} count={descriptor.count}/>;
-                    default:
-                        return null;
-                }
-            })}
-        </div>
+
+                    const {descriptor} = segment;
+                    switch (descriptor.type) {
+                        case 'gallery':
+                            // Gallery rendering is handled by the site frontend; in admin preview
+                            // we just show a placeholder label.
+                            return (
+                                    <div
+                                            key={index}
+                                            style={{
+                                                padding: '16px',
+                                                background: '#1a1a2e',
+                                                border: '1px dashed #4a90d9',
+                                                borderRadius: 4,
+                                                color: '#90c4f8',
+                                                margin: '8px 0',
+                                            }}
+                                    >
+                                        🖼 Gallery #{descriptor.id}
+                                    </div>
+                            );
+                        case 'image':
+                            return <EmbedImage key={index} id={descriptor.id}/>;
+                        case 'hero':
+                            return <EmbedHero key={index} id={descriptor.id} pageTitle={page.title}/>;
+                        case 'collapse':
+                            return <EmbedCollapse key={index} items={descriptor.items}/>;
+                        case 'carousel': {
+                            const carouselParams = descriptor.extra
+                                    ? parseCarouselParams(descriptor.extra)
+                                    : {autoplay: false, dotDuration: false, speed: 500};
+                            return <EmbedCarousel key={index} items={descriptor.items} params={carouselParams}/>;
+                        }
+                        case 'video':
+                            return <EmbedVideo key={index} id={descriptor.id}/>;
+                        case 'audio':
+                            return <EmbedAudio key={index} id={descriptor.id}/>;
+                        case 'youtube':
+                            return <EmbedYoutube key={index} url={descriptor.url}/>;
+                        case 'last':
+                            return <EmbedLast key={index} itemType={descriptor.itemType} count={descriptor.count}/>;
+                        default:
+                            return null;
+                    }
+                })}
+            </div>
     );
 }
