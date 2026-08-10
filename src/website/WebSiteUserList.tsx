@@ -5,7 +5,7 @@ import type {TransferProps} from "antd/es/transfer";
 import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {
     FileTypeEnum,
-    type WebSiteResourceQueryParams,
+    type WebSiteResourcePagedRequest,
     type WebSiteResourceResponse,
     type WebSiteResourceTypeEnum,
     type WebSiteUserRequest,
@@ -117,7 +117,7 @@ export function WebSiteUserList() {
     const loadResources = useCallback(async (page = 0, append = false) => {
         setResourcesLoading(true);
         try {
-            const params: WebSiteResourceQueryParams = {
+            const params: WebSiteResourcePagedRequest = {
                 page,
                 size: PAGE_SIZE
             };
@@ -128,12 +128,12 @@ export function WebSiteUserList() {
                 params.file_type = fileType;
             }
             if (searchQuery.trim().length > 0) {
-                params.query = searchQuery.trim();
+                params.search = searchQuery.trim();
             }
             const response = await webSiteManagementAPI.getResources(params);
-            const mapped = response.items.map(mapResourceResponseToOption);
+            const mapped = response.content.map(mapResourceResponseToOption);
             setResourceOptions((prev) => (append ? mergeResourceLists(prev, mapped) : mapped));
-            setCurrentPage(response.page_number);
+            setCurrentPage(response.page);
             setTotalPages(response.total_pages);
             setTotalElements(response.total_elements);
         } catch (err) {

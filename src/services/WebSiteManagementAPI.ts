@@ -1,16 +1,15 @@
-import {AbstractAPI} from "@vempain/vempain-auth-frontend";
+import {AbstractAPI, type PagedResponse} from "@vempain/vempain-auth-frontend";
 import {
     type WebSiteAclRequest,
     type WebSiteAclResponse,
     type WebSiteAclUsersResponse,
     type WebSiteConfigurationRequest,
     type WebSiteConfigurationResponse,
-    type WebSiteResourcePageResponse,
-    type WebSiteResourceQueryParams,
+    type WebSiteResourcePagedRequest,
+    type WebSiteResourceResponse,
     type WebSiteUserRequest,
     type WebSiteUserResponse
 } from "../models";
-import {buildResourceQuery} from "../tools";
 
 class WebSiteManagementAPI extends AbstractAPI<WebSiteUserRequest, WebSiteUserResponse> {
 
@@ -82,11 +81,10 @@ class WebSiteManagementAPI extends AbstractAPI<WebSiteUserRequest, WebSiteUserRe
     }
 
     // Web site resource Management
-    async getResources(params: WebSiteResourceQueryParams): Promise<WebSiteResourcePageResponse> {
+    async getResources(request: WebSiteResourcePagedRequest): Promise<PagedResponse<WebSiteResourceResponse>> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const queryString = buildResourceQuery(params);
-        const response = await this.axiosInstance.get<WebSiteResourcePageResponse>(`/resources?${queryString}`);
+        const response = await this.axiosInstance.post<PagedResponse<WebSiteResourceResponse>>("/resources", request);
         return response.data;
     }
 

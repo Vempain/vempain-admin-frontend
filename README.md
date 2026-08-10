@@ -24,3 +24,10 @@ Run `yarn install` to install the necessary npm packages.
 Now you can start up the local development environment with the command `yarn start`.
 
 [AGENTS.md](docs/AGENTS.md) has more detailed orientation and workflow guidance for agents working in this codebase.
+
+## Paginated data
+
+Admin tables send pagination, sorting, and filtering through the shared
+`PagedRequest` request-body contract. The backend returns `PagedResponse`
+metadata, which is passed to Ant Design tables through their built-in pagination and sorting support. Site-file, gallery, and website-resource requests no
+longer use legacy pagination query parameters.

@@ -2,12 +2,12 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Alert, Input, Modal, Spin} from 'antd';
 import VirtualList from 'rc-virtual-list';
 import {siteFileAPI} from '../../services';
-import type {FileTypeEnum, SiteFileResponse} from '../../models';
+import type {FileTypeEnum, SiteFilePagedRequest, SiteFileResponse} from '../../models';
 
 const PAGE_SIZE = 50;
 const FILTER_COLUMN = 'fileName';
 const SORT_BY = 'fileName';
-const SORT_DIRECTION = 'ASC';
+const SORT_DIRECTION: SiteFilePagedRequest["direction"] = 'ASC';
 const LIST_HEIGHT = 320;
 const ITEM_HEIGHT = 36;
 
@@ -60,13 +60,13 @@ export function CommonSiteFileSelectorModal({
 
         try {
             const trimmed = query.trim();
-            const params: Record<string, string | number> = {
-                page_size: PAGE_SIZE,
-                page_number: pageNumber,
+            const params: SiteFilePagedRequest = {
+                page: pageNumber,
+                size: PAGE_SIZE,
                 file_type: fileType,
                 sort_by: SORT_BY,
                 direction: SORT_DIRECTION,
-                filter: trimmed,
+                search: trimmed,
                 filter_column: FILTER_COLUMN,
             };
             const response = await siteFileAPI.getPagedSiteFiles(params);
@@ -178,4 +178,3 @@ export function CommonSiteFileSelectorModal({
             </Modal>
     );
 }
-

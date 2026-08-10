@@ -8,7 +8,7 @@ import {Link} from "react-router-dom";
 import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, ReloadOutlined} from "@ant-design/icons";
 import {SubmitResultHandler} from "../main";
 import {PublishSchedule} from "../content";
-import {aclTool, ActionResult, PrivilegeEnum, type SubmitResult, useSession} from "@vempain/vempain-auth-frontend";
+import {aclTool, ActionResult, type PagedRequest, PrivilegeEnum, type SubmitResult, useSession} from "@vempain/vempain-auth-frontend";
 import dayjs, {type Dayjs} from "dayjs";
 import {formatDateTime} from "../tools";
 
@@ -181,17 +181,20 @@ export function GalleryList() {
             return;
         }
         setLoading(true);
-        galleryAPI.searchGalleries({
+        const request: PagedRequest = {
             page: currentPage - 1,
             size: pageSize,
-            sort: sortField,
-            direction: sortOrder === "descend" ? "desc" : "asc",
+            sort_by: sortField,
+            direction: sortOrder === "descend" ? "DESC" : "ASC",
             search: searchTerm || undefined,
-            case_sensitive: caseSensitive,
-        })
+            case_sensitive: caseSensitive
+        };
+        galleryAPI.searchGalleries(request)
                 .then((response) => {
-                    convertResponseToGalleryListItems(response.items);
-                    setTotalItems(response.total_items);
+                    convertResponseToGalleryListItems(response.content);
+                    setCurrentPage(response.page + 1);
+                    setPageSize(response.size);
+                    setTotalItems(response.total_elements);
                 })
                 .catch((error) => {
                     console.error(error);

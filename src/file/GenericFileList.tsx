@@ -1,122 +1,99 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {Spin, Table, type TablePaginationConfig} from "antd";
 import type {ColumnsType} from "antd/es/table";
 import type {FilterValue, SorterResult} from "antd/es/table/interface";
-import type {PagedResponse} from "@vempain/vempain-auth-frontend";
+import {type PagedResponse} from "@vempain/vempain-auth-frontend";
+import type {SiteFilePagedRequest} from "../models";
 
 interface PageableApi<T> {
-    findPageable(params?: Record<string, unknown>): Promise<PagedResponse<T>>;
+    getPagedSiteFiles(request: SiteFilePagedRequest): Promise<PagedResponse<T>>;
 }
 
 interface Props<T extends { id: number }> {
     valueObjectColumns: ColumnsType<T>;
     api: PageableApi<T>;
-    // New: optional extra request params to send along with the pageable request
-    requestParams?: Record<string, unknown>;
+    requestParams: Pick<SiteFilePagedRequest, "file_type">;
 }
 
 export function GenericFileList<T extends { id: number }>({valueObjectColumns, api, requestParams}: Props<T>) {
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState(false);
     const [valueObjectList, setValueObjectList] = useState<T[]>([]);
-    const defaultFilterColumn: string = "id";
-
-    const [tablePaginationConfig, setTablePaginationConfig] = useState<TablePaginationConfig>({
+    const [pagination, setPagination] = useState<TablePaginationConfig>({
         current: 1,
-        pageSize: 10,
-        placement: ['topEnd', 'bottomEnd'],
-        defaultPageSize: 15,
+        pageSize: 15,
         total: 0,
+        placement: ["topEnd", "bottomEnd"],
         showSizeChanger: true,
         hideOnSinglePage: false,
         pageSizeOptions: ["5", "10", "15", "20", "30", "50", "100"]
     });
+    const [sortField, setSortField] = useState("id");
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const [search, setSearch] = useState("");
+    const [filterColumn, setFilterColumn] = useState("");
 
-    const [tableParams, setTableParams] = useState({
-        sortField: "",
-        sortOrder: "",
-        pagination: tablePaginationConfig,
-        columnKey: defaultFilterColumn,
-        field: defaultFilterColumn,
-        order: "descend",
-        filter: "",
-        filters: {},
-        filterColumn: defaultFilterColumn
-    });
+    function handleTableChange(
+            nextPagination: TablePaginationConfig,
+            filters: Record<string, FilterValue | null>,
+            sorter: SorterResult<T> | SorterResult<T>[]
+    ) {
+        const primarySorter = Array.isArray(sorter) ? sorter[0] : sorter;
+        const filterEntry = Object.entries(filters).find(([, value]) => value?.length);
+        const filterValue = filterEntry?.[1]?.[0];
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
-    const refreshDataFromServer = useRef(true); // useRef to track whether data should be fetched or not
-
-    function handleTableChange(tablePaginationConfig: TablePaginationConfig, filters: Record<string, FilterValue | null>,
-                               sorter: SorterResult<T> | SorterResult<T>[]) {
-        setTablePaginationConfig(tablePaginationConfig);
-
-        if (filters) {
-            setTableParams({
-                ...tableParams,
-                pagination: tablePaginationConfig,
-                filters: filters,
-            });
-        }
-
-        if (sorter) {
-            // At this point we only sort by one column
-            let primarySorter: null | SorterResult<T>;
-
-            if (Array.isArray(sorter)) {
-                primarySorter = sorter[0];
-            } else {
-                primarySorter = sorter;
-            }
-
-            setTableParams({
-                ...tableParams,
-                pagination: tablePaginationConfig,
-                field: primarySorter.field === undefined ? defaultFilterColumn : primarySorter.field.toString(),
-                order: primarySorter.order === "ascend" ? "asc" : "desc"
-            });
-        }
-
-        refreshDataFromServer.current = true;
+        setPagination((current) => ({
+            ...current,
+            current: nextPagination.current ?? 1,
+            pageSize: nextPagination.pageSize ?? current.pageSize ?? 15
+        }));
+        setSortField(primarySorter?.field?.toString() || "id");
+        setSortOrder(primarySorter?.order === "descend" ? "desc" : "asc");
+        setFilterColumn(filterEntry?.[0] ?? "");
+        setSearch(filterValue?.toString() ?? "");
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    const currentPage = pagination.current ?? 1;
+    const currentPageSize = pagination.pageSize ?? 15;
 
     useEffect(() => {
+        const request: SiteFilePagedRequest = {
+            page: currentPage - 1,
+            size: currentPageSize,
+            sort_by: sortField,
+            direction: sortOrder === "desc" ? "DESC" : "ASC",
+            search: search || undefined,
+            filter_column: filterColumn || undefined,
+            file_type: requestParams.file_type
+        };
+
         setLoading(true);
-        api.findPageable({
-            page_number: (tablePaginationConfig.current === undefined ? 0 : (tablePaginationConfig.current - 1)),
-            page_size: tablePaginationConfig.pageSize,
-            sorting: tableParams.field ? `${tableParams.field},${tableParams.order}` : null,
-            filter: tableParams.filter,
-            filter_column: defaultFilterColumn,
-            // New: include any extra params (e.g. file_type)
-            ...(requestParams ?? {})
-        })
+        api.getPagedSiteFiles(request)
                 .then((response) => {
                     setValueObjectList(response.content);
+                    setPagination((current) => ({
+                        ...current,
+                        current: response.page + 1,
+                        pageSize: response.size,
+                        total: response.total_elements
+                    }));
                 })
                 .catch((error: unknown) => {
                     console.error(error);
                 })
-                .finally(() => {
-                    setLoading(false);
-                });
-    }, [defaultFilterColumn, tableParams, tablePaginationConfig, api, requestParams]);
+                .finally(() => setLoading(false));
+    }, [api, filterColumn, currentPage, currentPageSize, requestParams.file_type, search, sortField, sortOrder]);
 
     return (
             <div className={"DarkDiv"}>
-                <h4> {}</h4>
-
                 <Spin spinning={loading}>
                     <Table dataSource={valueObjectList}
                            columns={valueObjectColumns}
-                           pagination={tablePaginationConfig}
+                           pagination={pagination}
                            loading={loading}
                            rowKey={"id"}
                            onChange={handleTableChange}
                     />
                 </Spin>
-
             </div>
     );
 }
