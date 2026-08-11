@@ -56,6 +56,13 @@ export function PageEditor() {
     const pageOptionsLoadingRef = useRef(false);
     const [selectedGalleries, setSelectedGalleries] = useState<GalleryList>({galleries: []});
     const [galleryList, setGalleryList] = useState<{ label: string, value: number }[]>([]);
+    const selectedGalleryOptionsRef = useRef<{ label: string, value: number }[]>([]);
+    const [galleryListPage, setGalleryListPage] = useState(0);
+    const [galleryListSearch, setGalleryListSearch] = useState("");
+    const [galleryListHasMore, setGalleryListHasMore] = useState(false);
+    const [galleryOptionsLoading, setGalleryOptionsLoading] = useState(false);
+    const galleryOptionsRequestRef = useRef(0);
+    const galleryOptionsLoadingRef = useRef(false);
 
     const mergedDataProviders = useMemo<EmbedDataProviders>(
             () => defaultDataProviders,
@@ -104,6 +111,60 @@ export function PageEditor() {
         void loadPageOptions(0, search, false, true);
     }
 
+    const loadGalleryOptions = useCallback(async (pageNumber: number, search: string, append: boolean, force = false) => {
+        if (galleryOptionsLoadingRef.current && !force) {
+            return;
+        }
+
+        const requestId = ++galleryOptionsRequestRef.current;
+        galleryOptionsLoadingRef.current = true;
+        setGalleryOptionsLoading(true);
+
+        try {
+            const response = await galleryAPI.findPageable({
+                page: pageNumber,
+                size: PAGE_OPTION_PAGE_SIZE,
+                sort_by: "short_name",
+                direction: "ASC",
+                search: search || undefined
+            });
+
+            if (requestId !== galleryOptionsRequestRef.current) {
+                return;
+            }
+
+            const options = response.content.map((item) => ({label: item.short_name, value: item.id}));
+            setGalleryList(current => {
+                const candidates = append ? [...current, ...options] : [...selectedGalleryOptionsRef.current, ...options];
+                return Array.from(new Map(candidates.map(option => [option.value, option])).values());
+            });
+            setGalleryListPage(response.page);
+            setGalleryListSearch(search);
+            setGalleryListHasMore(!response.last);
+        } catch (error) {
+            if (requestId === galleryOptionsRequestRef.current) {
+                console.error("Error fetching gallery options:", error);
+            }
+        } finally {
+            if (requestId === galleryOptionsRequestRef.current) {
+                galleryOptionsLoadingRef.current = false;
+                setGalleryOptionsLoading(false);
+            }
+        }
+    }, []);
+
+    function handleGallerySearch(search: string): void {
+        void loadGalleryOptions(0, search, false, true);
+    }
+
+    function handleGalleryPopupScroll(event: UIEvent<HTMLDivElement>): void {
+        const target = event.currentTarget;
+        const atBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 8;
+        if (atBottom && galleryListHasMore && !galleryOptionsLoadingRef.current) {
+            void loadGalleryOptions(galleryListPage + 1, galleryListSearch, true);
+        }
+    }
+
     function handlePagePopupScroll(event: UIEvent<HTMLDivElement>): void {
         const target = event.currentTarget;
         const atBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 8;
@@ -132,7 +193,7 @@ export function PageEditor() {
         Promise.all([
             formAPI.findAll({details: QueryDetailEnum.MINIMAL}),
             pageAPI.findPageable({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "page_path", direction: "ASC"}),
-            galleryAPI.findAll({details: QueryDetailEnum.MINIMAL}),
+            galleryAPI.findPageable({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "short_name", direction: "ASC"}),
             galleryAPI.findAllByPage({details: QueryDetailEnum.MINIMAL}, tmpPageId)
         ])
                 .then((responses) => {
@@ -143,9 +204,18 @@ export function PageEditor() {
                         setPageListSearch("");
                         setPageListHasMore(!responses[1].last);
                     }
-                    const tmpAvailableGalleryList: { label: string, value: number }[] = responses[2].map((item) => ({label: item.short_name, value: item.id}));
-                    console.log("Setting selected galleries:", tmpAvailableGalleryList);
-                    setGalleryList(tmpAvailableGalleryList);
+                    if (galleryOptionsRequestRef.current === 0) {
+                        const tmpAvailableGalleryList: { label: string, value: number }[] = responses[2].content.map((item) => ({
+                            label: item.short_name,
+                            value: item.id
+                        }));
+                        const selectedGalleryOptions = responses[3].map((item) => ({label: item.short_name, value: item.id}));
+                        selectedGalleryOptionsRef.current = selectedGalleryOptions;
+                        setGalleryList(Array.from(new Map([...selectedGalleryOptions, ...tmpAvailableGalleryList].map(option => [option.value, option])).values()));
+                        setGalleryListPage(responses[2].page);
+                        setGalleryListSearch("");
+                        setGalleryListHasMore(!responses[2].last);
+                    }
                     const tmpSelectedGalleryList: GalleryList = {galleries: responses[3].map((item) => ({label: item.short_name, value: item.id}))};
                     console.log("Setting selected galleries:", tmpSelectedGalleryList);
                     setSelectedGalleries(tmpSelectedGalleryList);
@@ -261,13 +331,6 @@ export function PageEditor() {
         }
 
         return Promise.reject("Please select a valid form");
-    }
-
-    function filterOption(input: string, option?: { label: string; value: number }) {
-        if (option && option.label) {
-            return option.label.toLowerCase().includes(input.toLowerCase());
-        }
-        return false; // Return false for options without a label
     }
 
     function showPageGalleryForm() {
@@ -393,7 +456,10 @@ export function PageEditor() {
                                                                     >
                                                                         <Select
                                                                                 options={galleryList}
-                                                                                filterOption={filterOption}
+                                                                                filterOption={false}
+                                                                                onSearch={handleGallerySearch}
+                                                                                onPopupScroll={handleGalleryPopupScroll}
+                                                                                loading={galleryOptionsLoading}
                                                                                 labelInValue={false}
                                                                                 showSearch={true}
                                                                                 key={uniqueKey + "-select"}
