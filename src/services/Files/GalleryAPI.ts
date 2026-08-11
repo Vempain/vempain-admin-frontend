@@ -1,9 +1,15 @@
 import {type GalleryRequest, type GalleryVO, type PublishItemRequest, QueryDetailEnum} from "../../models";
-import {AbstractAPI, type ActionVO} from "@vempain/vempain-auth-frontend";
-import type GalleryPageResponse from "../../models/Responses/Files/GalleryPageResponse.ts";
+import {AbstractAPI, type ActionVO, type PagedRequest, type PagedResponse} from "@vempain/vempain-auth-frontend";
 import type {GalleryPublishRequest} from "../../models/Requests/Files";
 
 class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryVO> {
+    public async findPageableWithoutFiles(request: PagedRequest): Promise<PagedResponse<GalleryVO>> {
+        this.setAuthorizationHeader();
+        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
+        const response = await this.axiosInstance.post<PagedResponse<GalleryVO>>("paged-without-files", request);
+        return response.data;
+    }
+
     public async findAllByPage(params: { details: QueryDetailEnum }, pageId: number) {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
@@ -27,12 +33,6 @@ class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryVO> {
     public async publishAll(params?: Record<string, string>): Promise<ActionVO> {
         this.setAuthorizationHeader();
         const response = await this.axiosInstance.get<ActionVO>("/publish", {params: params});
-        return response.data;
-    }
-
-    public async searchGalleries(params: Record<string, string | number | boolean | undefined>): Promise<GalleryPageResponse> {
-        this.setAuthorizationHeader();
-        const response = await this.axiosInstance.get<GalleryPageResponse>("/search", {params: params});
         return response.data;
     }
 

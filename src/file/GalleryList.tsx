@@ -1,14 +1,14 @@
-import {type Key, useCallback, useEffect, useState} from "react";
-import {Button, Input, message, Space, Spin, Switch, Table, type TablePaginationConfig} from "antd";
-import type {ColumnsType, FilterValue, SorterResult, SortOrder} from "antd/es/table/interface";
+import {type Key, useCallback, useEffect, useRef, useState} from "react";
+import {Button, Input, type InputRef, message, Space, Spin, Table, type TableColumnType, type TablePaginationConfig} from "antd";
+import type {ColumnsType, FilterDropdownProps, FilterValue, SorterResult, SortOrder} from "antd/es/table/interface";
 import {type GalleryVO} from "../models";
 import type {GalleryPublishRequest} from "../models/Requests/Files";
 import {fileSystemAPI, galleryAPI} from "../services";
 import {Link} from "react-router-dom";
-import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, ReloadOutlined} from "@ant-design/icons";
+import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, ReloadOutlined, SearchOutlined} from "@ant-design/icons";
 import {SubmitResultHandler} from "../main";
 import {PublishSchedule} from "../content";
-import {aclTool, ActionResult, PrivilegeEnum, type SubmitResult, useSession} from "@vempain/vempain-auth-frontend";
+import {aclTool, ActionResult, type PagedRequest, PrivilegeEnum, type SubmitResult, useSession} from "@vempain/vempain-auth-frontend";
 import dayjs, {type Dayjs} from "dayjs";
 import {formatDateTime} from "../tools";
 
@@ -34,12 +34,53 @@ export function GalleryList() {
     const [totalItems, setTotalItems] = useState<number>(0);
     const [sortField, setSortField] = useState<string>("id");
     const [sortOrder, setSortOrder] = useState<SortOrder>("ascend");
-    const [searchInput, setSearchInput] = useState<string>("");
     const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
-    const [caseSensitive, setCaseSensitive] = useState<boolean>(false);
+    const searchInput = useRef<InputRef>(null);
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<dayjs.Dayjs | null>(null);
     const [selectedGalleryIds, setSelectedGalleryIds] = useState<number[]>([]);
+
+    const handleSearch = (value: string, confirm: FilterDropdownProps["confirm"]) => {
+        confirm();
+        setSearchTerm(value || undefined);
+        setCurrentPage(1);
+    };
+
+    const getColumnSearchProps = (dataIndex: "name" | "description"): TableColumnType<GalleryListItem> => ({
+        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters, close}) => (
+                <div style={{padding: 8}} onKeyDown={(event) => event.stopPropagation()}>
+                    <Input
+                            ref={searchInput}
+                            value={selectedKeys[0]}
+                            onChange={(event) => setSelectedKeys(event.target.value ? [event.target.value] : [])}
+                            onPressEnter={() => handleSearch(selectedKeys[0]?.toString() ?? "", confirm)}
+                            style={{marginBottom: 8, display: "block"}}
+                    />
+                    <Space>
+                        <Button type="primary" size="small" onClick={() => handleSearch(selectedKeys[0]?.toString() ?? "", confirm)}>
+                            Search
+                        </Button>
+                        <Button size="small" onClick={() => {
+                            clearFilters?.();
+                            setSearchTerm(undefined);
+                            setCurrentPage(1);
+                            close();
+                        }}>
+                            Reset
+                        </Button>
+                    </Space>
+                </div>
+        ),
+        filterIcon: (filtered) => <SearchOutlined style={{color: filtered ? "#1677ff" : undefined}}/>,
+        filterDropdownProps: {
+            onOpenChange: (visible) => {
+                if (visible) {
+                    setTimeout(() => searchInput.current?.select(), 100);
+                }
+            }
+        },
+        title: dataIndex === "name" ? "Name" : "Description"
+    });
 
     const columns: ColumnsType<GalleryListItem> = [
         {
@@ -54,14 +95,16 @@ export function GalleryList() {
             dataIndex: "name",
             key: "name",
             sorter: true,
-            sortOrder: sortField === "short_name" ? sortOrder : undefined
+            sortOrder: sortField === "short_name" ? sortOrder : undefined,
+            ...getColumnSearchProps("name")
         },
         {
             title: "Description",
             dataIndex: "description",
             key: "description",
             sorter: true,
-            sortOrder: sortField === "description" ? sortOrder : undefined
+            sortOrder: sortField === "description" ? sortOrder : undefined,
+            ...getColumnSearchProps("description")
         },
         {
             title: "File count",
@@ -181,17 +224,20 @@ export function GalleryList() {
             return;
         }
         setLoading(true);
-        galleryAPI.searchGalleries({
+        const request: PagedRequest = {
             page: currentPage - 1,
             size: pageSize,
-            sort: sortField,
-            direction: sortOrder === "descend" ? "desc" : "asc",
+            sort_by: sortField,
+            direction: sortOrder === "descend" ? "DESC" : "ASC",
             search: searchTerm || undefined,
-            case_sensitive: caseSensitive,
-        })
+            case_sensitive: false
+        };
+        galleryAPI.findPageable(request)
                 .then((response) => {
-                    convertResponseToGalleryListItems(response.items);
-                    setTotalItems(response.total_items);
+                    convertResponseToGalleryListItems(response.content);
+                    setCurrentPage(response.page + 1);
+                    setPageSize(response.size);
+                    setTotalItems(response.total_elements);
                 })
                 .catch((error) => {
                     console.error(error);
@@ -199,7 +245,7 @@ export function GalleryList() {
                 .finally(() => {
                     setLoading(false);
                 });
-    }, [caseSensitive, currentPage, pageSize, searchTerm, sortField, sortOrder, userSession, convertResponseToGalleryListItems]);
+    }, [currentPage, pageSize, searchTerm, sortField, sortOrder, userSession, convertResponseToGalleryListItems]);
 
     useEffect(() => {
         fetchGalleries();
@@ -220,12 +266,6 @@ export function GalleryList() {
             setSortOrder("ascend");
         }
     }
-
-    const onSearch = (value: string) => {
-        setSearchInput(value);
-        setSearchTerm(value || undefined);
-        setCurrentPage(1);
-    };
 
     function publishAll(): void {
         const publishAll = window.confirm("Are you sure you want to publish all " + totalItems + " galleries?");
@@ -334,27 +374,6 @@ export function GalleryList() {
                             >Refresh all gallery files</Button>
                         </Space>
                         <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
-                        <Space wrap key={"galleryListFilters"} align={"center"}>
-                            <Input.Search
-                                    placeholder={"Search galleries"}
-                                    allowClear
-                                    value={searchInput}
-                                    onChange={(event) => setSearchInput(event.target.value)}
-                                    onSearch={onSearch}
-                                    style={{width: 320}}
-                            />
-                            <Space align={"center"}>
-                                Case sensitive
-                                <Switch
-                                        size={"small"}
-                                        checked={caseSensitive}
-                                        onChange={(checked) => {
-                                            setCaseSensitive(checked);
-                                            setCurrentPage(1);
-                                        }}
-                                />
-                            </Space>
-                        </Space>
                         <Table
                                 dataSource={galleryList}
                                 columns={columns}

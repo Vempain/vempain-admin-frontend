@@ -4,6 +4,7 @@ import {GenericFileList} from "./GenericFileList";
 import {siteFileAPI} from "../services";
 import type {FileTypeEnum, SiteFileResponse} from "../models";
 import {formatDateTimeWithMs, formatFileSize} from "../tools";
+import {useMemo} from "react";
 
 interface Props {
     fileType: FileTypeEnum;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export function SiteFileList({fileType, title}: Props) {
+    const requestParams = useMemo(() => ({file_type: fileType}), [fileType]);
     const columns: ColumnsType<SiteFileResponse> = [
         {
             title: "Creator",
@@ -101,9 +103,8 @@ export function SiteFileList({fileType, title}: Props) {
                 <GenericFileList<SiteFileResponse>
                         valueObjectColumns={columns}
                         api={siteFileAPI}
-                        requestParams={{file_type: fileType}}
+                        requestParams={requestParams}
                 />
             </div>
     );
 }
-

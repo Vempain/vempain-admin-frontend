@@ -98,13 +98,13 @@ export function GalleryEdit() {
     const fetchSiteFiles = useCallback((page = 0, append = false) => {
         setSiteFilesLoading(true);
         const params = {
-            page_size: PAGE_SIZE,
-            page_number: page,
+            page: page,
+            size: PAGE_SIZE,
             sort_by: siteFilesSortBy,
             direction: siteFilesSortDirection,
-            filter: siteFilesFilter || undefined,
-            filter_column: siteFilesFilterColumn,
+            search: siteFilesFilter || undefined,
             case_sensitive: siteFilesCaseSensitive,
+            filter_column: siteFilesFilterColumn,
             file_type: selectedFileType
         };
 

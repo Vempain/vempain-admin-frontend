@@ -12,8 +12,6 @@ export type {StringListVO} from './StringListVO';
 export type {TestVO} from './TestVO';
 export type {WebSiteAclResponse} from './WebSiteAclResponse';
 export type {WebSiteAclUsersResponse} from './WebSiteAclUsersResponse';
-export type {WebSiteResourcePageResponse} from './WebSiteResourcePageResponse';
-export type {WebSiteResourceQueryParams} from './WebSiteResourceQueryParams';
 export type {WebSiteResourceResponse} from './WebSiteResourceResponse';
 export type {WebSiteUserResponse} from './WebSiteUserResponse';
 export type {WebSiteConfigurationResponse} from './WebSiteConfigurationResponse';

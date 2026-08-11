@@ -7,3 +7,5 @@ export type {ScheduleTriggerRequest} from './ScheduleTriggerRequest';
 export type {WebSiteAclRequest} from './WebSiteAclRequest';
 export type {WebSiteUserRequest} from './WebSiteUserRequest';
 export type {WebSiteConfigurationRequest} from './WebSiteConfigurationRequest';
+export type {SiteFilePagedRequest} from './SiteFilePagedRequest';
+export type {WebSiteResourcePagedRequest} from './WebSiteResourcePagedRequest';
