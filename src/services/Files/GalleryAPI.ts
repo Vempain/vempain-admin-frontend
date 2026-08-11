@@ -1,8 +1,15 @@
 import {type GalleryRequest, type GalleryVO, type PublishItemRequest, QueryDetailEnum} from "../../models";
-import {AbstractAPI, type ActionVO} from "@vempain/vempain-auth-frontend";
+import {AbstractAPI, type ActionVO, type PagedRequest, type PagedResponse} from "@vempain/vempain-auth-frontend";
 import type {GalleryPublishRequest} from "../../models/Requests/Files";
 
 class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryVO> {
+    public async findPageableWithoutFiles(request: PagedRequest): Promise<PagedResponse<GalleryVO>> {
+        this.setAuthorizationHeader();
+        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
+        const response = await this.axiosInstance.post<PagedResponse<GalleryVO>>("paged-without-files", request);
+        return response.data;
+    }
+
     public async findAllByPage(params: { details: QueryDetailEnum }, pageId: number) {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';

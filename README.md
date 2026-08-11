@@ -32,3 +32,6 @@ Admin tables and page selectors send pagination, sorting, and filtering through 
 metadata, which is passed to Ant Design tables through their built-in pagination and sorting support. Site-file, gallery, and website-resource requests no
 longer use legacy pagination query parameters. Page and gallery selectors use Ant Design Select search against their paged endpoints and load the next 50
 options when the dropdown reaches its scroll boundary.
+
+The PageEditor gallery selector uses the gallery `paged-without-files` endpoint so gallery options do not load associated files. GalleryList continues to use
+the regular paged gallery endpoint because it displays file counts.
