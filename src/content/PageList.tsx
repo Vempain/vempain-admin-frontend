@@ -3,11 +3,10 @@ import {Button, Input, type InputRef, notification, Space, Spin, Table, type Tab
 import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, SearchOutlined} from "@ant-design/icons";
-import {type PageResponse, QueryDetailEnum} from "../models";
+import type {PageResponse} from "../models";
 import {pageAPI} from "../services";
 import dayjs from "dayjs";
-import {getPaginationConfig} from "../tools";
-import type {FilterDropdownProps} from "antd/es/table/interface";
+import type {FilterDropdownProps, FilterValue, SorterResult} from "antd/es/table/interface";
 import {PublishSchedule} from "./PublishSchedule";
 
 // Define a hash containing the spin messages
@@ -21,6 +20,9 @@ export function PageList() {
     const [pageList, setPageList] = useState<PageResponse[]>([]);
     const [spinMessage, setSpinMessage] = useState<string>(spinMessages.loading);
     const [pagination, setPagination] = useState<TablePaginationConfig>({});
+    const [sortField, setSortField] = useState("id");
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+    const [reloadToken, setReloadToken] = useState(0);
 
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
@@ -106,16 +108,6 @@ export function PageList() {
         filterIcon: (filtered: boolean) => (
                 <SearchOutlined style={{color: filtered ? "#1677ff" : undefined}}/>
         ),
-        onFilter: (value, record) => {
-            if (record !== null && dataIndex !== null && record[dataIndex] !== null && value !== null) {
-                return record[dataIndex]
-                        .toString()
-                        .toLowerCase()
-                        .includes((value as string).toLowerCase());
-            }
-
-            return false;
-        },
         filterDropdownProps: {
             onOpenChange: (visible) => {
                 if (visible) {
@@ -130,63 +122,63 @@ export function PageList() {
             title: "ID",
             dataIndex: "id",
             key: "id",
-            sorter: (a, b) => a.id - b.id
+            sorter: true
         },
         {
             title: "Parent ID",
             dataIndex: "parent_id",
             key: "parent_id",
-            sorter: (a, b) => a.parent_id - b.parent_id
+            sorter: true
         },
         {
             title: "Form ID",
             dataIndex: "form_id",
             key: "form_id",
-            sorter: (a, b) => a.form_id - b.form_id
+            sorter: true
         },
         {
             title: "Path",
             dataIndex: "page_path",
             key: "page_path",
-            sorter: (a, b) => a.page_path.localeCompare(b.page_path),
+            sorter: true,
             ...getColumnSearchProps("page_path")
         },
         {
             title: "Secure",
             dataIndex: "secure",
             key: "secure",
-            sorter: (a, b) => Number(b.secure) - Number(a.secure)
+            sorter: true
         },
         {
             title: "Index List",
             dataIndex: "index_list",
             key: "index_list",
-            sorter: (a, b) => Number(b.index_list) - Number(a.index_list)
+            sorter: true
         },
         {
             title: "Title",
             dataIndex: "title",
             key: "title",
-            sorter: (a, b) => a.title.localeCompare(b.title),
+            sorter: true,
             ...getColumnSearchProps("title")
         },
         {
             title: "Locked",
             dataIndex: "locked",
             key: "locked",
-            sorter: (a, b) => Number(b.locked) - Number(a.locked)
+            sorter: true
         },
         {
             title: "Creator",
             dataIndex: "creator",
             key: "creator",
-            sorter: (a, b) => a.creator - b.creator
+            sorter: true
         },
         {
             title: "Created",
             dataIndex: "created",
             key: "created",
-            sorter: (a, b) => dayjs(a.created).unix() - dayjs(b.created).unix(),
+            sorter: true,
             render: (_text: string, record: PageResponse) => {
                 return (<>{dayjs(record.created).format("YYYY.MM.DD HH:mm")}</>);
             }
@@ -195,18 +187,13 @@ export function PageList() {
             title: "Modifier",
             dataIndex: "modifier",
             key: "modifier",
-            sorter: (a, b) => (a.modifier ?? 0) - (b.modifier ?? 0),
+            sorter: true,
         },
         {
             title: "Modified",
             dataIndex: "modified",
             key: "modified",
-            sorter: (a, b) => {
-                if (a.modified === null && b.modified === null) return 0;
-                if (a.modified === null) return -1;
-                if (b.modified === null) return 1;
-                return dayjs(a.modified).unix() - dayjs(b.modified).unix();
-            },
+            sorter: true,
             render: (_text: string, record: PageResponse) => {
                 if (record.modified === null) {
                     return (<>-</>);
@@ -219,21 +206,7 @@ export function PageList() {
             title: "Published",
             dataIndex: "published",
             key: "published",
-            sorter: (a, b) => {
-                if (a.published === null && b.published === null) {
-                    return 0;
-                }
-
-                if (a.published === null) {
-                    return -1;
-                }
-
-                if (b.published === null) {
-                    return 1;
-                }
-
-                return dayjs(a.published).unix() - dayjs(b.published).unix();
-            },
+            sorter: true,
             render: (_text: string, record: PageResponse) => {
                 if (record.published === null) {
                     return (<>-</>);
@@ -255,14 +228,36 @@ export function PageList() {
         },
     ];
 
+    function handleTableChange(nextPagination: TablePaginationConfig, _filters: Record<string, FilterValue | null>,
+                               sorter: SorterResult<PageResponse> | SorterResult<PageResponse>[]): void {
+        const tableSorter = Array.isArray(sorter) ? sorter[0] : sorter;
+        setPagination(nextPagination);
+        setSortField(tableSorter.field?.toString() || "id");
+        setSortOrder(tableSorter.order === "descend" ? "desc" : "asc");
+    }
+
+    const currentPage = pagination.current ?? 1;
+    const currentPageSize = pagination.pageSize ?? 25;
+
     useEffect(() => {
         setSpinMessage(spinMessages.loading);
         setLoading(true);
 
-        pageAPI.findAll({details: QueryDetailEnum.UNPOPULATED})
+        pageAPI.findPageable({
+            page: currentPage - 1,
+            size: currentPageSize,
+            sort_by: sortField,
+            direction: sortOrder === "desc" ? "DESC" : "ASC",
+            search: searchText || undefined
+        })
                 .then((response) => {
-                    setPageList(response);
-                    setPagination(getPaginationConfig(response.length));
+                    setPageList(response.content);
+                    setPagination(current => ({
+                        ...current,
+                        current: response.page + 1,
+                        pageSize: response.size,
+                        total: response.total_elements
+                    }));
                 })
                 .catch((error) => {
                     console.error(error);
@@ -270,7 +265,7 @@ export function PageList() {
                 .finally(() => {
                     setLoading(false);
                 });
-    }, []);
+    }, [currentPage, currentPageSize, reloadToken, searchText, sortField, sortOrder]);
 
     function publishAll(): void {
         const publishAll = window.confirm("Are you sure you want to publish all " + pageList.length + " pages?");
@@ -290,19 +285,7 @@ export function PageList() {
 
         pageAPI.publishAll(publishParams)
                 .then(() => {
-                    setLoading(true);
-                    pageAPI.findAll({details: QueryDetailEnum.UNPOPULATED})
-                            .then((response) => {
-                                // This actually responds with: {"result":"OK","message":"Successfully published all pages","timestamp":"2024-04-02T20:02:01.247530395Z"}
-                                // TODO Handle the response
-                                setPageList(response);
-                            })
-                            .catch((error) => {
-                                console.error("Error fetching page list:", error);
-                            })
-                            .finally(() => {
-                                setLoading(false);
-                            });
+                    setReloadToken((current) => current + 1);
                 })
                 .catch((_error) => {
                     console.error("Error publishing all pages");
@@ -320,11 +303,12 @@ export function PageList() {
                         <h1 key={"pageListHeader"}>Page List <Link to={"/pages/0/edit"}><PlusCircleFilled/></Link></h1>
                         <Button type={"primary"} onClick={publishAll}>Publish all pages</Button>
                         <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
-                        {pageList.length > 0 && <Table
+                        <Table
                                 dataSource={pageList.map((item, index) => ({...item, key: `row_${index}`}))}
                                 columns={columns}
                                 pagination={pagination}
-                                key={"pageListTable"}/>}
+                                onChange={handleTableChange}
+                                key={"pageListTable"}/>
                     </Space>
                 </Spin>
             </div>

@@ -1,5 +1,5 @@
 import {useParams} from "react-router-dom";
-import {useEffect, useMemo, useState} from "react";
+import {type UIEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
 import type {RuleObject} from "antd/es/form";
 import {AclEdit} from "./AclEdit";
@@ -17,6 +17,7 @@ const spinMessages: Record<string, string> = {
     savingPageData: "Saving page data...",
     savingGalleryData: "Saving gallery data..."
 };
+const PAGE_OPTION_PAGE_SIZE = 50;
 
 const defaultDataProviders: EmbedDataProviders = {
     findGalleries: (params) => galleryAPI.findAll({details: params.details}),
@@ -47,6 +48,12 @@ export function PageEditor() {
 
     const [formList, setFormList] = useState<FormVO[]>([]);
     const [pageList, setPageList] = useState<PageResponse[]>([]);
+    const [pageListPage, setPageListPage] = useState(0);
+    const [pageListSearch, setPageListSearch] = useState("");
+    const [pageListHasMore, setPageListHasMore] = useState(false);
+    const [pageOptionsLoading, setPageOptionsLoading] = useState(false);
+    const pageOptionsRequestRef = useRef(0);
+    const pageOptionsLoadingRef = useRef(false);
     const [selectedGalleries, setSelectedGalleries] = useState<GalleryList>({galleries: []});
     const [galleryList, setGalleryList] = useState<{ label: string, value: number }[]>([]);
 
@@ -54,6 +61,56 @@ export function PageEditor() {
             () => defaultDataProviders,
             [],
     );
+
+    const loadPageOptions = useCallback(async (pageNumber: number, search: string, append: boolean, force = false) => {
+        if (pageOptionsLoadingRef.current && !force) {
+            return;
+        }
+
+        const requestId = ++pageOptionsRequestRef.current;
+        pageOptionsLoadingRef.current = true;
+        setPageOptionsLoading(true);
+
+        try {
+            const response = await pageAPI.findPageable({
+                page: pageNumber,
+                size: PAGE_OPTION_PAGE_SIZE,
+                sort_by: "page_path",
+                direction: "ASC",
+                search: search || undefined
+            });
+
+            if (requestId !== pageOptionsRequestRef.current) {
+                return;
+            }
+
+            setPageList(current => append ? [...current, ...response.content] : response.content);
+            setPageListPage(response.page);
+            setPageListSearch(search);
+            setPageListHasMore(!response.last);
+        } catch (error) {
+            if (requestId === pageOptionsRequestRef.current) {
+                console.error("Error fetching page options:", error);
+            }
+        } finally {
+            if (requestId === pageOptionsRequestRef.current) {
+                pageOptionsLoadingRef.current = false;
+                setPageOptionsLoading(false);
+            }
+        }
+    }, []);
+
+    function handlePageSearch(search: string): void {
+        void loadPageOptions(0, search, false, true);
+    }
+
+    function handlePagePopupScroll(event: UIEvent<HTMLDivElement>): void {
+        const target = event.currentTarget;
+        const atBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 8;
+        if (atBottom && pageListHasMore && !pageOptionsLoadingRef.current) {
+            void loadPageOptions(pageListPage + 1, pageListSearch, true);
+        }
+    }
 
     useEffect(() => {
         setSpinTip(spinMessages.loadingPageData);
@@ -74,13 +131,18 @@ export function PageEditor() {
 
         Promise.all([
             formAPI.findAll({details: QueryDetailEnum.MINIMAL}),
-            pageAPI.findAll({details: QueryDetailEnum.MINIMAL}),
+            pageAPI.findPageable({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "page_path", direction: "ASC"}),
             galleryAPI.findAll({details: QueryDetailEnum.MINIMAL}),
             galleryAPI.findAllByPage({details: QueryDetailEnum.MINIMAL}, tmpPageId)
         ])
                 .then((responses) => {
                     setFormList(responses[0]);
-                    setPageList(responses[1]);
+                    if (pageOptionsRequestRef.current === 0) {
+                        setPageList(responses[1].content);
+                        setPageListPage(responses[1].page);
+                        setPageListSearch("");
+                        setPageListHasMore(!responses[1].last);
+                    }
                     const tmpAvailableGalleryList: { label: string, value: number }[] = responses[2].map((item) => ({label: item.short_name, value: item.id}));
                     console.log("Setting selected galleries:", tmpAvailableGalleryList);
                     setGalleryList(tmpAvailableGalleryList);
@@ -265,7 +327,11 @@ export function PageEditor() {
                         <Form.Item name={"parent_id"} label={"Parent Page"}>
                             <Select
                                     placeholder={"Select a parent page"}
-                                    showSearch={{optionFilterProp: 'label', filterOption: filterOption}}
+                                    showSearch={true}
+                                    filterOption={false}
+                                    onSearch={handlePageSearch}
+                                    onPopupScroll={handlePagePopupScroll}
+                                    loading={pageOptionsLoading}
                                     options={[{label: 'None', value: 0}, ...pageList.map(p => ({label: p.page_path, value: p.id}))]}
                             />
                         </Form.Item>

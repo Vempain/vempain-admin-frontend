@@ -2,12 +2,6 @@ import type {PageResponse, PublishItemRequest} from "../models";
 import {AbstractAPI, type ActionVO} from "@vempain/vempain-auth-frontend";
 
 class PageAPI extends AbstractAPI<PageResponse, PageResponse> {
-    public async findByParentId(parentId: number): Promise<PageResponse[]> {
-        this.setAuthorizationHeader();
-        const response = await this.axiosInstance.get<PageResponse[]>("/by-parent/" + parentId);
-        return response.data;
-    }
-
     public async findPagesByFormId(formId: number): Promise<PageResponse[]> {
         this.setAuthorizationHeader();
         const response = await this.axiosInstance.get<PageResponse[]>("/by-form/" + formId);

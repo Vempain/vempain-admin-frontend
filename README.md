@@ -27,7 +27,8 @@ Now you can start up the local development environment with the command `yarn st
 
 ## Paginated data
 
-Admin tables send pagination, sorting, and filtering through the shared
+Admin tables and page selectors send pagination, sorting, and filtering through the shared
 `PagedRequest` request-body contract. The backend returns `PagedResponse`
 metadata, which is passed to Ant Design tables through their built-in pagination and sorting support. Site-file, gallery, and website-resource requests no
-longer use legacy pagination query parameters.
+longer use legacy pagination query parameters. Page selectors use Ant Design Select search against the paged page endpoint and loads the next 50 options when
+the dropdown reaches its scroll boundary.
