@@ -189,8 +189,8 @@ export function GalleryList() {
         if (field === "name") {
             return "short_name";
         }
-        if (field === "description") {
-            return "description";
+        if (field === "description" || field === "created" || field === "modified") {
+            return field;
         }
         return "id";
     };
