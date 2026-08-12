@@ -19,5 +19,10 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 const originalGetComputedStyle = window.getComputedStyle;
-window.getComputedStyle = ((element: Element, _pseudoElt?: string) => originalGetComputedStyle(element)) as typeof window.getComputedStyle;
+const getComputedStyleWithoutPseudoElement = (element: Element, _pseudoElt?: string | null) => originalGetComputedStyle(element);
 
+window.getComputedStyle = getComputedStyleWithoutPseudoElement;
+Object.defineProperty(globalThis, 'getComputedStyle', {
+    configurable: true,
+    value: getComputedStyleWithoutPseudoElement,
+});
