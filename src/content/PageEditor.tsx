@@ -8,7 +8,7 @@ import {MetadataForm, SubmitResultHandler} from "../main";
 import {dataAPI, formAPI, galleryAPI, pageAPI, siteFileAPI} from "../services";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-design/icons";
 import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
-import {type FormVO, type PageResponse, QueryDetailEnum} from "../models";
+import {type FileTypeEnum, type FormVO, type PageResponse, QueryDetailEnum, type SiteFilePagedRequest} from "../models";
 import dayjs from "dayjs";
 
 // Define the loading messages
@@ -19,9 +19,35 @@ const spinMessages: Record<string, string> = {
 };
 const PAGE_OPTION_PAGE_SIZE = 50;
 
+function toSiteFilePagedRequest(params: Record<string, string | number | boolean | undefined>): SiteFilePagedRequest {
+    const page = params.page ?? params.page_number;
+    const size = params.size ?? params.page_size;
+    const fileType = params.file_type;
+
+    if (typeof page !== "number" && typeof page !== "string") {
+        throw new Error("Site file pagination requires a page number.");
+    }
+    if (typeof size !== "number" && typeof size !== "string") {
+        throw new Error("Site file pagination requires a page size.");
+    }
+    if (typeof fileType !== "string") {
+        throw new Error("Site file pagination requires a file type.");
+    }
+
+    return {
+        page: Number(page),
+        size: Number(size),
+        sort_by: params.sort_by === "fileName" ? "file_name" : typeof params.sort_by === "string" ? params.sort_by : "file_name",
+        direction: params.direction === "DESC" ? "DESC" : "ASC",
+        search: typeof params.search === "string" ? params.search : typeof params.filter === "string" ? params.filter : undefined,
+        file_type: fileType as FileTypeEnum,
+        filter_column: params.filter_column === "fileName" ? "file_name" : typeof params.filter_column === "string" ? params.filter_column : "file_name",
+    };
+}
+
 const defaultDataProviders: EmbedDataProviders = {
     findGalleries: (params) => galleryAPI.findAll({details: params.details}),
-    getPagedSiteFiles: (params) => siteFileAPI.getPagedSiteFiles(params),
+    getPagedSiteFiles: (params) => siteFileAPI.getPagedSiteFiles(toSiteFilePagedRequest(params)),
     getAllDataSets: (params) => dataAPI.getAllDataSets(params),
 };
 
