@@ -1,6 +1,6 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {type GalleryVO, type PublishItemRequest} from "../models";
+import {type GalleryResponse, type PublishItemRequest} from "../models";
 import {galleryAPI} from "../services";
 import {Button, Divider, Input, Space, Spin} from "antd";
 import TextArea from "antd/es/input/TextArea";
@@ -17,7 +17,7 @@ export function GalleryPublish() {
     const [loadingMessage, setLoadingMessage] = useState<string>("Loading directories");
 
     const {paramId} = useParams();
-    const [gallery, setGallery] = useState<GalleryVO>();
+    const [gallery, setGallery] = useState<GalleryResponse>();
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<Dayjs | null>(null);

@@ -33,5 +33,6 @@ metadata, which is passed to Ant Design tables through their built-in pagination
 longer use legacy pagination query parameters. Page and gallery selectors use Ant Design Select search against their paged endpoints and load the next 50
 options when the dropdown reaches its scroll boundary.
 
-The PageEditor gallery selector uses the gallery `paged-without-files` endpoint so gallery options do not load associated files. GalleryList continues to use
-the regular paged gallery endpoint because it displays file counts.
+Gallery selectors and GalleryList use the lightweight gallery `paged-list` endpoint. Its
+`FileGroupListResponse` items include `file_count` but do not include associated file details. Page publish and page editor gallery lists use the corresponding
+lightweight page-linked endpoint. The full `paged` endpoint remains available for screens that display gallery files.

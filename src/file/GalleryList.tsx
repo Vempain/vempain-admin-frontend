@@ -1,7 +1,7 @@
 import {type Key, useCallback, useEffect, useRef, useState} from "react";
 import {Button, Input, type InputRef, message, Space, Spin, Table, type TableColumnType, type TablePaginationConfig} from "antd";
 import type {ColumnsType, FilterDropdownProps, FilterValue, SorterResult, SortOrder} from "antd/es/table/interface";
-import {type GalleryVO} from "../models";
+import {type FileGroupListResponse} from "../models";
 import type {GalleryPublishRequest} from "../models/Requests/Files";
 import {fileSystemAPI, galleryAPI} from "../services";
 import {Link} from "react-router-dom";
@@ -201,7 +201,7 @@ export function GalleryList() {
         preserveSelectedRowKeys: true,
     };
 
-    const convertResponseToGalleryListItems = useCallback((response: GalleryVO[]) => {
+    const convertResponseToGalleryListItems = useCallback((response: FileGroupListResponse[]) => {
         const tmpGalleryList: GalleryListItem[] = response.map((gallery) => {
                     return {
                         id: gallery.id,
@@ -209,7 +209,7 @@ export function GalleryList() {
                         created: gallery.created,
                         modified: gallery.modified,
                         description: gallery.description,
-                        fileCount: gallery.site_files.length,
+                        fileCount: gallery.file_count,
                         createPrivilege: aclTool.hasPrivilege(PrivilegeEnum.CREATE, userSession?.id, userSession?.units, gallery.acls),
                         modifyPrivilege: aclTool.hasPrivilege(PrivilegeEnum.MODIFY, userSession?.id, userSession?.units, gallery.acls),
                         deletePrivilege: aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, gallery.acls),
@@ -232,7 +232,7 @@ export function GalleryList() {
             search: searchTerm || undefined,
             case_sensitive: false
         };
-        galleryAPI.findPageable(request)
+        galleryAPI.findPageableList(request)
                 .then((response) => {
                     convertResponseToGalleryListItems(response.content);
                     setCurrentPage(response.page + 1);

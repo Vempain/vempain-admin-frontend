@@ -2,7 +2,7 @@ import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {formatDateTimeWithMs} from "../tools";
 import type {SiteFileResponse} from "../models";
-import {type GalleryVO} from "../models";
+import {type GalleryResponse} from "../models";
 import {SubmitResultHandler} from "../main";
 import {galleryAPI} from "../services";
 import {Button, Spin, Table} from "antd";
@@ -13,7 +13,7 @@ export function GalleryDelete() {
     const {paramId} = useParams();
     const [galleryId, setGalleryId] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
-    const [gallery, setGallery] = useState<GalleryVO | null>(null);
+    const [gallery, setGallery] = useState<GalleryResponse | null>(null);
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 

@@ -1,26 +1,40 @@
-import {type GalleryRequest, type GalleryVO, type PublishItemRequest, QueryDetailEnum} from "../../models";
+import {type FileGroupListResponse, type GalleryRequest, type GalleryResponse, type PublishItemRequest, QueryDetailEnum} from "../../models";
 import {AbstractAPI, type ActionVO, type PagedRequest, type PagedResponse} from "@vempain/vempain-auth-frontend";
 import type {GalleryPublishRequest} from "../../models/Requests/Files";
 
-class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryVO> {
-    public async findPageableWithoutFiles(request: PagedRequest): Promise<PagedResponse<GalleryVO>> {
+class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryResponse> {
+    public async findPageableWithoutFiles(request: PagedRequest): Promise<PagedResponse<GalleryResponse>> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.post<PagedResponse<GalleryVO>>("paged-without-files", request);
+        const response = await this.axiosInstance.post<PagedResponse<GalleryResponse>>("paged-without-files", request);
+        return response.data;
+    }
+
+    public async findPageableList(request: PagedRequest): Promise<PagedResponse<FileGroupListResponse>> {
+        this.setAuthorizationHeader();
+        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
+        const response = await this.axiosInstance.post<PagedResponse<FileGroupListResponse>>("paged-list", request);
         return response.data;
     }
 
     public async findAllByPage(params: { details: QueryDetailEnum }, pageId: number) {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.get<GalleryVO[]>("/page/" + pageId, {params: params});
+        const response = await this.axiosInstance.get<GalleryResponse[]>("/page/" + pageId, {params: params});
+        return response.data;
+    }
+
+    public async findListByPage(pageId: number): Promise<FileGroupListResponse[]> {
+        this.setAuthorizationHeader();
+        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
+        const response = await this.axiosInstance.get<FileGroupListResponse[]>("/page/" + pageId + "/list");
         return response.data;
     }
 
     public async updatePageGalleries(pageId: number, galleries: number[]) {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.post<GalleryVO[]>("/page/" + pageId, galleries);
+        const response = await this.axiosInstance.post<GalleryResponse[]>("/page/" + pageId, galleries);
         return response.data;
     }
 

@@ -147,7 +147,7 @@ export function PageEditor() {
         setGalleryOptionsLoading(true);
 
         try {
-            const response = await galleryAPI.findPageableWithoutFiles({
+            const response = await galleryAPI.findPageableList({
                 page: pageNumber,
                 size: PAGE_OPTION_PAGE_SIZE,
                 sort_by: "short_name",
@@ -219,8 +219,8 @@ export function PageEditor() {
         Promise.all([
             formAPI.findAll({details: QueryDetailEnum.MINIMAL}),
             pageAPI.findPageable({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "page_path", direction: "ASC"}),
-            galleryAPI.findPageableWithoutFiles({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "short_name", direction: "ASC"}),
-            galleryAPI.findAllByPage({details: QueryDetailEnum.MINIMAL}, tmpPageId)
+            galleryAPI.findPageableList({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "short_name", direction: "ASC"}),
+            galleryAPI.findListByPage(tmpPageId)
         ])
                 .then((responses) => {
                     setFormList(responses[0]);
