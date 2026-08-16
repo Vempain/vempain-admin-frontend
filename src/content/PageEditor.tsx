@@ -3,7 +3,7 @@ import {type UIEvent, useCallback, useEffect, useMemo, useRef, useState} from "r
 import {Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
 import type {RuleObject} from "antd/es/form";
 import {AclEdit} from "./AclEdit";
-import {type EmbedDataProviders, RichTextEditor as RtEditor,} from '@vempain/vempain-rt-editor';
+import {type DataSetQueryParams, type EmbedDataProviders, RichTextEditor as RtEditor,} from '@vempain/vempain-rt-editor';
 import {MetadataForm, SubmitResultHandler} from "../main";
 import {dataAPI, formAPI, galleryAPI, pageAPI, siteFileAPI} from "../services";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-design/icons";
@@ -46,9 +46,9 @@ function toSiteFilePagedRequest(params: Record<string, string | number | boolean
 }
 
 const defaultDataProviders: EmbedDataProviders = {
-    findGalleries: (params) => galleryAPI.findAll({details: params.details}),
+    findGalleries: (params) => galleryAPI.findPageableList(params),
     getPagedSiteFiles: (params) => siteFileAPI.getPagedSiteFiles(toSiteFilePagedRequest(params)),
-    getAllDataSets: (params) => dataAPI.getAllDataSets(params),
+    getAllDataSets: (params?: DataSetQueryParams) => dataAPI.getAllDataSets(params),
 };
 
 interface GalleryList {

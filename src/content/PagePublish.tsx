@@ -4,7 +4,7 @@ import type {FileGroupListResponse, PageResponse, PublishItemRequest} from "../m
 import {dataAPI, galleryAPI, pageAPI, siteFileAPI} from "../services";
 import {Button, Divider, Space, Spin, Table} from "antd";
 import {SubmitResultHandler} from "../main";
-import {type EmbedDataProviders, RichTextEditor as RtEditor,} from '@vempain/vempain-rt-editor';
+import {type DataSetQueryParams, type EmbedDataProviders, RichTextEditor as RtEditor,} from '@vempain/vempain-rt-editor';
 import TextArea from "antd/es/input/TextArea";
 import dayjs, {Dayjs} from "dayjs";
 import {PublishSchedule} from "./PublishSchedule";
@@ -12,9 +12,9 @@ import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain
 import type {ColumnsType} from "antd/lib/table";
 
 const defaultDataProviders: EmbedDataProviders = {
-    findGalleries: (params) => galleryAPI.findAll({details: params.details}),
+    findGalleries: (params) => galleryAPI.findPageableList(params),
     getPagedSiteFiles: (params) => siteFileAPI.getPagedSiteFiles(params),
-    getAllDataSets: (params) => dataAPI.getAllDataSets(params),
+    getAllDataSets: (params?: DataSetQueryParams) => dataAPI.getAllDataSets(params),
 };
 
 export function PagePublish() {
