@@ -1,11 +1,10 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useMemo, useState} from "react";
-import type {GalleryVO, PublishItemRequest} from "../models";
-import {type PageResponse, QueryDetailEnum} from "../models";
+import type {FileGroupListResponse, PageResponse, PublishItemRequest} from "../models";
 import {dataAPI, galleryAPI, pageAPI, siteFileAPI} from "../services";
 import {Button, Divider, Space, Spin, Table} from "antd";
 import {SubmitResultHandler} from "../main";
-import {type EmbedDataProviders, RichTextEditor as RtEditor,} from '@vempain/vempain-rt-editor';
+import {type DataSetQueryParams, type EmbedDataProviders, RichTextEditor as RtEditor,} from '@vempain/vempain-rt-editor';
 import TextArea from "antd/es/input/TextArea";
 import dayjs, {Dayjs} from "dayjs";
 import {PublishSchedule} from "./PublishSchedule";
@@ -13,9 +12,9 @@ import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain
 import type {ColumnsType} from "antd/lib/table";
 
 const defaultDataProviders: EmbedDataProviders = {
-    findGalleries: (params) => galleryAPI.findAll({details: params.details}),
+    findGalleries: (params) => galleryAPI.findPageableList(params),
     getPagedSiteFiles: (params) => siteFileAPI.getPagedSiteFiles(params),
-    getAllDataSets: (params) => dataAPI.getAllDataSets(params),
+    getAllDataSets: (params?: DataSetQueryParams) => dataAPI.getAllDataSets(params),
 };
 
 export function PagePublish() {
@@ -24,7 +23,7 @@ export function PagePublish() {
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [page, setPage] = useState<PageResponse | null>(null);
-    const [galleryList, setGalleryList] = useState<GalleryVO[]>([]);
+    const [galleryList, setGalleryList] = useState<FileGroupListResponse[]>([]);
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<Dayjs | null>(null);
     const [publishMessage, setPublishMessage] = useState<string>("");
@@ -34,7 +33,7 @@ export function PagePublish() {
             [],
     );
 
-    const galleryColumns: ColumnsType<GalleryVO> = [
+    const galleryColumns: ColumnsType<FileGroupListResponse> = [
         {
             title: "Galleries that will be published with the page",
             dataIndex: "short_name",
@@ -43,9 +42,9 @@ export function PagePublish() {
         {title: "Description", dataIndex: "description", key: "description"},
         {
             title: "Site files",
-            dataIndex: "site_files",
-            key: "site_files",
-            render: (files: number[]) => files.length
+            dataIndex: "file_count",
+            key: "file_count",
+            render: (fileCount: number) => fileCount
         }
     ];
 
@@ -63,7 +62,7 @@ export function PagePublish() {
         setLoading(true);
         Promise.all([
             pageAPI.findById(tmpPageId, null),
-            galleryAPI.findAllByPage({details: QueryDetailEnum.MINIMAL}, tmpPageId)
+            galleryAPI.findListByPage(tmpPageId)
         ])
                 .then((responses) => {
                     setPage(responses[0]);

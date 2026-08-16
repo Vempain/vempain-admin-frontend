@@ -7,7 +7,7 @@ import VirtualList from "rc-virtual-list";
 import {galleryAPI, siteFileAPI} from "../services";
 import {AclEdit} from "../content";
 import type {SiteFileResponse} from "../models";
-import {FileTypeEnum, type GalleryRequest, type GalleryVO} from "../models";
+import {FileTypeEnum, type GalleryRequest, type GalleryResponse} from "../models";
 import {aclTool, type AclVO, ActionResult, SortDirectionEnum, type SubmitResult, useSession, validateParamId} from "@vempain/vempain-auth-frontend";
 import dayjs from "dayjs";
 
@@ -33,7 +33,7 @@ export function GalleryEdit() {
     const {paramId} = useParams();
     const [galleryId, setGalleryId] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
-    const [gallery, setGallery] = useState<GalleryVO>();
+    const [gallery, setGallery] = useState<GalleryResponse>();
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [sendButtonText, setSendButtonText] = useState<string>("Update");
@@ -166,7 +166,7 @@ export function GalleryEdit() {
                 setAcls(galleryResponse.acls);
                 applySelectedSiteFiles(galleryResponse.site_files);
             } else {
-                const base: GalleryVO = {
+                const base: GalleryResponse = {
                     id: 0,
                     acls: [],
                     locked: false,

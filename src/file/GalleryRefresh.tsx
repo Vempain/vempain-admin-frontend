@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import {type GalleryVO} from "../models";
+import {type GalleryResponse} from "../models";
 import {fileSystemAPI, galleryAPI} from "../services";
 import {SubmitResultHandler} from "../main";
 import {LoadingOutlined} from "@ant-design/icons";
@@ -14,7 +14,7 @@ export function GalleryRefresh() {
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [loading, setLoading] = useState<boolean>(true);
     const [loadingMessage, setLoadingMessage] = useState<string>("Loading gallery files");
-    const [gallery, setGallery] = useState<GalleryVO>();
+    const [gallery, setGallery] = useState<GalleryResponse>();
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     useEffect(() => {

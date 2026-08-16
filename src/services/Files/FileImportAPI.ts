@@ -1,7 +1,7 @@
-import type {AddDirectoryRequest, GalleryVO, ImportResponseVO, StringListVO} from "../../models";
+import type {AddDirectoryRequest, GalleryResponse, ImportResponseVO, StringListVO} from "../../models";
 import {AbstractAPI} from "@vempain/vempain-auth-frontend";
 
-class FileImportAPI extends AbstractAPI<GalleryVO, GalleryVO> {
+class FileImportAPI extends AbstractAPI<GalleryResponse, GalleryResponse> {
     public async importDirectory(
         sourceDir: string,
         destinationDir: string,
