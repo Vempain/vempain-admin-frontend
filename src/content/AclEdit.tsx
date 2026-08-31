@@ -18,12 +18,12 @@ export function AclEdit({acls, parentForm}: AclEditProps) {
     useEffect(() => {
         Promise.all(
                 [
-                    userAPI.findAll(),
-                    unitAPI.findAll(),
+                    userAPI.findPageable({page: 0, size: 200, sort_by: "name", direction: "ASC"}),
+                    unitAPI.findPageable({page: 0, size: 200, sort_by: "name", direction: "ASC"}),
                 ])
                 .then((responses) => {
-                    setUserList(responses[0]);
-                    setUnitList(responses[1]);
+                    setUserList(responses[0].content);
+                    setUnitList(responses[1].content);
                 })
                 .catch((error) => {
                     console.error("Failed to fetch users and units: ", error);

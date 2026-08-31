@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {Button, Input, type InputRef, notification, Space, Spin, Table, type TableColumnType, type TablePaginationConfig} from "antd";
+import {Button, Input, type InputRef, notification, Space, Spin, Switch, Table, type TableColumnType, type TablePaginationConfig} from "antd";
 import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, SearchOutlined} from "@ant-design/icons";
@@ -26,6 +26,7 @@ export function PageList() {
 
     const [searchText, setSearchText] = useState("");
     const [searchedColumn, setSearchedColumn] = useState("");
+    const [caseSensitive, setCaseSensitive] = useState(false);
     const searchInput = useRef<InputRef>(null);
     type DataIndex = keyof PageResponse;
 
@@ -108,6 +109,7 @@ export function PageList() {
         filterIcon: (filtered: boolean) => (
                 <SearchOutlined style={{color: filtered ? "#1677ff" : undefined}}/>
         ),
+        filteredValue: searchText && searchedColumn === dataIndex ? [searchText] : null,
         filterDropdownProps: {
             onOpenChange: (visible) => {
                 if (visible) {
@@ -228,12 +230,15 @@ export function PageList() {
         },
     ];
 
-    function handleTableChange(nextPagination: TablePaginationConfig, _filters: Record<string, FilterValue | null>,
+    function handleTableChange(nextPagination: TablePaginationConfig, filters: Record<string, FilterValue | null>,
                                sorter: SorterResult<PageResponse> | SorterResult<PageResponse>[]): void {
         const tableSorter = Array.isArray(sorter) ? sorter[0] : sorter;
+        const search = Object.values(filters).flatMap(value => value ?? []).find(value => typeof value === "string" && value.length > 0);
         setPagination(nextPagination);
         setSortField(tableSorter.field?.toString() || "id");
         setSortOrder(tableSorter.order === "descend" ? "desc" : "asc");
+        setSearchText(typeof search === "string" ? search : "");
+        setSearchedColumn(typeof search === "string" ? Object.keys(filters).find(key => filters[key]?.includes(search)) ?? "" : "");
     }
 
     const currentPage = pagination.current ?? 1;
@@ -249,6 +254,7 @@ export function PageList() {
             sort_by: sortField,
             direction: sortOrder === "desc" ? "DESC" : "ASC",
             search: searchText || undefined
+            , case_sensitive: caseSensitive
         })
                 .then((response) => {
                     setPageList(response.content);
@@ -300,7 +306,13 @@ export function PageList() {
                 {contextHolder}
                 <Spin description={spinMessage} spinning={loading} key={"pageListSpinner"}>
                     <Space vertical={true} size={"large"} key={"pageListSpace"}>
-                        <h1 key={"pageListHeader"}>Page List <Link to={"/pages/0/edit"}><PlusCircleFilled/></Link></h1>
+                        <h1 key={"pageListHeader"}>Page List <Link to={"/pages/0/edit"}><PlusCircleFilled/></Link>
+                            <Switch checked={caseSensitive} onChange={checked => {
+                                setCaseSensitive(checked);
+                                setPagination(current => ({...current, current: 1}));
+                            }}
+                                    checkedChildren="Aa" unCheckedChildren="aa" style={{marginLeft: 16}}/>
+                        </h1>
                         <Button type={"primary"} onClick={publishAll}>Publish all pages</Button>
                         <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
                         <Table

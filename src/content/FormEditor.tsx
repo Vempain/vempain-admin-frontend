@@ -27,12 +27,12 @@ export function FormEditor() {
         setLoading(true);
 
         Promise.all([
-            componentAPI.findAll(),
-            layoutAPI.findAll()
+            componentAPI.findPageable({page: 0, size: 200, sort_by: "comp_name", direction: "ASC"}),
+            layoutAPI.findPageable({page: 0, size: 200, sort_by: "layout_name", direction: "ASC"})
         ])
                 .then((responses) => {
-                    setComponentList(responses[0]);
-                    setLayoutList(responses[1]);
+                    setComponentList(responses[0].content);
+                    setLayoutList(responses[1].content);
                 })
                 .catch((error) => {
                     console.error("Error fetching:", error);
