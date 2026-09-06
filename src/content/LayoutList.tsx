@@ -1,19 +1,38 @@
-import {useEffect, useState} from "react";
-import {Button, Space, Spin, Table, type TablePaginationConfig} from "antd";
+import {useEffect, useRef, useState} from "react";
+import {Button, Input, type InputRef, Space, Spin, Switch, Table, type TableColumnType, type TablePaginationConfig} from "antd";
 import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
-import {DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
+import {DeleteOutlined, EditOutlined, PlusCircleFilled, SearchOutlined} from "@ant-design/icons";
 import {type LayoutVO} from "../models";
-import {formatDateTime, getPaginationConfig} from "../tools";
-import {layoutAPI} from "../services";
+import {formatDateTime} from "../tools";
+import type {PagedRequest} from "@vempain/vempain-auth-frontend";
 import {aclTool, PrivilegeEnum, useSession} from "@vempain/vempain-auth-frontend";
-import dayjs from "dayjs";
+import type {FilterDropdownProps, FilterValue, SorterResult} from "antd/es/table/interface";
+import {layoutAPI} from "../services";
 
 export function LayoutList() {
     const [loading, setLoading] = useState<boolean>(false);
     const [layoutList, setLayoutList] = useState<LayoutVO[]>([]);
     const {userSession} = useSession();
-    const [pagination, setPagination] = useState<TablePaginationConfig>({});
+    const [pagedRequest, setPagedRequest] = useState<PagedRequest>({page: 0, size: 10, sort_by: "id", direction: "DESC", case_sensitive: false});
+    const [totalElements, setTotalElements] = useState(0);
+    const searchInput = useRef<InputRef>(null);
+    const getColumnSearchProps = (dataIndex: keyof LayoutVO): TableColumnType<LayoutVO> => ({
+        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters}: FilterDropdownProps) => (
+                <div style={{padding: 8}}>
+                    <Input ref={searchInput} value={selectedKeys[0]} onChange={event => setSelectedKeys(event.target.value ? [event.target.value] : [])}
+                           onPressEnter={() => confirm()} style={{marginBottom: 8}}/>
+                    <Space><Button type="primary" size="small" icon={<SearchOutlined/>} onClick={() => confirm()}>Search</Button>
+                        <Button size="small" onClick={() => {
+                            clearFilters?.();
+                            confirm();
+                        }}>Reset</Button></Space>
+                </div>
+        ),
+        filterIcon: (filtered: boolean) => <SearchOutlined style={{color: filtered ? "#1677ff" : undefined}}/>,
+        filteredValue: pagedRequest.search ? [pagedRequest.search] : null,
+        dataIndex
+    });
 
     const columns: ColumnsType<LayoutVO> = [
         {
@@ -21,26 +40,27 @@ export function LayoutList() {
             dataIndex: "id",
             key: "id",
             defaultSortOrder: "descend",
-            sorter: (a, b) => a.id - b.id
+            sorter: true
         },
         {
             title: "Layout Name",
             dataIndex: "layout_name",
             key: "layout_name",
             defaultSortOrder: "descend",
-            sorter: (a, b) => a.layout_name.localeCompare(b.layout_name),
+            sorter: true,
+            ...getColumnSearchProps("layout_name"),
         },
         {
             title: "Creator",
             dataIndex: "creator",
             key: "creator",
-            sorter: (a, b) => a.creator - b.creator,
+            sorter: true,
         },
         {
             title: "Created",
             dataIndex: "created",
             key: "created",
-            sorter: (a: LayoutVO, b: LayoutVO) => dayjs(a.created).unix() - dayjs(b.created).unix(),
+            sorter: true,
             render: (_: Record<string, unknown>, record: LayoutVO) => {
                 return formatDateTime(record.created);
             }
@@ -49,18 +69,13 @@ export function LayoutList() {
             title: "Modifier",
             dataIndex: "modifier",
             key: "modifier",
-            sorter: (a: LayoutVO, b: LayoutVO) => (a.modifier ?? 0) - (b.modifier ?? 0),
+            sorter: true,
         },
         {
             title: "Modified",
             dataIndex: "modified",
             key: "modified",
-            sorter: (a: LayoutVO, b: LayoutVO) => {
-                if (a.modified === null && b.modified === null) return 0;
-                if (a.modified === null) return -1;
-                if (b.modified === null) return 1;
-                return dayjs(a.modified).unix() - dayjs(b.modified).unix();
-            },
+            sorter: true,
             render: (_: Record<string, unknown>, record: LayoutVO) => {
                 if (record.modified === null) {
                     return "-";
@@ -83,10 +98,10 @@ export function LayoutList() {
 
     useEffect(() => {
         setLoading(true);
-        layoutAPI.findAll()
+        layoutAPI.findPageable(pagedRequest)
                 .then((response) => {
-                    setLayoutList(response);
-                    setPagination(getPaginationConfig(response.length));
+                    setLayoutList(response.content);
+                    setTotalElements(response.total_elements);
                 })
                 .catch((error) => {
                     console.error(error);
@@ -94,17 +109,33 @@ export function LayoutList() {
                 .finally(() => {
                     setLoading(false);
                 });
-    }, []);
+    }, [pagedRequest]);
+
+    function handleTableChange(pagination: TablePaginationConfig, filters: Record<string, FilterValue | null>,
+                               sorter: SorterResult<LayoutVO> | SorterResult<LayoutVO>[]): void {
+        const currentSorter = Array.isArray(sorter) ? sorter[0] : sorter;
+        const search = Object.values(filters).flatMap(value => value ?? []).find(value => typeof value === "string" && value.length > 0);
+        setPagedRequest(previous => ({
+            ...previous, page: (pagination.current ?? 1) - 1, size: pagination.pageSize ?? previous.size,
+            sort_by: typeof currentSorter.field === "string" ? currentSorter.field : "id",
+            direction: currentSorter.order === "descend" ? "DESC" : "ASC", search: typeof search === "string" ? search : undefined
+        }));
+    }
 
     return (
             <div className={"DarkDiv"} key={"layoutListDiv"}>
                 <Spin description={"Loading"} spinning={loading} key={"layoutListSpinner"}>
-                    <h1 key={"layoutListHeader"}>Layout List <Link to={"/layouts/0/edit"}><PlusCircleFilled/></Link></h1>
+                    <h1 key={"layoutListHeader"}>Layout List <Link to={"/layouts/0/edit"}><PlusCircleFilled/></Link>
+                        <Switch checked={pagedRequest.case_sensitive}
+                                onChange={checked => setPagedRequest(previous => ({...previous, page: 0, case_sensitive: checked}))}
+                                checkedChildren="Aa" unCheckedChildren="aa" style={{marginLeft: 16}}/>
+                    </h1>
 
                     {layoutList.length > 0 && <Table
                             dataSource={layoutList.map((item, index) => ({...item, key: `row_${index}`}))}
                             columns={columns}
-                            pagination={pagination}
+                            pagination={{current: pagedRequest.page + 1, pageSize: pagedRequest.size, total: totalElements, showSizeChanger: true}}
+                            onChange={handleTableChange}
                             key={"layoutListTable"}/>}
                 </Spin>
             </div>

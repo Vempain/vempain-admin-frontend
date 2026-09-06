@@ -3,12 +3,12 @@ import {type UIEvent, useCallback, useEffect, useMemo, useRef, useState} from "r
 import {Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
 import type {RuleObject} from "antd/es/form";
 import {AclEdit} from "./AclEdit";
-import {type DataSetQueryParams, type EmbedDataProviders, RichTextEditor as RtEditor,} from '@vempain/vempain-rt-editor';
+import {type DataSetQueryParams, type EmbedDataProviders, RichTextEditor as RtEditor, type SiteFileQueryParams,} from '@vempain/vempain-rt-editor';
 import {MetadataForm, SubmitResultHandler} from "../main";
 import {dataAPI, formAPI, galleryAPI, pageAPI, siteFileAPI} from "../services";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-design/icons";
 import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
-import {type FileTypeEnum, type FormVO, type PageResponse, QueryDetailEnum, type SiteFilePagedRequest} from "../models";
+import {type FileTypeEnum, type FormVO, type PageResponse, type SiteFilePagedRequest} from "../models";
 import dayjs from "dayjs";
 
 // Define the loading messages
@@ -19,9 +19,9 @@ const spinMessages: Record<string, string> = {
 };
 const PAGE_OPTION_PAGE_SIZE = 50;
 
-function toSiteFilePagedRequest(params: Record<string, string | number | boolean | undefined>): SiteFilePagedRequest {
-    const page = params.page ?? params.page_number;
-    const size = params.size ?? params.page_size;
+function toSiteFilePagedRequest(params: SiteFileQueryParams): SiteFilePagedRequest {
+    const page = params.page;
+    const size = params.size;
     const fileType = params.file_type;
 
     if (typeof page !== "number" && typeof page !== "string") {
@@ -39,7 +39,7 @@ function toSiteFilePagedRequest(params: Record<string, string | number | boolean
         size: Number(size),
         sort_by: params.sort_by === "fileName" ? "file_name" : typeof params.sort_by === "string" ? params.sort_by : "file_name",
         direction: params.direction === "DESC" ? "DESC" : "ASC",
-        search: typeof params.search === "string" ? params.search : typeof params.filter === "string" ? params.filter : undefined,
+        search: params.search,
         file_type: fileType as FileTypeEnum,
         filter_column: params.filter_column === "fileName" ? "file_name" : typeof params.filter_column === "string" ? params.filter_column : "file_name",
     };
@@ -217,13 +217,13 @@ export function PageEditor() {
         setPageId(tmpPageId);
 
         Promise.all([
-            formAPI.findAll({details: QueryDetailEnum.MINIMAL}),
+            formAPI.findPageable({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "name", direction: "ASC"}),
             pageAPI.findPageable({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "page_path", direction: "ASC"}),
             galleryAPI.findPageableList({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "short_name", direction: "ASC"}),
             galleryAPI.findListByPage(tmpPageId)
         ])
                 .then((responses) => {
-                    setFormList(responses[0]);
+                    setFormList(responses[0].content);
                     if (pageOptionsRequestRef.current === 0) {
                         setPageList(responses[1].content);
                         setPageListPage(responses[1].page);
