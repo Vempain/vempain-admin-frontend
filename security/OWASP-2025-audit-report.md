@@ -4,15 +4,18 @@ Date: 2026-09-15 · Scope: frontend, frontend container, and frontend CI · Meth
 
 ## Executive summary
 
-The audit found two exploitable stored-content HTML/URL injection paths and three medium hardening gaps.
+The audit found two exploitable stored-content HTML/URL injection paths and four medium hardening gaps.
 All identified frontend CRITICAL/HIGH findings were fixed at the browser trust boundary. Rich-text content is now
 sanitized before it reaches the third-party editor and before it is sent back to the API, and preview iframes only
 accept canonical HTTPS YouTube URLs. CI now uses read-only permissions and a pinned reusable workflow revision.
-Backend authorization and server-side CMS sanitization remain required controls outside this frontend-only change.
+Backend authorization and server-side CMS sanitization remain required controls outside this frontend-only change; see
+the companion `../vempain-admin-backend/security/OWASP-2025-audit-report.md` for the backend authorization evidence.
 
 ## Asset and trust-boundary inventory
 
 - Browser → Admin API: Axios services under `src/services/`, authenticated by the shared auth package/local bearer header.
+  All admin screens are now nested under `ProtectedRoute`; this is a UX/data-minimization guard, not a replacement for
+  backend authorization.
 - Browser-rendered content: page body and embed descriptors in `src/content/PageView.tsx`; editable page body in
   `src/content/PageEditor.tsx` and publish preview in `src/content/PagePublish.tsx`.
 - Browser → file service: numeric file IDs rendered through the configured `VITE_APP_FILE_URL`.
@@ -25,7 +28,7 @@ Backend authorization and server-side CMS sanitization remain required controls 
 
 | Category                             | Checked | Findings (C/H/M/L) | Status                                                                                 |
 |--------------------------------------|---------|-------------------:|----------------------------------------------------------------------------------------|
-| A01 Broken Access Control            | yes     |            0/0/0/0 | Backend boundary required; frontend routes are not treated as authorization            |
+| A01 Broken Access Control            | yes     |            0/0/1/0 | Added an authenticated route boundary; backend remains authoritative                   |
 | A02 Security Misconfiguration        | yes     |            0/0/1/0 | Fixed headers, explicit no-source-map build; container base/runtime items deferred     |
 | A03 Software Supply Chain Failures   | yes     |            0/0/1/0 | Fixed CI permissions and workflow pin; SCA unavailable without private registry auth   |
 | A04 Cryptographic Failures           | yes     |            0/0/0/0 | Shared auth boundary; no frontend cryptographic implementation found                   |
@@ -94,10 +97,23 @@ Backend authorization and server-side CMS sanitization remain required controls 
   explicitly disabled Vite production source maps.
 - **Verification:** Docker configuration review and production build pass.
 
+### [MEDIUM] F-06 — Direct navigation rendered admin screens before authentication · A01:2025 · CWE-602
+
+- **Location:** `src/App.tsx:53-107`, `src/main/TopBar.tsx:44-245`.
+- **Description:** The menu was hidden for anonymous sessions, but every admin route was still directly navigable.
+  This exposed admin UI and initiated API requests before the shared auth interceptor could reject them. It did not bypass
+  backend authorization, but it violated frontend/backend authorization parity and increased data exposure in the
+  browser.
+- **Fix applied:** Nested all non-login/logout routes beneath `ProtectedRoute`, which redirects anonymous users to `/login`
+  and preserves only the internal path in router state.
+- **Verification:** `src/__tests__/ProtectedRoute.test.tsx` proves anonymous users cannot render an admin route and that
+  an authenticated session can render it. The backend must still return `401/403` for direct API calls.
+
 ## Checklist verdicts
 
-- **A01:** PASS for frontend not making authorization decisions; backend authorization, object ownership, CSRF/CORS,
-  rate limits, and management endpoints are UNVERIFIED in this frontend-only scope.
+- **A01:** PASS for the authenticated frontend route boundary and for not treating it as authorization; backend
+  authorization, object ownership, CSRF/CORS, rate limits, and management endpoints are UNVERIFIED in this
+  frontend-only scope. The route regression is F-06.
 - **A02:** PASS for explicit Vite source-map policy and nginx response headers; DEFERRED for pinned nginx digest,
   non-root container execution, and deployment TLS/HSTS because deployment ownership is outside this repo.
 - **A03:** PASS for committed Yarn lockfile, immutable-install CI input, HTTPS registries, and pinned reusable workflow;
@@ -126,7 +142,7 @@ Backend authorization and server-side CMS sanitization remain required controls 
 
 ## Verification
 
-- `yarn test --runInBand`: 66 tests passed across 5 suites.
+- `yarn test --runInBand`: 68 tests passed across 6 suites.
 - `yarn lint`: passed with zero warnings.
 - `yarn tsc -p tsconfig.app.json --noEmit`: passed.
 - `yarn build`: passed; Vite emitted only its existing chunk-size warning.

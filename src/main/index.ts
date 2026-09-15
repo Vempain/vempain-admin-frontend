@@ -3,3 +3,4 @@ export {Home} from './Home';
 export {MetadataForm} from './MetadataForm';
 export {SubmitResultHandler} from './SubmitResultHandler';
 export {TopBar} from './TopBar';
+export {ProtectedRoute} from './ProtectedRoute';
