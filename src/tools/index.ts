@@ -4,4 +4,8 @@ export {padTo2Digits, padTo3Digits, formatDateTime, formatDate, formatDateTimeWi
 export {getPaginationConfig} from './tablePaginationConfig';
 export {isWebSiteUserResponse, isWebSiteAclResponse, isWebSiteResourceResponse} from './WebSiteTools';
 export {parseEmbeds, convertTagsToPlaceholders, convertPlaceholdersToTags, buildEmbedTag, buildCarouselTag, parseCarouselParams} from './embedTools';
+export {normalizeYoutubeEmbedUrl} from './urlSecurity';
+export {sanitizeFooterMarkup} from './footerSecurity';
+export {sanitizeRichText} from './richTextSecurity';
+export {sanitizeHtmlFragment} from './richTextSecurity';
 export type {LastEmbedType} from './embedTools';

@@ -10,6 +10,7 @@ import dayjs, {Dayjs} from "dayjs";
 import {PublishSchedule} from "./PublishSchedule";
 import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 import type {ColumnsType} from "antd/lib/table";
+import {sanitizeRichText} from "../tools";
 
 const defaultDataProviders: EmbedDataProviders = {
     findGalleries: (params) => galleryAPI.findPageableList(params),
@@ -65,7 +66,7 @@ export function PagePublish() {
             galleryAPI.findListByPage(tmpPageId)
         ])
                 .then((responses) => {
-                    setPage(responses[0]);
+                    setPage({...responses[0], body: sanitizeRichText(responses[0].body)});
                     setGalleryList(responses[1]);
                 })
                 .catch((error) => {
