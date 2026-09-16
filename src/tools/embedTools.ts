@@ -223,6 +223,15 @@ function escapeAttr(value: string): string {
         .replace(/>/g, '&gt;');
 }
 
+function escapeHtml(value: string): string {
+    return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 /**
  * Unescape an HTML-escaped attribute value back to the original string.
  * Inverse of escapeAttr.
@@ -241,10 +250,11 @@ function unescapeAttr(value: string): string {
  */
 export function parseCarouselParams(extra: string): CarouselParams {
     const parts = extra.split(':');
+    const parsedSpeed = parts[2] ? Number.parseInt(parts[2], 10) : 500;
     return {
         autoplay: parts[0] === 'true',
         dotDuration: parts[1] === 'true',
-        speed: parts[2] ? parseInt(parts[2], 10) : 500,
+        speed: Number.isFinite(parsedSpeed) ? Math.min(Math.max(parsedSpeed, 0), 60000) : 500,
     };
 }
 
@@ -345,7 +355,12 @@ function parseEmbedContent(type: EmbedType, raw: string): EmbedDescriptor {
                 try {
                     const parsed = JSON.parse(jsonStr);
                     if (Array.isArray(parsed)) {
-                        items = parsed as CollapseCarouselItem[];
+                        items = parsed.filter((item): item is CollapseCarouselItem =>
+                            typeof item === 'object'
+                            && item !== null
+                            && typeof (item as { title?: unknown }).title === 'string'
+                            && typeof (item as { body?: unknown }).body === 'string',
+                        );
                     }
                 } catch {
                     // malformed JSON — treat as empty items list
@@ -466,7 +481,7 @@ export function convertTagsToPlaceholders(html: string): string {
             `style="display:inline-block;background:#1a3a5c;border:1px solid #4a90d9;` +
             `border-radius:4px;padding:2px 8px;margin:2px 4px;cursor:pointer;` +
             `user-select:none;color:#90c4f8;font-size:0.85em;white-space:nowrap;"` +
-            `>${label}</span>`;
+            `>${escapeHtml(label)}</span>`;
 
         lastIndex = match.index + match.length;
     }

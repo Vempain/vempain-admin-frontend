@@ -271,7 +271,7 @@ export function PageList() {
                 .finally(() => {
                     setLoading(false);
                 });
-    }, [currentPage, currentPageSize, reloadToken, searchText, sortField, sortOrder]);
+    }, [caseSensitive, currentPage, currentPageSize, reloadToken, searchText, sortField, sortOrder]);
 
     function publishAll(): void {
         const publishAll = window.confirm("Are you sure you want to publish all " + pageList.length + " pages?");

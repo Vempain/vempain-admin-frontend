@@ -4,6 +4,19 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 
+if (!globalThis.TextEncoder) {
+    Object.defineProperty(globalThis, 'TextEncoder', {
+        configurable: true,
+        value: class {
+            readonly encoding = 'utf-8';
+
+            encode(input = '') {
+                return Uint8Array.from(unescape(encodeURIComponent(input)), (character) => character.charCodeAt(0));
+            }
+        },
+    });
+}
+
 Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: jest.fn().mockImplementation((query: string) => ({
