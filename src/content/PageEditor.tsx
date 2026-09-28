@@ -10,6 +10,7 @@ import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-desi
 import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 import {type FileTypeEnum, type FormVO, type PageResponse, type SiteFilePagedRequest} from "../models";
 import dayjs from "dayjs";
+import {sanitizeRichText} from "../tools";
 
 // Define the loading messages
 const spinMessages: Record<string, string> = {
@@ -249,7 +250,7 @@ export function PageEditor() {
                     if (tmpPageId > 0) {
                         pageAPI.findById(tmpPageId, null)
                                 .then((response) => {
-                                    setPage(response);
+                                    setPage({...response, body: sanitizeRichText(response.body)});
                                     setPageTitle(response.title);
                                     setAcls(response.acls);
                                 })
@@ -289,16 +290,17 @@ export function PageEditor() {
 
     function onFinish(values: PageResponse): void {
         console.debug("onFinish", values);
+        const safeValues: PageResponse = {...values, body: sanitizeRichText(values.body)};
 
-        for (let i = 0; i < values.acls.length; i++) {
-            values.acls[i] = aclTool.completeAcl(values.acls[i]);
+        for (let i = 0; i < safeValues.acls.length; i++) {
+            safeValues.acls[i] = aclTool.completeAcl(safeValues.acls[i]);
         }
 
         setSpinTip(spinMessages.savingPageData);
         setLoading(true);
 
         if (pageId > 0) {
-            pageAPI.update(values)
+            pageAPI.update(safeValues)
                     .then((response) => {
                         console.debug("Update response:", response);
                         setSubmitResults({status: ActionResult.OK, message: "Page updated"});
@@ -311,7 +313,7 @@ export function PageEditor() {
                         setLoading(false);
                     });
         } else {
-            pageAPI.create(values)
+            pageAPI.create(safeValues)
                     .then((response) => {
                         console.debug("Create response:", response);
                         setSubmitResults({status: ActionResult.OK, message: "Page created"});

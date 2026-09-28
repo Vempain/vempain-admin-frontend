@@ -4,35 +4,15 @@ import {Carousel, Collapse, Image, Spin} from 'antd';
 import {pageAPI} from '../services';
 import {type PageResponse} from '../models';
 import {type CarouselParams, type CollapseCarouselItem, parseCarouselParams, parseEmbeds} from '../tools/embedTools';
-import DOMPurify from 'dompurify';
 import {ActionResult, type SubmitResult, validateParamId} from '@vempain/vempain-auth-frontend';
 import {SubmitResultHandler} from '../main';
+import {normalizeYoutubeEmbedUrl} from '../tools/urlSecurity';
+import {sanitizeHtmlFragment} from '../tools/richTextSecurity';
 
 const FILE_BASE_URL = import.meta.env.VITE_APP_FILE_URL ?? '';
 
 function fileUrl(id: number): string {
     return `${FILE_BASE_URL}/files/${id}`;
-}
-
-function normalizeYoutubeEmbedUrl(url: string): string {
-    try {
-        const parsed = new URL(url);
-        const host = parsed.hostname.toLowerCase();
-        if (host === 'youtu.be' || host.endsWith('.youtu.be')) {
-            const id = parsed.pathname.replace(/^\//, '');
-            if (id) return `https://www.youtube.com/embed/${id}`;
-        }
-        if (host === 'youtube.com' || host.endsWith('.youtube.com')) {
-            const id = parsed.searchParams.get('v');
-            if (id) return `https://www.youtube.com/embed/${id}`;
-            if (parsed.pathname.startsWith('/embed/')) {
-                return `https://www.youtube.com${parsed.pathname}`;
-            }
-        }
-    } catch {
-        // keep original url if parsing fails
-    }
-    return url;
 }
 
 interface EmbedImageProps {
@@ -94,7 +74,7 @@ function EmbedCollapse({items}: EmbedCollapseProps) {
                         children: (
                                 <div
                                         dangerouslySetInnerHTML={{
-                                            __html: DOMPurify.sanitize(item.body),
+                                            __html: sanitizeHtmlFragment(item.body),
                                         }}
                                 />
                         ),
@@ -123,7 +103,7 @@ function EmbedCarousel({items, params}: EmbedCarouselProps) {
                             <div
                                     style={{padding: '0 16px'}}
                                     dangerouslySetInnerHTML={{
-                                        __html: DOMPurify.sanitize(item.body),
+                                        __html: sanitizeHtmlFragment(item.body),
                                     }}
                             />
                         </div>
@@ -156,6 +136,10 @@ function EmbedAudio({id}: { id: number }) {
 
 function EmbedYoutube({url}: { url: string }) {
     const embedUrl = normalizeYoutubeEmbedUrl(url);
+    if (!embedUrl) {
+        return <div role="status">Unsupported video URL</div>;
+    }
+
     return (
             <div style={{margin: '8px 0'}}>
                 <iframe
@@ -164,6 +148,7 @@ function EmbedYoutube({url}: { url: string }) {
                         style={{width: '100%', aspectRatio: '16 / 9', border: 0}}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         referrerPolicy="strict-origin-when-cross-origin"
+                        sandbox="allow-presentation allow-same-origin allow-scripts"
                         allowFullScreen
                 />
             </div>
@@ -243,7 +228,7 @@ export function PageView() {
                         return (
                                 <div
                                         key={index}
-                                        dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(segment.content)}}
+                                        dangerouslySetInnerHTML={{__html: sanitizeHtmlFragment(segment.content)}}
                                 />
                         );
                     }
