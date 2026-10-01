@@ -5,17 +5,21 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import {BrowserRouter} from "react-router-dom";
 import {SessionProvider} from "@vempain/vempain-auth-frontend";
+import {I18nextProvider} from "react-i18next";
+import i18n from "./i18n";
 
 const root = ReactDOM.createRoot(
         document.getElementById("root") as HTMLElement
 );
 root.render(
         <React.StrictMode>
-            <SessionProvider baseURL={`${import.meta.env.VITE_APP_API_URL}`} loginPath="/login">
-                <BrowserRouter>
-                    <App/>
-                </BrowserRouter>
-            </SessionProvider>
+            <I18nextProvider i18n={i18n}>
+                <SessionProvider baseURL={`${import.meta.env.VITE_APP_API_URL}`} loginPath="/login">
+                    <BrowserRouter>
+                        <App/>
+                    </BrowserRouter>
+                </SessionProvider>
+            </I18nextProvider>
         </React.StrictMode>
 );
 

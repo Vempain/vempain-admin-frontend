@@ -24,16 +24,18 @@
   },
   "dependencies" : {
     "@ant-design/icons" : "^6.3.4",
-    "@vempain/vempain-auth-frontend" : "^2.0.14",
+    "@vempain/vempain-auth-frontend" : "^2.0.15",
     "@vempain/vempain-rt-editor" : "1.0.21",
     "antd" : "^6.6.5",
     "axios" : "^1.20.0",
     "dayjs" : "^1.11.23",
     "dompurify" : "^3.4.16",
+    "i18next" : "^26.4.2",
     "rc-virtual-list" : "^3.19.2",
     "react" : "^19.3.0",
     "react-dom" : "^19.3.0",
     "react-highlight-words" : "^0.21.0",
+    "react-i18next" : "^17.0.15",
     "react-router-dom" : "^7.18.4",
     "web-vitals" : "^6.2.2"
   },
@@ -61,7 +63,7 @@
     "jest-environment-jsdom" : "^30.5.2",
     "ts-jest" : "^29.4.14",
     "typescript" : "^6.0.3",
-    "typescript-eslint" : "^8.70.1",
+    "typescript-eslint" : "^8.71.0",
     "vite" : "^8.3.1"
   },
   "browserslist" : {
