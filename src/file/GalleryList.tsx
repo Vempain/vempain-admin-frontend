@@ -1,14 +1,21 @@
-import {type Key, useCallback, useEffect, useRef, useState} from "react";
-import {Button, Input, type InputRef, message, Space, Spin, Table, type TableColumnType, type TablePaginationConfig} from "antd";
-import type {ColumnsType, FilterDropdownProps, FilterValue, SorterResult, SortOrder} from "antd/es/table/interface";
-import {type FileGroupListResponse} from "../models";
+import {type Key, useState} from "react";
+import {Button, message, Space, Spin} from "antd";
+import {
+    aclTool,
+    ActionResult,
+    PrivilegeEnum,
+    type SubmitResult,
+    usePagedTable,
+    useSession,
+    type VempainColumnsType,
+    VempainTable
+} from "@vempain/vempain-auth-frontend";
 import type {GalleryPublishRequest} from "../models/Requests/Files";
 import {fileSystemAPI, galleryAPI} from "../services";
 import {Link} from "react-router-dom";
-import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, ReloadOutlined, SearchOutlined} from "@ant-design/icons";
+import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, ReloadOutlined} from "@ant-design/icons";
 import {SubmitResultHandler} from "../main";
 import {PublishSchedule} from "../content";
-import {aclTool, ActionResult, type PagedRequest, PrivilegeEnum, type SubmitResult, useSession} from "@vempain/vempain-auth-frontend";
 import dayjs, {type Dayjs} from "dayjs";
 import {formatDateTime} from "../tools";
 
@@ -25,86 +32,59 @@ interface GalleryListItem {
 }
 
 export function GalleryList() {
-    const [loading, setLoading] = useState<boolean>(false);
-    const [galleryList, setGalleryList] = useState<GalleryListItem[]>([]);
+    const [actionLoading, setActionLoading] = useState<boolean>(false);
     const {userSession} = useSession();
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(25);
-    const [totalItems, setTotalItems] = useState<number>(0);
-    const [sortField, setSortField] = useState<string>("id");
-    const [sortOrder, setSortOrder] = useState<SortOrder>("ascend");
-    const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined);
-    const searchInput = useRef<InputRef>(null);
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<dayjs.Dayjs | null>(null);
     const [selectedGalleryIds, setSelectedGalleryIds] = useState<number[]>([]);
 
-    const handleSearch = (value: string, confirm: FilterDropdownProps["confirm"]) => {
-        confirm();
-        setSearchTerm(value || undefined);
-        setCurrentPage(1);
-    };
-
-    const getColumnSearchProps = (dataIndex: "name" | "description"): TableColumnType<GalleryListItem> => ({
-        filterDropdown: ({setSelectedKeys, selectedKeys, confirm, clearFilters, close}) => (
-                <div style={{padding: 8}} onKeyDown={(event) => event.stopPropagation()}>
-                    <Input
-                            ref={searchInput}
-                            value={selectedKeys[0]}
-                            onChange={(event) => setSelectedKeys(event.target.value ? [event.target.value] : [])}
-                            onPressEnter={() => handleSearch(selectedKeys[0]?.toString() ?? "", confirm)}
-                            style={{marginBottom: 8, display: "block"}}
-                    />
-                    <Space>
-                        <Button type="primary" size="small" onClick={() => handleSearch(selectedKeys[0]?.toString() ?? "", confirm)}>
-                            Search
-                        </Button>
-                        <Button size="small" onClick={() => {
-                            clearFilters?.();
-                            setSearchTerm(undefined);
-                            setCurrentPage(1);
-                            close();
-                        }}>
-                            Reset
-                        </Button>
-                    </Space>
-                </div>
-        ),
-        filterIcon: (filtered) => <SearchOutlined style={{color: filtered ? "#1677ff" : undefined}}/>,
-        filterDropdownProps: {
-            onOpenChange: (visible) => {
-                if (visible) {
-                    setTimeout(() => searchInput.current?.select(), 100);
-                }
-            }
-        },
-        title: dataIndex === "name" ? "Name" : "Description"
+    const paged = usePagedTable<GalleryListItem>(async (request) => {
+        const response = await galleryAPI.findPageableList({
+            ...request,
+            sort_by: request.sort_by === "name" ? "short_name" : request.sort_by,
+            filter_column: request.filter_column === "name" ? "short_name" : request.filter_column
+        });
+        return {
+            ...response, content: response.content.map((gallery) => ({
+                id: gallery.id,
+                name: gallery.short_name,
+                created: gallery.created,
+                modified: gallery.modified,
+                description: gallery.description,
+                fileCount: gallery.file_count,
+                createPrivilege: aclTool.hasPrivilege(PrivilegeEnum.CREATE, userSession?.id, userSession?.units, gallery.acls),
+                modifyPrivilege: aclTool.hasPrivilege(PrivilegeEnum.MODIFY, userSession?.id, userSession?.units, gallery.acls),
+                deletePrivilege: aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, gallery.acls)
+            }))
+        };
+    }, {
+        defaultSortBy: "id",
+        defaultDirection: "ASC",
+        defaultPageSize: 25,
+        deps: [userSession?.id, userSession?.units?.map((unit) => unit.id).join(",")]
     });
 
-    const columns: ColumnsType<GalleryListItem> = [
+    const columns: VempainColumnsType<GalleryListItem> = [
         {
             title: "ID",
             dataIndex: "id",
             key: "id",
             sorter: true,
-            sortOrder: sortField === "id" ? sortOrder : undefined
         },
         {
             title: "Name",
             dataIndex: "name",
             key: "name",
             sorter: true,
-            sortOrder: sortField === "short_name" ? sortOrder : undefined,
-            ...getColumnSearchProps("name")
+            searchable: true
         },
         {
             title: "Description",
             dataIndex: "description",
             key: "description",
             sorter: true,
-            sortOrder: sortField === "description" ? sortOrder : undefined,
-            ...getColumnSearchProps("description")
+            searchable: true
         },
         {
             title: "File count",
@@ -119,7 +99,6 @@ export function GalleryList() {
             dataIndex: "created",
             key: "created",
             sorter: true,
-            sortOrder: sortField === "created" ? sortOrder : undefined,
             render: (_text, record) => {
                 return formatDateTime(record.created);
             }
@@ -129,7 +108,6 @@ export function GalleryList() {
             dataIndex: "modified",
             key: "modified",
             sorter: true,
-            sortOrder: sortField === "modified" ? sortOrder : undefined,
             render: (_text, record) => {
                 if (record.modified === null) {
                     return "-";
@@ -185,96 +163,20 @@ export function GalleryList() {
         }
     ];
 
-    const toBackendSortField = (field?: string): string => {
-        if (field === "name") {
-            return "short_name";
-        }
-        if (field === "description" || field === "created" || field === "modified") {
-            return field;
-        }
-        return "id";
-    };
-
     const rowSelection = {
         selectedRowKeys: selectedGalleryIds,
         onChange: (selectedRowKeys: Key[]) => setSelectedGalleryIds(selectedRowKeys as number[]),
         preserveSelectedRowKeys: true,
     };
 
-    const convertResponseToGalleryListItems = useCallback((response: FileGroupListResponse[]) => {
-        const tmpGalleryList: GalleryListItem[] = response.map((gallery) => {
-                    return {
-                        id: gallery.id,
-                        name: gallery.short_name,
-                        created: gallery.created,
-                        modified: gallery.modified,
-                        description: gallery.description,
-                        fileCount: gallery.file_count,
-                        createPrivilege: aclTool.hasPrivilege(PrivilegeEnum.CREATE, userSession?.id, userSession?.units, gallery.acls),
-                        modifyPrivilege: aclTool.hasPrivilege(PrivilegeEnum.MODIFY, userSession?.id, userSession?.units, gallery.acls),
-                        deletePrivilege: aclTool.hasPrivilege(PrivilegeEnum.DELETE, userSession?.id, userSession?.units, gallery.acls),
-                    };
-                }
-        );
-        setGalleryList(tmpGalleryList);
-    }, [userSession?.id, userSession?.units]);
-
-    const fetchGalleries = useCallback(() => {
-        if (!userSession) {
-            return;
-        }
-        setLoading(true);
-        const request: PagedRequest = {
-            page: currentPage - 1,
-            size: pageSize,
-            sort_by: sortField,
-            direction: sortOrder === "descend" ? "DESC" : "ASC",
-            search: searchTerm || undefined,
-            case_sensitive: false
-        };
-        galleryAPI.findPageableList(request)
-                .then((response) => {
-                    convertResponseToGalleryListItems(response.content);
-                    setCurrentPage(response.page + 1);
-                    setPageSize(response.size);
-                    setTotalItems(response.total_elements);
-                })
-                .catch((error) => {
-                    console.error(error);
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-    }, [currentPage, pageSize, searchTerm, sortField, sortOrder, userSession, convertResponseToGalleryListItems]);
-
-    useEffect(() => {
-        fetchGalleries();
-    }, [fetchGalleries]);
-
-    function handleTableChange(
-            tablePagination: TablePaginationConfig,
-            _filters: Record<string, FilterValue | null>,
-            sorter: SorterResult<GalleryListItem> | SorterResult<GalleryListItem>[]
-    ) {
-        setCurrentPage(tablePagination.current ?? 1);
-        setPageSize(tablePagination.pageSize ?? 25);
-        if (!Array.isArray(sorter) && sorter.field) {
-            setSortField(toBackendSortField(sorter.field as string));
-            setSortOrder(sorter.order ?? "ascend");
-        } else {
-            setSortField("id");
-            setSortOrder("ascend");
-        }
-    }
-
     function publishAll(): void {
-        const publishAll = window.confirm("Are you sure you want to publish all " + totalItems + " galleries?");
+        const publishAll = window.confirm("Are you sure you want to publish all " + (paged.pagination.total ?? 0) + " galleries?");
 
         if (!publishAll) {
             return;
         }
 
-        setLoading(true);
+        setActionLoading(true);
 
         let publishParams: Record<string, string> | undefined = undefined;
 
@@ -284,13 +186,13 @@ export function GalleryList() {
 
         galleryAPI.publishAll(publishParams)
                 .then(() => {
-                    fetchGalleries();
+                    paged.reload();
                 })
                 .catch((_error) => {
                     console.error("Error publishing all galleries");
                 })
                 .finally(() => {
-                    setLoading(false);
+                    setActionLoading(false);
                 });
     }
 
@@ -298,31 +200,31 @@ export function GalleryList() {
         if (selectedGalleryIds.length === 0) {
             return;
         }
-        setLoading(true);
+        setActionLoading(true);
         const request: GalleryPublishRequest = {gallery_ids: selectedGalleryIds};
         galleryAPI.publishSelectedGalleries(request)
                 .then(() => {
                     message.success("Selected galleries publishing triggered");
                     setSelectedGalleryIds([]);
-                    fetchGalleries();
+                    paged.reload();
                 })
                 .catch((error) => {
                     console.error("Error publishing selected galleries:", error);
                     message.error("Failed to publish selected galleries");
                 })
                 .finally(() => {
-                    setLoading(false);
+                    setActionLoading(false);
                 });
     }
 
     function refreshhAll(): void {
-        const refreshAll = window.confirm("Are you sure you want to refresh all " + galleryList.length + " galleries?");
+        const refreshAll = window.confirm("Are you sure you want to refresh all " + paged.dataSource.length + " galleries?");
 
         if (!refreshAll) {
             return;
         }
 
-        setLoading(true);
+        setActionLoading(true);
 
         fileSystemAPI.refreshAllGalleryFiles()
                 .then((response) => {
@@ -338,7 +240,7 @@ export function GalleryList() {
                     setSubmitResults({status: ActionResult.FAIL, message: "Failed to publish the gallery, try again later"});
                 })
                 .finally(() => {
-                    setLoading(false);
+                    setActionLoading(false);
                 });
     }
 
@@ -348,7 +250,7 @@ export function GalleryList() {
 
     return (
             <div className={"DarkDiv"} key={"galleryListDiv"}>
-                <Spin description={"Loading"} spinning={loading} key={"galleryListSpinner"}>
+                <Spin description={"Loading"} spinning={paged.loading || actionLoading} key={"galleryListSpinner"}>
                     <Space vertical={true} size={"large"} key={"pageListSpace"}>
                         <h1 key={"pageListHeader"}>Gallery List <Link to={"/galleries/0/edit"} key={"galleryAddLink"}><PlusCircleFilled/></Link></h1>
                         <Space vertical={false}
@@ -374,17 +276,13 @@ export function GalleryList() {
                             >Refresh all gallery files</Button>
                         </Space>
                         <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
-                        <Table
-                                dataSource={galleryList}
+                        {paged.contextHolder}
+                        <VempainTable
+                                dataSource={paged.dataSource}
                                 columns={columns}
-                                loading={loading}
-                                pagination={{
-                                    current: currentPage,
-                                    pageSize: pageSize,
-                                    total: totalItems,
-                                    showSizeChanger: true,
-                                }}
-                                onChange={handleTableChange}
+                                dataMode={"server"}
+                                paged={paged}
+                                loading={paged.loading || actionLoading}
                                 rowKey={"id"}
                                 rowSelection={rowSelection}
                                 key={"galleryListTable"}
