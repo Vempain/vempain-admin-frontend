@@ -1,7 +1,15 @@
 import {type Key, useState} from "react";
 import {Button, message, Space, Spin} from "antd";
-import {type VempainColumnsType, VempainTable} from "@vempain/vempain-auth-frontend";
-import {aclTool, ActionResult, PrivilegeEnum, type SubmitResult, usePagedTable, useSession, VempainTable} from "@vempain/vempain-auth-frontend";
+import {
+    aclTool,
+    ActionResult,
+    PrivilegeEnum,
+    type SubmitResult,
+    usePagedTable,
+    useSession,
+    type VempainColumnsType,
+    VempainTable
+} from "@vempain/vempain-auth-frontend";
 import type {GalleryPublishRequest} from "../models/Requests/Files";
 import {fileSystemAPI, galleryAPI} from "../services";
 import {Link} from "react-router-dom";
