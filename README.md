@@ -6,13 +6,13 @@
 
 # Vempain admin frontend
 
-See [documentation](development.md) for development processes and guidelines.
+See [AGENTS.md](AGENTS.md) for development processes and guidelines.
 
 ## Prerequisites
 
 To run the frontend in production, you need a web server that can serve static files. For development, you need Node.js and npm.
 
-## Setting up development environment
+## Setting up the development environment
 
 ### ENV files
 
@@ -23,7 +23,7 @@ Run `yarn install` to install the necessary npm packages.
 
 Now you can start up the local development environment with the command `yarn start`.
 
-[AGENTS.md](docs/AGENTS.md) has more detailed orientation and workflow guidance for agents working in this codebase.
+[AGENTS.md](AGENTS.md) has more detailed orientation and workflow guidance for agents working in this codebase.
 
 ## Paginated data
 
