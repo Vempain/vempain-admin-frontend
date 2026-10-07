@@ -24,8 +24,8 @@
   },
   "dependencies" : {
     "@ant-design/icons" : "^6.3.4",
-    "@vempain/vempain-auth-frontend" : "^2.0.15",
-    "@vempain/vempain-rt-editor" : "1.0.21",
+    "@vempain/vempain-auth-frontend" : "^2.0.17",
+    "@vempain/vempain-rt-editor" : "1.0.23",
     "antd" : "^6.6.5",
     "axios" : "^1.20.0",
     "dayjs" : "^1.11.23",
@@ -35,9 +35,9 @@
     "react" : "^19.3.0",
     "react-dom" : "^19.3.0",
     "react-highlight-words" : "^0.21.0",
-    "react-i18next" : "^17.0.15",
+    "react-i18next" : "^17.0.16",
     "react-router-dom" : "^7.18.4",
-    "web-vitals" : "^6.2.2"
+    "web-vitals" : "^6.2.3"
   },
   "devDependencies" : {
     "@eslint/js" : "^10.0.1",
@@ -47,24 +47,24 @@
     "@testing-library/user-event" : "^14.6.7",
     "@types/dompurify" : "^3.2.0",
     "@types/jest" : "^30.0.0",
-    "@types/node" : "^26.6.3",
+    "@types/node" : "^26.6.4",
     "@types/react" : "^19.3.0",
     "@types/react-dom" : "^19.3.0",
     "@types/react-highlight-words" : "^0.20.1",
     "@typescript/native" : "npm:typescript@^7.0.2",
-    "@vitejs/plugin-react" : "^6.1.1",
+    "@vitejs/plugin-react" : "^6.1.2",
     "@vitejs/plugin-react-swc" : "^4.3.3",
     "env-cmd" : "^11.0.0",
-    "eslint" : "^10.11.0",
+    "eslint" : "^10.12.0",
     "eslint-plugin-react-hooks" : "^7.1.1",
     "eslint-plugin-react-refresh" : "^0.5.7",
-    "globals" : "^17.12.0",
+    "globals" : "^17.13.0",
     "jest" : "^30.5.2",
     "jest-environment-jsdom" : "^30.5.2",
     "ts-jest" : "^29.4.14",
     "typescript" : "^6.0.3",
-    "typescript-eslint" : "^8.71.0",
-    "vite" : "^8.3.1"
+    "typescript-eslint" : "^8.71.1",
+    "vite" : "^8.3.3"
   },
   "browserslist" : {
     "production" : [
