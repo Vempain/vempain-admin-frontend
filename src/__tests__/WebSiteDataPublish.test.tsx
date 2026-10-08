@@ -5,6 +5,11 @@ import type {DataSummaryResponse} from "../models";
 
 const getAllDataSets = jest.fn();
 const publishDataSet = jest.fn();
+const trackTask = jest.fn();
+
+jest.mock("@vempain/vempain-common-frontend", () => ({
+    useTaskProgress: () => ({trackTask: (...args: unknown[]) => trackTask(...args)})
+}));
 
 jest.mock("../services", () => ({
     dataAPI: {
@@ -52,11 +57,12 @@ describe("WebSiteDataPublish", () => {
         expect(screen.queryByText("weather_series")).toBeNull();
     });
 
-    it("publishes selected data set and reloads list", async () => {
+    it("starts the publishing task of the selected data set and reloads the list once it has finished", async () => {
         getAllDataSets.mockResolvedValue([
             buildDataSummary({id: 20, identifier: "music_album_data", description: "Music CD collection"})
         ]);
-        publishDataSet.mockResolvedValue({identifier: "music_album_data"});
+        const accepted = {task_id: "task-1", type: "PUBLISH_DATA_SET", title: "Publish data set music_album_data", status: "QUEUED", total_steps: 1};
+        publishDataSet.mockResolvedValue(accepted);
 
         render(<WebSiteDataPublish/>);
 
@@ -69,6 +75,14 @@ describe("WebSiteDataPublish", () => {
 
         await waitFor(() => {
             expect(publishDataSet).toHaveBeenCalledWith("music_album_data");
+            expect(trackTask).toHaveBeenCalledWith(accepted, expect.objectContaining({onFinished: expect.any(Function)}));
+        });
+        expect(getAllDataSets).toHaveBeenCalledTimes(1);
+
+        // The list is reloaded by the onFinished callback of the tracked task
+        const options = trackTask.mock.calls[0][1] as { onFinished: () => void };
+        options.onFinished();
+        await waitFor(() => {
             expect(getAllDataSets).toHaveBeenCalledTimes(2);
         });
     });

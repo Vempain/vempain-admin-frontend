@@ -25,6 +25,8 @@ import {Login, Logout} from "@vempain/vempain-auth-frontend";
 import {FileTypeEnum} from "./models";
 import {SiteFileList} from "./file/SiteFileList.tsx";
 import {WebSiteConfiguration, WebSiteDataPublish, WebSiteUserList} from "./website";
+import {TaskProgressProvider, TaskProgressTray} from "@vempain/vempain-common-frontend";
+import {taskAPI} from "./services";
 
 const {Content} = Layout;
 
@@ -45,6 +47,7 @@ function App() {
 
     return (
             <ConfigProvider theme={{algorithm: darkAlgorithm, token: darkThemeTokens}}>
+                <TaskProgressProvider taskAPI={taskAPI}>
                 <Layout className={"layout"}>
                     <TopBar/>
                     <Content style={{marginTop: "65px"}}>
@@ -110,6 +113,8 @@ function App() {
                         <BottomFooter/>
                     </Content>
                 </Layout>
+                    <TaskProgressTray/>
+                </TaskProgressProvider>
             </ConfigProvider>
     );
 }

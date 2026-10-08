@@ -9,6 +9,21 @@ void i18n
         resources: {
             en: {
                 translation: {
+                    TaskProgress: {
+                        title: "Background tasks",
+                        queued: "Queued",
+                        running: "Running",
+                        cancelling: "Cancelling, reverting changes",
+                        cancelled: "Cancelled, changes reverted",
+                        completed: "Completed",
+                        failed: "Failed",
+                        steps: "{{completed}} / {{total}} steps",
+                        failedSteps: "{{count}} failed",
+                        revertedSteps: "{{count}} reverted",
+                        close: "Close",
+                        cancel: "Cancel",
+                        cancelError: "Failed to cancel the task"
+                    },
                     common: {
                         table: {
                             fetchLimitReached: "Only the first {{rows}} rows could be loaded.",

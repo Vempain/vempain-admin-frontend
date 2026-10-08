@@ -8,12 +8,14 @@ import {pageAPI} from "../services";
 import dayjs from "dayjs";
 import {PublishSchedule} from "./PublishSchedule";
 import {usePagedTable, VempainTable} from "@vempain/vempain-auth-frontend";
+import {useTaskProgress} from "@vempain/vempain-common-frontend";
 
 export function PageList() {
     const [spinMessage, setSpinMessage] = useState("Loading page list...");
     const [publishing, setPublishing] = useState(false);
     const [schedulePublish, setSchedulePublish] = useState(false);
     const [publishDate, setPublishDate] = useState<dayjs.Dayjs | null>(null);
+    const {trackTask} = useTaskProgress();
     const paged = usePagedTable<PageResponse>(request => pageAPI.findPageable(request), {
         defaultSortBy: "id",
         defaultDirection: "ASC",
@@ -71,7 +73,14 @@ export function PageList() {
                 : undefined;
 
         pageAPI.publishAll(publishParams)
-                .then(() => paged.reload())
+                .then((response) => {
+                    if (response.task) {
+                        // Publishing runs in the background; reload the list once the task has finished
+                        trackTask(response.task, {onFinished: () => paged.reload()});
+                    } else {
+                        paged.reload();
+                    }
+                })
                 .catch(() => console.error("Error publishing all pages"))
                 .finally(() => setPublishing(false));
     }

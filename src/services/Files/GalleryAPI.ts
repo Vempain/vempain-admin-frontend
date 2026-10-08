@@ -1,5 +1,12 @@
-import {type FileGroupListResponse, type GalleryRequest, type GalleryResponse, type PublishItemRequest, QueryDetailEnum} from "../../models";
-import {AbstractAPI, type ActionVO, type PagedRequest, type PagedResponse} from "@vempain/vempain-auth-frontend";
+import {
+    type FileGroupListResponse,
+    type GalleryRequest,
+    type GalleryResponse,
+    type PublishItemRequest,
+    type PublishResponse,
+    QueryDetailEnum
+} from "../../models";
+import {AbstractAPI, type PagedRequest, type PagedResponse} from "@vempain/vempain-auth-frontend";
 import type {GalleryPublishRequest} from "../../models/Requests/Files";
 
 class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryResponse> {
@@ -38,21 +45,21 @@ class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryResponse> {
         return response.data;
     }
 
-    public async publish(request: PublishItemRequest): Promise<ActionVO> {
+    public async publish(request: PublishItemRequest): Promise<PublishResponse> {
         this.setAuthorizationHeader();
-        const response = await this.axiosInstance.patch<ActionVO>("/publish", request);
+        const response = await this.axiosInstance.patch<PublishResponse>("/publish", request);
         return response.data;
     }
 
-    public async publishAll(params?: Record<string, string>): Promise<ActionVO> {
+    public async publishAll(params?: Record<string, string>): Promise<PublishResponse> {
         this.setAuthorizationHeader();
-        const response = await this.axiosInstance.get<ActionVO>("/publish", {params: params});
+        const response = await this.axiosInstance.get<PublishResponse>("/publish", {params: params});
         return response.data;
     }
 
-    public async publishSelectedGalleries(galleryIdList: GalleryPublishRequest): Promise<ActionVO> {
+    public async publishSelectedGalleries(galleryIdList: GalleryPublishRequest): Promise<PublishResponse> {
         this.setAuthorizationHeader();
-        const response = await this.axiosInstance.post<ActionVO>("/publish-selected", galleryIdList);
+        const response = await this.axiosInstance.post<PublishResponse>("/publish-selected", galleryIdList);
         return response.data;
     }
 }

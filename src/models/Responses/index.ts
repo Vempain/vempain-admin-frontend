@@ -6,6 +6,7 @@ export type {LayoutVO} from './LayoutVO';
 export type {LocationResponse} from './LocationResponse';
 export type {PageResponse} from './PageResponse.ts';
 export type {PageableVO} from './PageableVO';
+export type {PublishResponse} from './PublishResponse';
 export type {PublishScheduleResponse} from './PublishScheduleResponse';
 export type {ScheduleTriggerResponse} from './ScheduleTriggerResponse';
 export type {StringListVO} from './StringListVO';
