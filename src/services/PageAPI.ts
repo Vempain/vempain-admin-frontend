@@ -1,5 +1,5 @@
-import type {PageResponse, PublishItemRequest} from "../models";
-import {AbstractAPI, type ActionVO} from "@vempain/vempain-auth-frontend";
+import type {PageResponse, PublishItemRequest, PublishResponse} from "../models";
+import {AbstractAPI} from "@vempain/vempain-auth-frontend";
 
 class PageAPI extends AbstractAPI<PageResponse, PageResponse> {
     public async findPagesByFormId(formId: number): Promise<PageResponse[]> {
@@ -8,15 +8,15 @@ class PageAPI extends AbstractAPI<PageResponse, PageResponse> {
         return response.data;
     }
 
-    public async publish(request: PublishItemRequest): Promise<ActionVO> {
+    public async publish(request: PublishItemRequest): Promise<PublishResponse> {
         this.setAuthorizationHeader();
-        const response = await this.axiosInstance.patch<ActionVO>("/publish", request);
+        const response = await this.axiosInstance.patch<PublishResponse>("/publish", request);
         return response.data;
     }
 
-    public async publishAll(params?: Record<string, string>): Promise<ActionVO> {
+    public async publishAll(params?: Record<string, string>): Promise<PublishResponse> {
         this.setAuthorizationHeader();
-        const response = await this.axiosInstance.get<ActionVO>("/publish", {params: params});
+        const response = await this.axiosInstance.get<PublishResponse>("/publish", {params: params});
         return response.data;
     }
 }

@@ -11,6 +11,8 @@ import {
     VempainTable
 } from "@vempain/vempain-auth-frontend";
 import type {GalleryPublishRequest} from "../models/Requests/Files";
+import type {RefreshResponse} from "../models";
+import {TaskStatusEnum, useTaskProgress} from "@vempain/vempain-common-frontend";
 import {fileSystemAPI, galleryAPI} from "../services";
 import {Link} from "react-router-dom";
 import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, ReloadOutlined} from "@ant-design/icons";
@@ -38,6 +40,7 @@ export function GalleryList() {
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<dayjs.Dayjs | null>(null);
     const [selectedGalleryIds, setSelectedGalleryIds] = useState<number[]>([]);
+    const {trackTask} = useTaskProgress();
 
     const paged = usePagedTable<GalleryListItem>(async (request) => {
         const response = await galleryAPI.findPageableList({
@@ -185,8 +188,13 @@ export function GalleryList() {
         }
 
         galleryAPI.publishAll(publishParams)
-                .then(() => {
-                    paged.reload();
+                .then((response) => {
+                    if (response.task) {
+                        // The files are transferred to the site server in the background; reload the list once the task has finished
+                        trackTask(response.task, {onFinished: () => paged.reload()});
+                    } else {
+                        paged.reload();
+                    }
                 })
                 .catch((_error) => {
                     console.error("Error publishing all galleries");
@@ -203,10 +211,12 @@ export function GalleryList() {
         setActionLoading(true);
         const request: GalleryPublishRequest = {gallery_ids: selectedGalleryIds};
         galleryAPI.publishSelectedGalleries(request)
-                .then(() => {
-                    message.success("Selected galleries publishing triggered");
+                .then((response) => {
+                    if (response.task) {
+                        trackTask(response.task, {onFinished: () => paged.reload()});
+                    }
+                    message.success("Selected galleries publishing started");
                     setSelectedGalleryIds([]);
-                    paged.reload();
                 })
                 .catch((error) => {
                     console.error("Error publishing selected galleries:", error);
@@ -228,7 +238,22 @@ export function GalleryList() {
 
         fileSystemAPI.refreshAllGalleryFiles()
                 .then((response) => {
-                    if (response.result === ActionResult.OK) {
+                    if (response.task) {
+                        // The refresh runs as a background task; the final RefreshResponse arrives as its result
+                        trackTask<RefreshResponse>(response.task, {
+                            onFinished: (task) => {
+                                const result = task.result;
+                                if (task.status === TaskStatusEnum.COMPLETED && result?.result === ActionResult.OK) {
+                                    message.success("Gallery files refreshed successfully");
+                                } else {
+                                    const responseDetails = result?.details?.map((detail) => detail.result_description).join(", ") ?? task.error_message ?? "";
+                                    message.error("Failed to refresh the gallery files, details: " + responseDetails);
+                                }
+                                paged.reload();
+                            }
+                        });
+                        message.info("Refresh of all gallery files started");
+                    } else if (response.result === ActionResult.OK) {
                         setSubmitResults({status: ActionResult.OK, message: "Gallery files refreshed successfully"});
                     } else {
                         const responseDetails = response.details.map((detail) => detail.result_description).join(", ");
@@ -236,8 +261,8 @@ export function GalleryList() {
                     }
                 })
                 .catch((error) => {
-                    console.error("Error publishing gallery:", error);
-                    setSubmitResults({status: ActionResult.FAIL, message: "Failed to publish the gallery, try again later"});
+                    console.error("Error refreshing the gallery files:", error);
+                    setSubmitResults({status: ActionResult.FAIL, message: "Failed to refresh the gallery files, try again later"});
                 })
                 .finally(() => {
                     setActionLoading(false);

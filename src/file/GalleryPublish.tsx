@@ -9,6 +9,7 @@ import {LoadingOutlined} from "@ant-design/icons";
 import dayjs, {Dayjs} from "dayjs";
 import {PublishSchedule} from "../content";
 import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import {useTaskProgress} from "@vempain/vempain-common-frontend";
 import {SiteFileCard} from "./SiteFileCard.tsx";
 
 export function GalleryPublish() {
@@ -22,6 +23,7 @@ export function GalleryPublish() {
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<Dayjs | null>(null);
     const [publishMessage, setPublishMessage] = useState<string>("");
+    const {trackTask} = useTaskProgress();
 
     const sortedSiteFiles = gallery?.site_files ? [...gallery.site_files].sort((a, b) => a.id - b.id) : [];
 
@@ -66,8 +68,14 @@ export function GalleryPublish() {
             };
 
             galleryAPI.publish(publishRequest)
-                    .then(() => {
-                        setSubmitResults({status: ActionResult.OK, message: "Gallery published successfully"});
+                    .then((response) => {
+                        if (response.task) {
+                            // The files are transferred to the site server in the background; the task tray shows the progress
+                            trackTask(response.task);
+                            setSubmitResults({status: ActionResult.OK, message: "Gallery publishing started, follow it in the task tray"});
+                        } else {
+                            setSubmitResults({status: ActionResult.OK, message: "Gallery publishing scheduled"});
+                        }
                     })
                     .catch((error) => {
                         console.error("Error publishing gallery:", error);

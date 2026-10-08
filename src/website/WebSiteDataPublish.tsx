@@ -4,6 +4,7 @@ import {useCallback, useEffect, useMemo, useState} from "react";
 import type {DataSummaryResponse} from "../models";
 import {dataAPI} from "../services";
 import {formatDateTime} from "../tools";
+import {useTaskProgress} from "@vempain/vempain-common-frontend";
 
 const MUSIC_KEYWORDS = ["music", "album", "song", "cd", "audio"] as const;
 const GPS_KEYWORDS = ["gps", "geo", "track", "location"] as const;
@@ -22,6 +23,7 @@ export function WebSiteDataPublish() {
     const [dataSets, setDataSets] = useState<DataSummaryResponse[]>([]);
     const [loading, setLoading] = useState(false);
     const [publishingIdentifier, setPublishingIdentifier] = useState<string | null>(null);
+    const {trackTask} = useTaskProgress();
 
     const loadDataSets = useCallback(async () => {
         setLoading(true);
@@ -56,16 +58,17 @@ export function WebSiteDataPublish() {
     const handlePublish = useCallback(async (identifier: string) => {
         setPublishingIdentifier(identifier);
         try {
-            await dataAPI.publishDataSet(identifier);
-            message.success(`Published data set '${identifier}' to website`);
-            await loadDataSets();
+            const accepted = await dataAPI.publishDataSet(identifier);
+            // The publishing runs as a background task; the list is reloaded once it has finished
+            trackTask(accepted, {onFinished: () => void loadDataSets()});
+            message.success(`Publishing of data set '${identifier}' to the website started`);
         } catch (error) {
             console.error(error);
             message.error(`Failed to publish data set '${identifier}'`);
         } finally {
             setPublishingIdentifier(null);
         }
-    }, [loadDataSets]);
+    }, [loadDataSets, trackTask]);
 
     const columns: ColumnsType<DataSummaryResponse> = useMemo(() => [
         {

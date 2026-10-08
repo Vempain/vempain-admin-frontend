@@ -9,6 +9,7 @@ import TextArea from "antd/es/input/TextArea";
 import dayjs, {Dayjs} from "dayjs";
 import {PublishSchedule} from "./PublishSchedule";
 import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import {useTaskProgress} from "@vempain/vempain-common-frontend";
 import type {ColumnsType} from "antd/lib/table";
 import {sanitizeRichText} from "../tools";
 
@@ -28,6 +29,7 @@ export function PagePublish() {
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<Dayjs | null>(null);
     const [publishMessage, setPublishMessage] = useState<string>("");
+    const {trackTask} = useTaskProgress();
 
     const mergedDataProviders = useMemo<EmbedDataProviders>(
             () => defaultDataProviders,
@@ -91,8 +93,14 @@ export function PagePublish() {
             };
 
             pageAPI.publish(publishRequest)
-                    .then(() => {
-                        setSubmitResults({status: ActionResult.OK, message: "Page publishing completed"});
+                    .then((response) => {
+                        if (response.task) {
+                            // The backend publishes in the background; the task tray shows the progress
+                            trackTask(response.task);
+                            setSubmitResults({status: ActionResult.OK, message: "Page publishing started, follow it in the task tray"});
+                        } else {
+                            setSubmitResults({status: ActionResult.OK, message: "Page publishing scheduled"});
+                        }
                     })
                     .catch((error) => {
                         console.error("Error publishing page:", error);

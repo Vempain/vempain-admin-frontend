@@ -1,3 +1,4 @@
+import type {TaskAcceptedResponse} from "@vempain/vempain-common-frontend";
 import {AbstractAPI} from "@vempain/vempain-auth-frontend";
 import type {DataResponse, DataSummaryResponse} from "../models";
 
@@ -14,9 +15,10 @@ class DataAPI extends AbstractAPI<object, DataResponse> {
         return response.data;
     }
 
-    async publishDataSet(identifier: string): Promise<DataResponse> {
+    /** Starts the publishing as a background task (HTTP 202); the finished task carries the DataResponse as result. */
+    async publishDataSet(identifier: string): Promise<TaskAcceptedResponse> {
         this.setAuthorizationHeader();
-        const response = await this.axiosInstance.post<DataResponse>(`/${identifier}/publish`);
+        const response = await this.axiosInstance.post<TaskAcceptedResponse>(`/${identifier}/publish`);
         return response.data;
     }
 }
