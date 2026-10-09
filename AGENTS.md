@@ -28,6 +28,26 @@
 - JSON contracts are snake_case end to end; TS models mirror the backend DTO field names. Never rename fields to camelCase ad hoc.
 - Do not add TypeScript `enum`; use `as const` objects plus a derived type (see `src/models/FileTypeEnum.ts`).
 - Route changes must be reflected in both `src/App.tsx` and `src/main/TopBar.tsx`.
+- `PageEditor.tsx`: the path field is `PagePathInput` (`AutoComplete` fed by `pageAPI.suggestPath`, debounced; the backend answers with the
+  parent path shared by the readable pages whose path starts with the typed text, never a full existing path), and a new page starts
+  with one ACL row granting the signed-in user every privilege (`useSession().userSession.id`).
+- `src/administration/ApiTokens.tsx` (`/administration/api-tokens`, menu "Web Site Management > API tokens") manages the
+  service-to-service API tokens of the admin backend through `apiTokenAPI` (`/admin-management/api-tokens`): list, create (description,
+  IPv4/IPv6 network pre-filled from `apiTokenAPI.defaultNetwork()` (the admin backend's own private network when the deployment declares
+  `vempain.admin.api-token.private-network`, with every attached private network offered as an alternative; otherwise entered by hand), validated client-side by
+  `isValidNetwork` (`src/tools/networkTools.ts`) and again by the backend, future expiry) and delete. The token string is
+  shown in a modal exactly once after creation; the list only shows the prefix. Tested in `src/__tests__/ApiTokens.test.tsx`.
+- `src/main/MetadataForm.tsx` is the read-only audit trail (created by / created / modified by / modified) of every editor: a compact
+  antd `Descriptions` line, never inputs. It resolves user ids to "name (login)" through `resolveUserName` (`src/tools/userNames.ts`, `userAPI.findById` with a
+  session cache) and
+  shows the raw id and exact timestamp on hover. The user and unit editors keep the audit fields as hidden form items so that their
+  submitted payload is unchanged. Tested in `src/__tests__/MetadataForm.test.tsx`.
+- User and unit management (`src/user/*`) and the ACL editor are the shared screens of `@vempain/vempain-auth-frontend` (`UserList`,
+  `UserEditor`, `UnitList`, `UnitEditor`, `AclEditor`) bound to this backend's `userAPI`/`unitAPI` (`src/services/UserAPI.ts`,
+  `UnitAPI.ts`, instances of the library's `UserAPI`/`UnitAPI` on `/content-management/users|units`). `src/content/AclEdit.tsx` is only
+  the wrapper that loads this backend's users and units for the shared `AclEditor`; the editors keep its `acls`/`parentForm` contract.
+  The ACL rules (create implies read, "All" button) and the nested-unit cycle check live and are tested in the library; here
+  `src/__tests__/AclEdit.test.tsx` covers the wrapper and `src/__tests__/PagePathInput.test.tsx` the path input.
 - Editor integration: `PageEditor.tsx` and `PagePublish.tsx` are the reference host for `RichTextEditor` and its `dataProviders`; keep them aligned
   with the rt-editor integration guide.
 - Rich-text/HTML from the backend is sanitized with the helpers in `src/tools/` (`richTextSecurity`, `urlSecurity`, `footerSecurity`); do not bypass them.

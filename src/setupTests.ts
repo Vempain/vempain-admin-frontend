@@ -39,3 +39,34 @@ Object.defineProperty(globalThis, 'getComputedStyle', {
     configurable: true,
     value: getComputedStyleWithoutPseudoElement,
 });
+
+// antd form fields schedule work through MessageChannel, which jsdom does not provide
+if (typeof globalThis.MessageChannel === 'undefined') {
+    class StubMessageChannel {
+        port1: { onmessage: ((event: { data: unknown }) => void) | null; postMessage: (data: unknown) => void };
+        port2: { onmessage: ((event: { data: unknown }) => void) | null; postMessage: (data: unknown) => void };
+
+        constructor() {
+            this.port1 = {onmessage: null, postMessage: data => setTimeout(() => this.port2.onmessage?.({data}), 0)};
+            this.port2 = {onmessage: null, postMessage: data => setTimeout(() => this.port1.onmessage?.({data}), 0)};
+        }
+    }
+
+    Object.defineProperty(globalThis, 'MessageChannel', {configurable: true, writable: true, value: StubMessageChannel});
+}
+
+// antd dropdowns observe their trigger size; jsdom has no ResizeObserver
+if (typeof globalThis.ResizeObserver === 'undefined') {
+    class StubResizeObserver {
+        observe(): void {
+        }
+
+        unobserve(): void {
+        }
+
+        disconnect(): void {
+        }
+    }
+
+    Object.defineProperty(globalThis, 'ResizeObserver', {configurable: true, writable: true, value: StubResizeObserver});
+}

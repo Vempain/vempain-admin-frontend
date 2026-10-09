@@ -25,6 +25,7 @@ import {Login, Logout} from "@vempain/vempain-auth-frontend";
 import {FileTypeEnum} from "./models";
 import {SiteFileList} from "./file/SiteFileList.tsx";
 import {WebSiteConfiguration, WebSiteDataPublish, WebSiteUserList} from "./website";
+import {ApiTokens} from "./administration";
 import {TaskProgressProvider, TaskProgressTray} from "@vempain/vempain-common-frontend";
 import {taskAPI} from "./services";
 
@@ -107,6 +108,7 @@ function App() {
                                     <Route path={"/administration/web-users"} element={<WebSiteUserList/>}/>
                                     <Route path={"/administration/web-site-configuration"} element={<WebSiteConfiguration/>}/>
                                     <Route path={"/administration/data-publish"} element={<WebSiteDataPublish/>}/>
+                                    <Route path={"/administration/api-tokens"} element={<ApiTokens/>}/>
                                 </Route>
                             </Routes>
                         </div>

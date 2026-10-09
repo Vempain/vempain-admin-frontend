@@ -1,10 +1,17 @@
-import type {PageResponse, PublishItemRequest, PublishResponse} from "../models";
+import type {PagePathSuggestionResponse, PageResponse, PublishItemRequest, PublishResponse} from "../models";
 import {AbstractAPI} from "@vempain/vempain-auth-frontend";
 
 class PageAPI extends AbstractAPI<PageResponse, PageResponse> {
     public async findPagesByFormId(formId: number): Promise<PageResponse[]> {
         this.setAuthorizationHeader();
         const response = await this.axiosInstance.get<PageResponse[]>("/by-form/" + formId);
+        return response.data;
+    }
+
+    /** Parent path shared by the readable pages whose path starts with the typed prefix; suggestion is null when nothing matches */
+    public async suggestPath(prefix: string): Promise<PagePathSuggestionResponse> {
+        this.setAuthorizationHeader();
+        const response = await this.axiosInstance.get<PagePathSuggestionResponse>("/path-suggestion", {params: {prefix}});
         return response.data;
     }
 

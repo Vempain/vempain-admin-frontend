@@ -9,3 +9,4 @@ export {sanitizeFooterMarkup} from './footerSecurity';
 export {sanitizeRichText} from './richTextSecurity';
 export {sanitizeHtmlFragment} from './richTextSecurity';
 export type {LastEmbedType} from './embedTools';
+export {isValidNetwork} from './networkTools';
