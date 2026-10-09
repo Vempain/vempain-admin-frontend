@@ -18,6 +18,7 @@ import {
     FormOutlined,
     ForwardOutlined,
     InfoCircleOutlined,
+    KeyOutlined,
     LogoutOutlined,
     MenuOutlined,
     PictureOutlined,
@@ -191,6 +192,11 @@ export function TopBar() {
                         label: (<Link to={"/administration/data-publish"}>Data publish</Link>),
                         key: "data-publish",
                         icon: <DatabaseOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/administration/api-tokens"}>API tokens</Link>),
+                        key: "api-tokens",
+                        icon: <KeyOutlined/>
                     }
                 ],
             },

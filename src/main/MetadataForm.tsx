@@ -1,38 +1,90 @@
-import {Col, Divider, Row} from "antd";
+import {Descriptions, Tooltip, Typography} from "antd";
+import {useEffect, useState} from "react";
 import dayjs, {type Dayjs} from "dayjs";
+import {resolveUserName} from "../tools/userNames";
 
 interface Metadata {
     creator: number;
-    created: Dayjs;
+    created: Dayjs | string;
     modifier?: number | null;
-    modified?: Dayjs | null;
+    modified?: Dayjs | string | null;
 }
 
 interface MetadataFormProps {
     metadata: Metadata;
 }
 
-function MetadataForm({metadata}: MetadataFormProps) {
-    const displayCreated = dayjs(metadata.created).format("YYYY-MM-DD hh:mm");
-    const displayModified = metadata.modified ? dayjs(metadata.modified).format("YYYY-MM-DD hh:mm") : "-";
+const EMPTY = "–";
+
+function formatStamp(value: Dayjs | string | null | undefined): { short: string; full: string } | null {
+    if (value === null || value === undefined) {
+        return null;
+    }
+    const stamp = dayjs(value);
+    if (!stamp.isValid()) {
+        return null;
+    }
+    return {short: stamp.format("YYYY-MM-DD HH:mm"), full: stamp.format("YYYY-MM-DD HH:mm:ss")};
+}
+
+function UserName({id}: { id: number | null | undefined }) {
+    const [name, setName] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (id === null || id === undefined || id <= 0) {
+            return;
+        }
+        let active = true;
+        resolveUserName(id)
+                .then(resolved => {
+                    if (active) setName(resolved);
+                });
+        return () => {
+            active = false;
+        };
+    }, [id]);
+
+    if (id === null || id === undefined || id <= 0) {
+        return <Typography.Text type="secondary">{EMPTY}</Typography.Text>;
+    }
     return (
-            <div style={{backgroundColor: "rgba(190, 190, 190, 0.1)", padding: "16px", borderRadius: "4px"}}>
-                <Divider orientation={"horizontal"} key={"page-meta-divider"}>Metadata</Divider>
-                <div>
-                    <Row gutter={[16, 16]}>
-                        <Col span={6}><b>Creator</b></Col>
-                        <Col span={6}><b>Created</b></Col>
-                        <Col span={6}><b>Modifier</b></Col>
-                        <Col span={6}><b>Modified</b></Col>
-                    </Row>
-                    <Row gutter={[16, 16]}>
-                        <Col span={6}>{metadata.creator}</Col>
-                        <Col span={6}>{displayCreated}</Col>
-                        <Col span={6}>{metadata.modifier ?? "-"}</Col>
-                        <Col span={6}>{displayModified}</Col>
-                    </Row>
-                </div>
-            </div>
+            <Tooltip title={`User ID ${id}`}>
+                <Typography.Text>{name ?? `#${id}`}</Typography.Text>
+            </Tooltip>
+    );
+}
+
+function Stamp({value}: { value: Dayjs | string | null | undefined }) {
+    const formatted = formatStamp(value);
+    if (formatted === null) {
+        return <Typography.Text type="secondary">{EMPTY}</Typography.Text>;
+    }
+    return (
+            <Tooltip title={formatted.full}>
+                <Typography.Text>{formatted.short}</Typography.Text>
+            </Tooltip>
+    );
+}
+
+/**
+ * Read-only audit trail of an entity (who created and last modified it, and when) as one compact line of descriptions. The user ids
+ * are shown as "name (login)" once resolved; hovering shows the raw id and the exact timestamp.
+ */
+function MetadataForm({metadata}: MetadataFormProps) {
+    return (
+            <Descriptions
+                    size="small"
+                    column={{xs: 1, sm: 2, lg: 4}}
+                    colon={false}
+                    styles={{label: {color: "rgba(128, 128, 128, 0.9)", fontSize: "0.85em", paddingInlineEnd: 6}}}
+                    data-testid="metadata"
+                    items={[
+                        {key: "creator", label: "Created by", children: <UserName id={metadata.creator}/>},
+                        {key: "created", label: "Created", children: <Stamp value={metadata.created}/>},
+                        {key: "modifier", label: "Modified by", children: <UserName id={metadata.modifier}/>},
+                        {key: "modified", label: "Modified", children: <Stamp value={metadata.modified}/>}
+                    ]}
+            />
     );
 }
 

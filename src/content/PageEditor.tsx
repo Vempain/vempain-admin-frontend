@@ -3,11 +3,12 @@ import {type UIEvent, useCallback, useEffect, useMemo, useRef, useState} from "r
 import {Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
 import type {RuleObject} from "antd/es/form";
 import {AclEdit} from "./AclEdit";
+import {PagePathInput} from "./PagePathInput";
 import {type DataSetQueryParams, type EmbedDataProviders, RichTextEditor as RtEditor, type SiteFileQueryParams,} from '@vempain/vempain-rt-editor';
 import {MetadataForm, SubmitResultHandler} from "../main";
 import {dataAPI, formAPI, galleryAPI, pageAPI, siteFileAPI} from "../services";
 import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-design/icons";
-import {aclTool, type AclVO, ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import {aclTool, type AclVO, ActionResult, type SubmitResult, useSession, validateParamId} from "@vempain/vempain-auth-frontend";
 import {type FileTypeEnum, type FormVO, type PageResponse, type SiteFilePagedRequest} from "../models";
 import dayjs from "dayjs";
 import {sanitizeRichText} from "../tools";
@@ -61,6 +62,7 @@ interface GalleryList {
 
 export function PageEditor() {
     const {paramId} = useParams();
+    const {userSession} = useSession();
     const [pageId, setPageId] = useState<number>(0);
     const [pageTitle, setPageTitle] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
@@ -259,6 +261,18 @@ export function PageEditor() {
                                     setSubmitResults({status: ActionResult.FAIL, message: "Failed to fetch the page, try again later"});
                                 });
                     } else {
+                        // A new page starts with the current user holding every privilege, so that the creator never locks themselves out
+                        const defaultAcls: AclVO[] = userSession?.id ? [{
+                            permission_id: 0,
+                            acl_id: 0,
+                            user: Number(userSession.id),
+                            unit: null,
+                            create_privilege: true,
+                            read_privilege: true,
+                            modify_privilege: true,
+                            delete_privilege: true
+                        }] : [];
+                        setAcls(defaultAcls);
                         setPage({
                             id: 0,
                             parent_id: 0,
@@ -269,7 +283,7 @@ export function PageEditor() {
                             title: "",
                             header: "",
                             body: "",
-                            acls: [],
+                            acls: defaultAcls,
                             locked: false,
                             creator: 0,
                             created: dayjs(),
@@ -286,7 +300,7 @@ export function PageEditor() {
                 .finally(() => {
                     setLoading(false);
                 });
-    }, [paramId]);
+    }, [paramId, userSession?.id]);
 
     function onFinish(values: PageResponse): void {
         console.debug("onFinish", values);
@@ -436,7 +450,7 @@ export function PageEditor() {
                             <RtEditor dataProviders={mergedDataProviders}/>
                         </Form.Item>
                         <Form.Item name={"page_path"} label={"Path"}>
-                            <Input/>
+                            <PagePathInput/>
                         </Form.Item>
 
                         <Form.Item name={"locked"} label={"Locked"} valuePropName={"checked"}>

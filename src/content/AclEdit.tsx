@@ -1,200 +1,41 @@
+import {type FormInstance, Spin} from "antd";
 import {useEffect, useState} from "react";
-import {Button, Col, Form, type FormInstance, Row, Select, Switch} from "antd";
-import {MinusCircleFilled, PlusCircleFilled} from "@ant-design/icons";
+import {AclEditor, type AclVO, loadUsersAndUnits, type UnitVO, type UserVO} from "@vempain/vempain-auth-frontend";
 import {unitAPI, userAPI} from "../services";
-import type {AclVO, UnitVO, UserVO} from "@vempain/vempain-auth-frontend";
 
 interface AclEditProps {
     acls: AclVO[];
     parentForm: FormInstance;
 }
 
+/**
+ * The shared ACL editor of `@vempain/vempain-auth-frontend` fed with this backend's users and units. Every content editor (page, form,
+ * layout, component, gallery) mounts it on its own form's `acls` list.
+ */
 export function AclEdit({acls, parentForm}: AclEditProps) {
-    const [aclForm] = Form.useForm();
-    const [userList, setUserList] = useState<UserVO[]>([]);
-    const [unitList, setUnitList] = useState<UnitVO[]>([]);
-    const [loadingLists, setLoadingLists] = useState<boolean>(true);
+    const [users, setUsers] = useState<UserVO[]>([]);
+    const [units, setUnits] = useState<UnitVO[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        Promise.all(
-                [
-                    userAPI.findPageable({page: 0, size: 200, sort_by: "name", direction: "ASC"}),
-                    unitAPI.findPageable({page: 0, size: 200, sort_by: "name", direction: "ASC"}),
-                ])
-                .then((responses) => {
-                    setUserList(responses[0].content);
-                    setUnitList(responses[1].content);
+        let active = true;
+        loadUsersAndUnits(userAPI, unitAPI)
+                .then(lookup => {
+                    if (!active) return;
+                    setUsers(lookup.users);
+                    setUnits(lookup.units);
                 })
-                .catch((error) => {
-                    console.error("Failed to fetch users and units: ", error);
-                })
+                .catch(error => console.error("Failed to fetch users and units: ", error))
                 .finally(() => {
-                    setLoadingLists(false);
+                    if (active) setLoading(false);
                 });
+        return () => {
+            active = false;
+        };
     }, []);
 
-    function parseOptionalId(value: unknown): number | undefined {
-        if (value === undefined || value === null || value === "empty" || value === "") {
-            return undefined;
-        }
-        const parsed = Number(value);
-        return Number.isFinite(parsed) ? parsed : undefined;
+    if (loading) {
+        return <Spin size="small"/>;
     }
-
-    function validateAclRow(fieldName: string, _value: unknown, index: number): Promise<void> {
-        if (fieldName === "user" || fieldName === "unit") {
-            const userValue = parentForm.getFieldValue(["acls", index, "user"]);
-            const unitValue = parentForm.getFieldValue(["acls", index, "unit"]);
-
-            const userId = parseOptionalId(userValue);
-            const unitId = parseOptionalId(unitValue);
-
-            // One of the two must be selected
-            if ((userId === undefined) && (unitId === undefined)) {
-                return Promise.reject("Either User or Unit must be selected.");
-            }
-
-            // Both cannot be selected
-            if ((userId !== undefined) && (unitId !== undefined)) {
-                return Promise.reject("Either User or Unit must be selected, not both.");
-            }
-        }
-
-        if (fieldName.endsWith("_privilege")) {
-            const readPrivilegeValue = parentForm.getFieldValue(["acls", index, "read_privilege"]);
-            const modifyPrivilegeValue = parentForm.getFieldValue(["acls", index, "modify_privilege"]);
-            const deletePrivilegeValue = parentForm.getFieldValue(["acls", index, "delete_privilege"]);
-
-            if (!readPrivilegeValue) {
-                return Promise.reject("Read privilege must be selected.");
-            }
-
-            if ((fieldName === "delete_privilege" || fieldName === "modify_privilege")
-                    && deletePrivilegeValue && !modifyPrivilegeValue) {
-                return Promise.reject("Delete privilege requires modify privilege.");
-            }
-        }
-
-        return Promise.resolve();
-    }
-
-    return (
-            <>
-                {!loadingLists && (
-                        <>
-                            <Row gutter={16} align="middle">
-                                <Col span={4}><strong>User</strong></Col>
-                                <Col span={4}><strong>Unit</strong></Col>
-                                <Col span={3}><strong>Create</strong></Col>
-                                <Col span={3}><strong>Read</strong></Col>
-                                <Col span={3}><strong>Modify</strong></Col>
-                                <Col span={3}><strong>Delete</strong></Col>
-                            </Row>
-
-                            <Form.List name={"acls"} key={"layout-acl-list"} initialValue={acls}>
-                                {(acls, {add, remove}) => (
-                                        <>
-                                            {acls.map((field, index) => (
-                                                    <Row gutter={16} align="middle" key={field.key}>
-                                                        {/* User Dropdown */}
-                                                        <Col span={4}>
-                                                            <Form.Item name={[field.name, "permission_id"]} hidden={true}></Form.Item>
-                                                            <Form.Item name={[field.name, "acl_id"]} hidden={true}></Form.Item>
-                                                            <Form.Item name={[field.name, "user"]}
-                                                                       rules={[
-                                                                           {
-                                                                               validator: (_rule, value) => validateAclRow("user", value, index)
-                                                                           }
-                                                                       ]}
-                                                            >
-                                                                <Select
-                                                                        placeholder="Select User"
-                                                                        showSearch
-                                                                        optionFilterProp="children"
-                                                                >
-                                                                    {/* Empty item */}
-                                                                    <Select.Option value={null} key="empty">
-                                                                        None
-                                                                    </Select.Option>
-                                                                    {userList.map(user => (
-                                                                            <Select.Option key={user.id} value={user.id}>
-                                                                                {user.name} ({user.login_name})
-                                                                            </Select.Option>
-                                                                    ))}
-                                                                </Select>
-                                                            </Form.Item>
-                                                        </Col>
-
-                                                        {/* Unit Dropdown */}
-                                                        <Col span={4}>
-                                                            <Form.Item name={[field.name, "unit"]}
-                                                                       rules={[
-                                                                           {
-                                                                               validator: (_rule, value) => validateAclRow("unit", value, index)
-                                                                           }
-                                                                       ]}
-                                                            >
-                                                                <Select placeholder="Select Unit" showSearch optionFilterProp="children">
-                                                                    {/* Empty item */}
-                                                                    <Select.Option key="empty">
-                                                                        None
-                                                                    </Select.Option>
-                                                                    {unitList.map(unit => (
-                                                                            <Select.Option key={unit.id} value={unit.id}>
-                                                                                {unit.name}
-                                                                            </Select.Option>
-                                                                    ))}
-                                                                </Select>
-                                                            </Form.Item>
-                                                        </Col>
-
-                                                        {/* Privileges Switches */}
-                                                        {["create_privilege", "read_privilege", "modify_privilege", "delete_privilege"].map((privilege, privIndex) => (
-                                                                <Col span={3} key={index + "-" + privIndex}>
-                                                                    <Form.Item
-                                                                            name={[field.name, privilege]}
-                                                                            valuePropName="checked"
-                                                                            rules={[
-                                                                                {
-                                                                                    validator: (_rule, value) => validateAclRow(privilege, value, index)
-                                                                                }
-                                                                            ]}
-                                                                    >
-                                                                        <Switch
-                                                                                checkedChildren={true}
-                                                                                unCheckedChildren={false}
-                                                                                onChange={(checked) => {
-                                                                                    aclForm.setFieldsValue({
-                                                                                        [field.name]: {
-                                                                                            [privilege]: checked
-                                                                                        }
-                                                                                    });
-                                                                                }}
-                                                                        />
-                                                                    </Form.Item>
-                                                                </Col>
-                                                        ))}
-
-                                                        {/* Remove Button */}
-                                                        <Col span={2}>
-                                                            <Button onClick={() => remove(field.name)}
-                                                                    type="text"
-                                                                    danger
-                                                            ><MinusCircleFilled/></Button>
-                                                        </Col>
-                                                    </Row>
-                                            ))}
-
-                                            <Form.Item>
-                                                <Button type="dashed" onClick={() => add()} block icon={<PlusCircleFilled/>}>
-                                                    Add ACL
-                                                </Button>
-                                            </Form.Item>
-                                        </>
-                                )}
-                            </Form.List>
-                        </>
-                )}
-            </>
-    );
+    return <AclEditor acls={acls} parentForm={parentForm} users={users} units={units}/>;
 }

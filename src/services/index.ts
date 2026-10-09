@@ -1,4 +1,5 @@
 export {aclAPI} from './AclAPI';
+export {apiTokenAPI} from './ApiTokenAPI';
 export {authHeader} from './AuthHeader';
 export {componentAPI} from './ComponentAPI';
 export {dataAPI} from './DataAPI';
