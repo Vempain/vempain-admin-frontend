@@ -5,8 +5,8 @@ import {Link} from "react-router-dom";
 import {DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {type LayoutVO} from "../models";
 import {formatDateTime} from "../tools";
-import {aclTool, PrivilegeEnum, usePagedTable, useSession, VempainTable} from "@vempain/vempain-auth-frontend";
-import {layoutAPI} from "../services";
+import {aclTool, PrivilegeEnum, usePagedTable, UserName, useSession, VempainTable} from "@vempain/vempain-auth-frontend";
+import {layoutAPI, userAPI} from "../services";
 
 export function LayoutList() {
     const {userSession} = useSession();
@@ -19,9 +19,9 @@ export function LayoutList() {
     const columns: ColumnsType<LayoutVO> = useMemo(() => [
         {title: "ID", dataIndex: "id", key: "id", defaultSortOrder: "descend", sorter: true},
         {title: "Layout Name", dataIndex: "layout_name", key: "layout_name", defaultSortOrder: "descend", sorter: true, searchable: true},
-        {title: "Creator", dataIndex: "creator", key: "creator", sorter: true},
+        {title: "Creator", dataIndex: "creator", key: "creator", sorter: true, render: (_, record) => <UserName userAPI={userAPI} id={record.creator}/>},
         {title: "Created", dataIndex: "created", key: "created", sorter: true, render: (_, record) => formatDateTime(record.created)},
-        {title: "Modifier", dataIndex: "modifier", key: "modifier", sorter: true},
+        {title: "Modifier", dataIndex: "modifier", key: "modifier", sorter: true, render: (_, record) => <UserName userAPI={userAPI} id={record.modifier}/>},
         {
             title: "Modified",
             dataIndex: "modified",

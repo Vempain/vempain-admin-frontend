@@ -68,7 +68,7 @@ function Stamp({value}: { value: Dayjs | string | null | undefined }) {
 
 /**
  * Read-only audit trail of an entity (who created and last modified it, and when) as one compact line of descriptions. The user ids
- * are shown as "name (login)" once resolved; hovering shows the raw id and the exact timestamp.
+ * are shown as "name (nick)" once resolved; hovering shows the raw id and the exact timestamp.
  */
 function MetadataForm({metadata}: MetadataFormProps) {
     return (

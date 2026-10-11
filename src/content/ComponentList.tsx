@@ -4,9 +4,9 @@ import {Button, Space, Spin, Switch} from "antd";
 import {DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {Link} from "react-router-dom";
 import {type ComponentVO} from "../models";
-import {aclTool, PrivilegeEnum, usePagedTable, useSession, VempainTable} from "@vempain/vempain-auth-frontend";
+import {aclTool, PrivilegeEnum, usePagedTable, UserName, useSession, VempainTable} from "@vempain/vempain-auth-frontend";
 import {formatDateTime} from "../tools";
-import {componentAPI} from "../services";
+import {componentAPI, userAPI} from "../services";
 
 export function ComponentList() {
     const {userSession} = useSession();
@@ -40,34 +40,29 @@ export function ComponentList() {
             title: "Creator",
             dataIndex: "creator",
             key: "creator",
-            sorter: true
+            sorter: true,
+            render: (_, record) => <UserName userAPI={userAPI} id={record.creator}/>
         },
         {
             title: "Created",
             dataIndex: "created",
             key: "created",
             sorter: true,
-            render: (_: Record<string, unknown>, record: ComponentVO) => {
-                return formatDateTime(record.created);
-            }
+            render: (_: Record<string, unknown>, record: ComponentVO) => formatDateTime(record.created)
         },
         {
             title: "Modifier",
             dataIndex: "modifier",
             key: "modifier",
-            sorter: true
+            sorter: true,
+            render: (_, record) => <UserName userAPI={userAPI} id={record.modifier}/>
         },
         {
             title: "Modified",
             dataIndex: "modified",
             key: "modified",
             sorter: true,
-            render: (_: Record<string, unknown>, record: ComponentVO) => {
-                if (record.modified === null) {
-                    return "-";
-                }
-                return formatDateTime(record.modified);
-            }
+            render: (_: Record<string, unknown>, record: ComponentVO) => record.modified === null ? "-" : formatDateTime(record.modified)
         },
         {
             title: "Action",

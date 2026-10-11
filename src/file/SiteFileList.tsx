@@ -1,10 +1,11 @@
 import type {ColumnsType} from "antd/es/table";
 import {Tag} from "antd";
 import {GenericFileList} from "./GenericFileList";
-import {siteFileAPI} from "../services";
+import {siteFileAPI, userAPI} from "../services";
 import type {FileTypeEnum, SiteFileResponse} from "../models";
 import {formatDateTimeWithMs, formatFileSize} from "../tools";
 import {useMemo} from "react";
+import {UserName} from "@vempain/vempain-auth-frontend";
 
 interface Props {
     fileType: FileTypeEnum;
@@ -20,6 +21,7 @@ export function SiteFileList({fileType, title}: Props) {
             key: "creator",
             sorter: true,
             sortDirections: ["descend", "ascend"],
+            render: (_, record) => <UserName userAPI={userAPI} id={record.creator}/>,
         },
         {
             title: "Created",
