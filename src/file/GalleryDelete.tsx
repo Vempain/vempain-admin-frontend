@@ -4,10 +4,10 @@ import {formatDateTimeWithMs} from "../tools";
 import type {SiteFileResponse} from "../models";
 import {type GalleryResponse} from "../models";
 import {SubmitResultHandler} from "../main";
-import {galleryAPI} from "../services";
+import {galleryAPI, userAPI} from "../services";
 import {Button, Spin, Table} from "antd";
 import type {ColumnsType} from "antd/es/table";
-import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import {ActionResult, type SubmitResult, UserName, validateParamId} from "@vempain/vempain-auth-frontend";
 
 export function GalleryDelete() {
     const {paramId} = useParams();
@@ -27,7 +27,7 @@ export function GalleryDelete() {
             sorter: true,
             sortDirections: ["descend", "ascend"],
             render: (_, record) => {
-                return (<>{record.creator}</>);
+                return (<UserName userAPI={userAPI} id={record.creator}/>);
             }
         },
         {

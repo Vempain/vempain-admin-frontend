@@ -9,6 +9,9 @@ const deleteToken = jest.fn();
 const defaultNetwork = jest.fn();
 
 jest.mock("../services", () => ({
+    userAPI: {
+        findById: jest.fn(async () => ({id: 1, name: "Admin", nick: "admin"}))
+    },
     apiTokenAPI: {
         list: (...args: unknown[]) => list(...args),
         createToken: (...args: unknown[]) => createToken(...args),

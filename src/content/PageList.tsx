@@ -4,10 +4,10 @@ import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import type {PageResponse} from "../models";
-import {pageAPI} from "../services";
+import {pageAPI, userAPI} from "../services";
 import dayjs from "dayjs";
 import {PublishSchedule} from "./PublishSchedule";
-import {usePagedTable, VempainTable} from "@vempain/vempain-auth-frontend";
+import {usePagedTable, UserName, VempainTable} from "@vempain/vempain-auth-frontend";
 import {useTaskProgress} from "@vempain/vempain-common-frontend";
 
 export function PageList() {
@@ -31,9 +31,9 @@ export function PageList() {
         {title: "Index List", dataIndex: "index_list", key: "index_list", sorter: true},
         {title: "Title", dataIndex: "title", key: "title", sorter: true, searchable: true},
         {title: "Locked", dataIndex: "locked", key: "locked", sorter: true},
-        {title: "Creator", dataIndex: "creator", key: "creator", sorter: true},
+        {title: "Creator", dataIndex: "creator", key: "creator", sorter: true, render: (_, record) => <UserName userAPI={userAPI} id={record.creator}/>},
         {title: "Created", dataIndex: "created", key: "created", sorter: true, render: (_, record) => dayjs(record.created).format("YYYY.MM.DD HH:mm")},
-        {title: "Modifier", dataIndex: "modifier", key: "modifier", sorter: true},
+        {title: "Modifier", dataIndex: "modifier", key: "modifier", sorter: true, render: (_, record) => <UserName userAPI={userAPI} id={record.modifier}/>},
         {
             title: "Modified",
             dataIndex: "modified",

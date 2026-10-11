@@ -13,8 +13,9 @@ import {
 } from "../models";
 import {WebSiteResourceTypeEnum as WebSiteResourceTypeValues} from "../models/WebSiteResourceTypeEnum";
 import VirtualList from "rc-virtual-list";
-import {webSiteManagementAPI} from "../services";
+import {userAPI, webSiteManagementAPI} from "../services";
 import {formatDateTime} from "../tools";
+import {UserName} from "@vempain/vempain-auth-frontend";
 
 const PAGE_SIZE = 100;
 
@@ -349,7 +350,8 @@ export function WebSiteUserList() {
         },
         {
             title: "Creator",
-            dataIndex: "creator"
+            dataIndex: "creator",
+            render: (_, record) => <UserName userAPI={userAPI} id={record.creator}/>
         },
         {
             title: "Created",
@@ -358,7 +360,8 @@ export function WebSiteUserList() {
         },
         {
             title: "Modifier",
-            dataIndex: "modifier"
+            dataIndex: "modifier",
+            render: (_, record) => <UserName userAPI={userAPI} id={record.modifier}/>
         },
         {
             title: "Modified",

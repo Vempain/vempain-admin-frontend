@@ -5,8 +5,8 @@ import {Link} from "react-router-dom";
 import {DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {type FormVO} from "../models";
 import {formatDateTime} from "../tools";
-import {aclTool, PrivilegeEnum, usePagedTable, useSession, VempainTable} from "@vempain/vempain-auth-frontend";
-import {formAPI} from "../services";
+import {aclTool, PrivilegeEnum, usePagedTable, UserName, useSession, VempainTable} from "@vempain/vempain-auth-frontend";
+import {formAPI, userAPI} from "../services";
 
 export function FormList() {
     const {userSession} = useSession();
@@ -34,9 +34,9 @@ export function FormList() {
             )
         },
         {title: "Locked", dataIndex: "locked", key: "locked", sorter: true},
-        {title: "Creator", dataIndex: "creator", key: "creator", sorter: true},
+        {title: "Creator", dataIndex: "creator", key: "creator", sorter: true, render: (_, record) => <UserName userAPI={userAPI} id={record.creator}/>},
         {title: "Created", dataIndex: "created", key: "created", sorter: true, render: (_, record) => formatDateTime(record.created)},
-        {title: "Modifier", dataIndex: "modifier", key: "modifier", sorter: true},
+        {title: "Modifier", dataIndex: "modifier", key: "modifier", sorter: true, render: (_, record) => <UserName userAPI={userAPI} id={record.modifier}/>},
         {
             title: "Modified",
             dataIndex: "modified",

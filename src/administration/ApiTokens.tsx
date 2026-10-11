@@ -4,8 +4,9 @@ import {DeleteOutlined, KeyOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {useCallback, useEffect, useState} from "react";
 import dayjs, {type Dayjs} from "dayjs";
 import {type ApiTokenCreatedResponse, type ApiTokenNetworkResponse, ApiTokenNetworkSource, type ApiTokenRequest, type ApiTokenResponse} from "../models";
-import {apiTokenAPI} from "../services";
+import {apiTokenAPI, userAPI} from "../services";
 import {formatDateTime, isValidNetwork} from "../tools";
+import {UserName} from "@vempain/vempain-auth-frontend";
 
 interface TokenFormValues {
     description: string;
@@ -114,7 +115,7 @@ export function ApiTokens() {
                     </Space>
             )
         },
-        {title: "Owner", dataIndex: "owner_user_id", key: "owner_user_id", render: (id: number) => `#${id}`},
+        {title: "Owner", dataIndex: "owner_user_id", key: "owner_user_id", render: (id: number) => <UserName userAPI={userAPI} id={id}/>},
         {title: "Created", dataIndex: "created", key: "created", render: (value: string) => formatDateTime(dayjs(value))},
         {title: "Last used", dataIndex: "last_used", key: "last_used", render: (value: string | null) => value ? formatDateTime(dayjs(value)) : "never"},
         {
