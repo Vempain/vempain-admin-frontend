@@ -17,8 +17,8 @@ describe("MetadataForm", () => {
 
     it("renders a compact read-only line with resolved user names and 24h timestamps", async () => {
         findById.mockImplementation((id: number) => Promise.resolve(id === 1
-                ? {id: 1, name: "Admin User", login_name: "admin"}
-                : {id: 2, name: "Editor", login_name: "editor"}));
+                ? {id: 1, name: "Admin User", nick: "admin", login_name: "admin"}
+                : {id: 2, name: "Editor", nick: "editor", login_name: "editor"}));
 
         const {container} = render(<MetadataForm metadata={{
             creator: 1,
@@ -50,8 +50,16 @@ describe("MetadataForm", () => {
         expect(findById).toHaveBeenCalledTimes(1);
     });
 
+    it("shows only the nick when the full user name is unavailable", async () => {
+        findById.mockResolvedValue({id: 9, nick: "editor"});
+
+        render(<MetadataForm metadata={{creator: 9, created: "2026-01-01T00:00:00Z"}}/>);
+
+        await waitFor(() => expect(screen.getByText("editor")).toBeTruthy());
+    });
+
     it("looks every user up only once across instances", async () => {
-        findById.mockResolvedValue({id: 1, name: "Admin User", login_name: "admin"});
+        findById.mockResolvedValue({id: 1, name: "Admin User", nick: "admin", login_name: "admin"});
 
         render(<>
             <MetadataForm metadata={{creator: 1, created: "2026-01-01T00:00:00Z", modifier: 1, modified: "2026-01-02T00:00:00Z"}}/>
