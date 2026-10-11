@@ -384,7 +384,7 @@ export function PageEditor() {
     }
 
     if (submitResults.status !== ActionResult.NO_CHANGE) {
-        return (<SubmitResultHandler submitResult={submitResults} successTo={"/pages/" + paramId + "/edit"} failTo={"/pages/" + paramId + "/edit"}/>);
+        return (<SubmitResultHandler submitResult={submitResults} successTo={"/pages"} failTo={"/pages"}/>);
     }
 
     return (
