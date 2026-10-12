@@ -1,7 +1,7 @@
-import type {PagePathSuggestionResponse, PageResponse, PublishItemRequest, PublishResponse} from "../models";
+import type {PagePathSuggestionResponse, PageRequest, PageResponse, PublishItemRequest, PublishResponse} from "../models";
 import {AbstractAPI} from "@vempain/vempain-auth-frontend";
 
-class PageAPI extends AbstractAPI<PageResponse, PageResponse> {
+class PageAPI extends AbstractAPI<PageRequest, PageResponse> {
     public async findPagesByFormId(formId: number): Promise<PageResponse[]> {
         this.setAuthorizationHeader();
         const response = await this.axiosInstance.get<PageResponse[]>("/by-form/" + formId);

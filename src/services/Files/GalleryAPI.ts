@@ -38,13 +38,6 @@ class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryResponse> {
         return response.data;
     }
 
-    public async updatePageGalleries(pageId: number, galleries: number[]) {
-        this.setAuthorizationHeader();
-        this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
-        const response = await this.axiosInstance.post<GalleryResponse[]>("/page/" + pageId, galleries);
-        return response.data;
-    }
-
     public async publish(request: PublishItemRequest): Promise<PublishResponse> {
         this.setAuthorizationHeader();
         const response = await this.axiosInstance.patch<PublishResponse>("/publish", request);
