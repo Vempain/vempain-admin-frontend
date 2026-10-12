@@ -1,23 +1,27 @@
 import {useParams} from "react-router-dom";
-import {type UIEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {Button, Col, Form, Input, Row, Select, Spin, Switch} from "antd";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {Button, Form, Input, Select, Spin, Switch, Tag, Typography} from "antd";
 import type {RuleObject} from "antd/es/form";
 import {AclEdit} from "./AclEdit";
 import {PagePathInput} from "./PagePathInput";
-import {type DataSetQueryParams, type EmbedDataProviders, RichTextEditor as RtEditor, type SiteFileQueryParams,} from '@vempain/vempain-rt-editor';
+import {
+    type DataSetQueryParams,
+    type EmbedDataProviders,
+    type EmbedDescriptor,
+    RichTextEditor as RtEditor,
+    type SiteFileQueryParams,
+} from '@vempain/vempain-rt-editor';
 import {MetadataForm, SubmitResultHandler} from "../main";
 import {dataAPI, formAPI, galleryAPI, pageAPI, siteFileAPI} from "../services";
-import {ArrowDownOutlined, ArrowUpOutlined, MinusCircleOutlined} from "@ant-design/icons";
 import {aclTool, type AclVO, ActionResult, type SubmitResult, useSession, validateParamId} from "@vempain/vempain-auth-frontend";
-import {type FileTypeEnum, type FormVO, type PageResponse, type SiteFilePagedRequest} from "../models";
+import {type FileTypeEnum, type FormVO, type PageRequest, type PageResponse, type SiteFilePagedRequest} from "../models";
 import dayjs from "dayjs";
-import {sanitizeRichText} from "../tools";
+import {galleryIdsFromEmbeds, sameGalleryIds, sanitizeRichText} from "../tools";
 
 // Define the loading messages
 const spinMessages: Record<string, string> = {
     loadingPageData: "Loading page data...",
-    savingPageData: "Saving page data...",
-    savingGalleryData: "Saving gallery data..."
+    savingPageData: "Saving page data..."
 };
 const PAGE_OPTION_PAGE_SIZE = 50;
 
@@ -53,13 +57,6 @@ const defaultDataProviders: EmbedDataProviders = {
     getAllDataSets: (params?: DataSetQueryParams) => dataAPI.getAllDataSets(params),
 };
 
-interface GalleryList {
-    galleries: {
-        label: string;
-        value: number;
-    }[];
-}
-
 export function PageEditor() {
     const {paramId} = useParams();
     const {userSession} = useSession();
@@ -67,7 +64,6 @@ export function PageEditor() {
     const [pageTitle, setPageTitle] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
     const [pageForm] = Form.useForm();
-    const [pageGalleryForm] = Form.useForm();
     const [acls, setAcls] = useState<AclVO[]>([]);
     const [spinTip, setSpinTip] = useState<string>(spinMessages.loadingPageData);
 
@@ -83,15 +79,9 @@ export function PageEditor() {
     const [pageOptionsLoading, setPageOptionsLoading] = useState(false);
     const pageOptionsRequestRef = useRef(0);
     const pageOptionsLoadingRef = useRef(false);
-    const [selectedGalleries, setSelectedGalleries] = useState<GalleryList>({galleries: []});
-    const [galleryList, setGalleryList] = useState<{ label: string, value: number }[]>([]);
-    const selectedGalleryOptionsRef = useRef<{ label: string, value: number }[]>([]);
-    const [galleryListPage, setGalleryListPage] = useState(0);
-    const [galleryListSearch, setGalleryListSearch] = useState("");
-    const [galleryListHasMore, setGalleryListHasMore] = useState(false);
-    const [galleryOptionsLoading, setGalleryOptionsLoading] = useState(false);
-    const galleryOptionsRequestRef = useRef(0);
-    const galleryOptionsLoadingRef = useRef(false);
+    // The galleries the body embeds (gallery and hero carousel embeds), reported by the editor; saved with the page as its gallery links
+    const [galleryIds, setGalleryIds] = useState<number[]>([]);
+    const [galleryNames, setGalleryNames] = useState<Record<number, string>>({});
 
     const mergedDataProviders = useMemo<EmbedDataProviders>(
             () => defaultDataProviders,
@@ -140,59 +130,33 @@ export function PageEditor() {
         void loadPageOptions(0, search, false, true);
     }
 
-    const loadGalleryOptions = useCallback(async (pageNumber: number, search: string, append: boolean, force = false) => {
-        if (galleryOptionsLoadingRef.current && !force) {
+    const handleEmbedsChange = useCallback((embeds: EmbedDescriptor[]) => {
+        const next = galleryIdsFromEmbeds(embeds);
+        setGalleryIds(current => sameGalleryIds(current, next) ? current : next);
+    }, []);
+
+    // Resolve the names of the embedded galleries for the summary; an unreadable or missing gallery is shown by its id
+    useEffect(() => {
+        const missing = galleryIds.filter(id => galleryNames[id] === undefined);
+
+        if (missing.length === 0) {
             return;
         }
 
-        const requestId = ++galleryOptionsRequestRef.current;
-        galleryOptionsLoadingRef.current = true;
-        setGalleryOptionsLoading(true);
+        let cancelled = false;
+        Promise.all(missing.map(id => galleryAPI.findById(id, null)
+                .then(gallery => [id, gallery.short_name] as const)
+                .catch(() => [id, `#${id}`] as const)))
+                .then(entries => {
+                    if (!cancelled) {
+                        setGalleryNames(current => ({...current, ...Object.fromEntries(entries)}));
+                    }
+                });
 
-        try {
-            const response = await galleryAPI.findPageableList({
-                page: pageNumber,
-                size: PAGE_OPTION_PAGE_SIZE,
-                sort_by: "short_name",
-                direction: "ASC",
-                search: search || undefined
-            });
-
-            if (requestId !== galleryOptionsRequestRef.current) {
-                return;
-            }
-
-            const options = response.content.map((item) => ({label: item.short_name, value: item.id}));
-            setGalleryList(current => {
-                const candidates = append ? [...current, ...options] : [...selectedGalleryOptionsRef.current, ...options];
-                return Array.from(new Map(candidates.map(option => [option.value, option])).values());
-            });
-            setGalleryListPage(response.page);
-            setGalleryListSearch(search);
-            setGalleryListHasMore(!response.last);
-        } catch (error) {
-            if (requestId === galleryOptionsRequestRef.current) {
-                console.error("Error fetching gallery options:", error);
-            }
-        } finally {
-            if (requestId === galleryOptionsRequestRef.current) {
-                galleryOptionsLoadingRef.current = false;
-                setGalleryOptionsLoading(false);
-            }
-        }
-    }, []);
-
-    function handleGallerySearch(search: string): void {
-        void loadGalleryOptions(0, search, false, true);
-    }
-
-    function handleGalleryPopupScroll(event: UIEvent<HTMLDivElement>): void {
-        const target = event.currentTarget;
-        const atBottom = target.scrollTop + target.clientHeight >= target.scrollHeight - 8;
-        if (atBottom && galleryListHasMore && !galleryOptionsLoadingRef.current) {
-            void loadGalleryOptions(galleryListPage + 1, galleryListSearch, true);
-        }
-    }
+        return () => {
+            cancelled = true;
+        };
+    }, [galleryIds, galleryNames]);
 
     function handlePagePopupScroll(event: UIEvent<HTMLDivElement>): void {
         const target = event.currentTarget;
@@ -221,9 +185,7 @@ export function PageEditor() {
 
         Promise.all([
             formAPI.findPageable({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "name", direction: "ASC"}),
-            pageAPI.findPageable({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "page_path", direction: "ASC"}),
-            galleryAPI.findPageableList({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "short_name", direction: "ASC"}),
-            galleryAPI.findListByPage(tmpPageId)
+            pageAPI.findPageable({page: 0, size: PAGE_OPTION_PAGE_SIZE, sort_by: "page_path", direction: "ASC"})
         ])
                 .then((responses) => {
                     setFormList(responses[0].content);
@@ -233,21 +195,6 @@ export function PageEditor() {
                         setPageListSearch("");
                         setPageListHasMore(!responses[1].last);
                     }
-                    if (galleryOptionsRequestRef.current === 0) {
-                        const tmpAvailableGalleryList: { label: string, value: number }[] = responses[2].content.map((item) => ({
-                            label: item.short_name,
-                            value: item.id
-                        }));
-                        const selectedGalleryOptions = responses[3].map((item) => ({label: item.short_name, value: item.id}));
-                        selectedGalleryOptionsRef.current = selectedGalleryOptions;
-                        setGalleryList(Array.from(new Map([...selectedGalleryOptions, ...tmpAvailableGalleryList].map(option => [option.value, option])).values()));
-                        setGalleryListPage(responses[2].page);
-                        setGalleryListSearch("");
-                        setGalleryListHasMore(!responses[2].last);
-                    }
-                    const tmpSelectedGalleryList: GalleryList = {galleries: responses[3].map((item) => ({label: item.short_name, value: item.id}))};
-                    console.log("Setting selected galleries:", tmpSelectedGalleryList);
-                    setSelectedGalleries(tmpSelectedGalleryList);
 
                     if (tmpPageId > 0) {
                         pageAPI.findById(tmpPageId, null)
@@ -304,7 +251,8 @@ export function PageEditor() {
 
     function onFinish(values: PageResponse): void {
         console.debug("onFinish", values);
-        const safeValues: PageResponse = {...values, body: sanitizeRichText(values.body)};
+        // The gallery links travel with the page: the backend replaces them with the galleries the body embeds
+        const safeValues: PageRequest = {...values, body: sanitizeRichText(values.body), gallery_ids: galleryIds};
 
         for (let i = 0; i < safeValues.acls.length; i++) {
             safeValues.acls[i] = aclTool.completeAcl(safeValues.acls[i]);
@@ -342,41 +290,12 @@ export function PageEditor() {
         }
     }
 
-    function onPageGalleryFinish(values: { galleries: { label: string, value: number }[] }): void {
-        setSpinTip(spinMessages.savingGalleryData);
-        setLoading(true);
-
-        const galleryIds: number[] = values.galleries.map(gallery => gallery.value);
-
-        galleryAPI.updatePageGalleries(pageId, galleryIds)
-                .then((response) => {
-                    console.debug("Update response:", response);
-
-                    if (response.length === galleryIds.length) {
-                        setSubmitResults({status: ActionResult.OK, message: "Galleries updated"});
-                    } else {
-                        setSubmitResults({status: ActionResult.FAIL, message: "Failed to update the galleries, try again later"});
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error updating:", error);
-                    setSubmitResults({status: ActionResult.FAIL, message: "Failed to update the galleries, try again later"});
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-    }
-
     function formValidation(_rule: RuleObject, value: number): Promise<void> {
         if (value > 0 && formList.filter(form => form.id === value).length > 0) {
             return Promise.resolve();
         }
 
         return Promise.reject("Please select a valid form");
-    }
-
-    function showPageGalleryForm() {
-        console.debug("showPageGalleryForm", pageGalleryForm.getFieldValue("galleries"));
     }
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
@@ -447,7 +366,12 @@ export function PageEditor() {
                             <Input/>
                         </Form.Item>
                         <Form.Item name={"body"} label={"Body"}>
-                            <RtEditor dataProviders={mergedDataProviders}/>
+                            <RtEditor dataProviders={mergedDataProviders} onEmbedsChange={handleEmbedsChange}/>
+                        </Form.Item>
+                        <Form.Item label={"Galleries"} key={"page-galleries"}
+                                   tooltip={"The galleries embedded in the body are linked to the page and published with it"}>
+                            {galleryIds.length === 0 && <Typography.Text type={"secondary"}>No galleries embedded in the body</Typography.Text>}
+                            {galleryIds.map(id => <Tag key={id} data-testid={"page-gallery-" + id}>{galleryNames[id] ?? `#${id}`}</Tag>)}
                         </Form.Item>
                         <Form.Item name={"page_path"} label={"Path"}>
                             <PagePathInput/>
@@ -469,89 +393,6 @@ export function PageEditor() {
                         </Form.Item>
                     </Form>}
 
-                    {!loading && galleryList.length > 0 &&
-                            <Form
-                                    form={pageGalleryForm}
-                                    initialValues={selectedGalleries}
-                                    onFinish={onPageGalleryFinish}
-                                    labelCol={{span: 4}}
-                                    name={"PageGalleryForm"}
-                                    autoComplete={"off"}
-                            >
-                                <Form.List
-                                        name={"galleries"}
-                                >
-                                    {(fields, {add, move, remove}) => (
-                                            <div>
-                                                {fields.map((field, index) => {
-                                                    const uniqueKey = `page_gallery-${index}`;
-
-                                                    return (
-                                                            <Row gutter={16} align={"middle"} key={uniqueKey + "-row"}>
-                                                                <Col span={4}>
-                                                                </Col>
-                                                                <Col span={12}>
-                                                                    <Form.Item
-                                                                            name={[field.key, "value"]}
-                                                                            key={uniqueKey + "-select"}
-                                                                            rules={[{required: true, message: "Please select a gallery"}]}
-                                                                    >
-                                                                        <Select
-                                                                                options={galleryList}
-                                                                                filterOption={false}
-                                                                                onSearch={handleGallerySearch}
-                                                                                onPopupScroll={handleGalleryPopupScroll}
-                                                                                loading={galleryOptionsLoading}
-                                                                                labelInValue={false}
-                                                                                showSearch={true}
-                                                                                key={uniqueKey + "-select"}
-                                                                                placeholder={"Select a gallery"}
-                                                                        />
-                                                                    </Form.Item>
-                                                                </Col>
-                                                                <Col span={4}>
-                                                                    <Button
-                                                                            type={"primary"}
-                                                                            onClick={() => move(index, (index - 1))}
-                                                                            icon={<ArrowUpOutlined/>}
-                                                                            disabled={index === 0 || fields.length === 1}
-                                                                    />
-                                                                    <Button
-                                                                            type={"primary"}
-                                                                            onClick={() => move(index, (index + 1))}
-                                                                            icon={<ArrowDownOutlined/>}
-                                                                            disabled={index === fields.length - 1 || fields.length === 1}
-                                                                    />
-                                                                    <Button
-                                                                            type={"primary"}
-                                                                            danger={true}
-                                                                            onClick={() => remove(index)}
-                                                                            icon={<MinusCircleOutlined/>}
-                                                                    >
-                                                                        Remove
-                                                                    </Button>
-                                                                </Col>
-                                                            </Row>);
-                                                })}
-
-                                                <Form.Item wrapperCol={{offset: 8, span: 16,}}>
-                                                    <Button
-                                                            type={"dashed"}
-                                                            onClick={() => add()}
-                                                            style={{width: "100%"}}
-                                                    >
-                                                        Add Gallery
-                                                    </Button>
-                                                </Form.Item>
-                                            </div>
-                                    )}
-                                </Form.List>
-                                <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: "center"}}>
-                                    <Button type={"primary"} onClick={showPageGalleryForm}>Check</Button>
-                                    <Button type={"primary"} htmlType={"submit"}>Save list of galleries</Button>
-                                </Form.Item>
-                            </Form>
-                    }
                 </Spin>
             </div>
     );

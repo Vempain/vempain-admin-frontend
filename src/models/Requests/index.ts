@@ -10,3 +10,4 @@ export type {WebSiteConfigurationRequest} from './WebSiteConfigurationRequest';
 export type {SiteFilePagedRequest} from './SiteFilePagedRequest';
 export type {WebSiteResourcePagedRequest} from './WebSiteResourcePagedRequest';
 export type {ApiTokenRequest} from "./ApiTokenRequest";
+export type {PageRequest} from "./PageRequest";
