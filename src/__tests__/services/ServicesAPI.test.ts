@@ -1,5 +1,28 @@
 import type {AclVO} from "@vempain/vempain-auth-frontend";
-import {
+import {QueryDetailEnum} from "../../models";
+
+/**
+ * Every service is a singleton built from VITE_APP_API_URL and its backend prefix; the requests go through the Axios instance
+ * `AbstractAPI` creates, which is replaced by a recording stub here.
+ */
+const axiosStub = {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    patch: jest.fn(),
+    delete: jest.fn(),
+    defaults: {headers: {put: {} as Record<string, string>, common: {} as Record<string, string>}},
+    interceptors: {request: {use: jest.fn()}, response: {use: jest.fn(), eject: jest.fn()}}
+};
+const mockCreate = jest.fn((_config: { baseURL: string }) => axiosStub);
+
+jest.mock("axios", () => ({
+    __esModule: true,
+    default: {create: (config: { baseURL: string }) => mockCreate(config)},
+    create: (config: { baseURL: string }) => mockCreate(config)
+}));
+
+const {
     aclAPI,
     apiTokenAPI,
     componentAPI,
@@ -16,29 +39,7 @@ import {
     unitAPI,
     userAPI,
     webSiteManagementAPI
-} from "../../services";
-import {QueryDetailEnum} from "../../models";
-
-/**
- * Every service is a singleton built from VITE_APP_API_URL and its backend prefix; the requests go through the Axios instance
- * `AbstractAPI` creates, which is replaced by a recording stub here.
- */
-const axiosStub = {
-    get: jest.fn(),
-    post: jest.fn(),
-    put: jest.fn(),
-    patch: jest.fn(),
-    delete: jest.fn(),
-    defaults: {headers: {put: {} as Record<string, string>, common: {} as Record<string, string>}},
-    interceptors: {request: {use: jest.fn()}, response: {use: jest.fn(), eject: jest.fn()}}
-};
-const create = jest.fn((_config: { baseURL: string }) => axiosStub);
-
-jest.mock("axios", () => ({
-    __esModule: true,
-    default: {create: (config: { baseURL: string }) => create(config)},
-    create: (config: { baseURL: string }) => create(config)
-}));
+} = jest.requireActual("../../services") as typeof import("../../services");
 
 const BASE = "http://localhost:8080/api";
 
@@ -48,7 +49,7 @@ function respond(method: jest.Mock, data: unknown, status = 200) {
 
 describe("service singletons", () => {
     it("are built on VITE_APP_API_URL with their backend prefix", () => {
-        const baseURLs = create.mock.calls.map(call => call[0].baseURL);
+        const baseURLs = mockCreate.mock.calls.map(call => call[0].baseURL);
         expect(baseURLs).toEqual(expect.arrayContaining([
             `${BASE}/content-management/acls`,
             `${BASE}/admin-management/api-tokens`,
