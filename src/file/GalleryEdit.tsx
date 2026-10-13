@@ -324,7 +324,7 @@ export function GalleryEdit() {
                         </Form.Item>
 
                         <Form.Item label="Site Files">
-                            <Space direction="vertical" style={{width: "100%"}}>
+                            <Space orientation="vertical" style={{width: "100%"}}>
                                 <Space wrap style={{width: "100%"}}>
                                     <div style={{display: "flex", flexDirection: "column", minWidth: 240}}>
                                         <Typography.Text strong>Search site files</Typography.Text>

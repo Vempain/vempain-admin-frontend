@@ -1572,9 +1572,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rc-component/notification@npm:~2.0.8":
-  version: 2.0.9
-  resolution: "@rc-component/notification@npm:2.0.9"
+"@rc-component/notification@npm:~2.1.1":
+  version: 2.1.1
+  resolution: "@rc-component/notification@npm:2.1.1"
   dependencies:
     "@rc-component/motion": "npm:^1.1.4"
     "@rc-component/util": "npm:^1.13.0"
@@ -1582,7 +1582,7 @@ __metadata:
   peerDependencies:
     react: ">=18.0.0"
     react-dom: ">=18.0.0"
-  checksum: 10c0/fd05fef511a1857ddd908c380f9cefd28be28c1b5b5d4c6b045ee085ce8c4bbe14a018b8b5b9c3e61f3b4026a9ecfb2b850e9137a82449cf61135ad5dffaa867
+  checksum: 10c0/0854c4dea246fb456bd666ae2b65fac5e23d551cba7f176dc5b180c6a63c85737c941d391bd178ece0bdea72c5321b127e2588ec9dbe9cdf1850bdb32ec581ee
   languageName: node
   linkType: hard
 
@@ -3013,27 +3013,27 @@ __metadata:
     "@types/react-dom": "npm:^19.3.0"
     "@types/react-highlight-words": "npm:^0.20.1"
     "@typescript/native": "npm:typescript@^7.0.2"
-    "@vempain/vempain-auth-frontend": "npm:^2.1.1"
-    "@vempain/vempain-common-frontend": "npm:^1.0.1"
+    "@vempain/vempain-auth-frontend": "npm:^2.1.2"
+    "@vempain/vempain-common-frontend": "npm:^1.0.2"
     "@vempain/vempain-rt-editor": "npm:1.0.26"
     "@vitejs/plugin-react": "npm:^6.1.2"
     "@vitejs/plugin-react-swc": "npm:^4.3.3"
-    antd: "npm:^6.6.5"
+    antd: "npm:^6.6.6"
     axios: "npm:^1.20.0"
     dayjs: "npm:^1.11.23"
-    dompurify: "npm:^3.4.16"
+    dompurify: "npm:^3.4.17"
     env-cmd: "npm:^11.0.0"
     eslint: "npm:^10.12.0"
     eslint-plugin-react-hooks: "npm:^7.1.1"
     eslint-plugin-react-refresh: "npm:^0.5.7"
     globals: "npm:^17.13.0"
-    i18next: "npm:^26.4.3"
+    i18next: "npm:^26.4.4"
     jest: "npm:^30.5.2"
     jest-environment-jsdom: "npm:^30.5.2"
     rc-virtual-list: "npm:^3.19.2"
     react: "npm:^19.3.0"
     react-dom: "npm:^19.3.0"
-    react-highlight-words: "npm:^0.21.1"
+    react-highlight-words: "npm:^1.0.0"
     react-i18next: "npm:^17.0.16"
     react-router-dom: "npm:^7.18.4"
     ts-jest: "npm:^29.4.14"
@@ -3044,27 +3044,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@vempain/vempain-auth-frontend@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "@vempain/vempain-auth-frontend@npm:2.1.1::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-auth-frontend%2F2.1.1%2Febb551254a1e8eac2b738f4116e72996dc110e55"
+"@vempain/vempain-auth-frontend@npm:^2.1.2":
+  version: 2.1.2
+  resolution: "@vempain/vempain-auth-frontend@npm:2.1.2::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-auth-frontend%2F2.1.2%2F50f484ef993366603aa851e753c11c6abf8d3521"
   dependencies:
     "@ant-design/icons": "npm:^6.3.4"
-    antd: "npm:^6.6.5"
+    antd: "npm:^6.6.6"
     dayjs: "npm:^1.11.23"
-    i18next: "npm:^26.4.2"
+    i18next: "npm:^26.4.4"
     react-i18next: "npm:^17.0.16"
   peerDependencies:
     axios: 1.20.0
     react: ^19.2.5
     react-dom: ^19.2.5
     react-router-dom: ^7.14.1
-  checksum: 10c0/aec615dac71cb5aab812c8a825f37366e4fca7058d959eb6fdf402f4b412e4d22f5769c225fb21b38fd446e329ec9e4f666d2f65ee9c00462c427f3ddd672344
+  checksum: 10c0/ad2cb87b3634aef9c74eb78d16828ed5782924c4c00de6dc20a58dd3525fa312c209445102bdc56ffbcf0a113e5790cafa3e1e4181e2388fd7d6f82e01453593
   languageName: node
   linkType: hard
 
-"@vempain/vempain-common-frontend@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@vempain/vempain-common-frontend@npm:1.0.1::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-common-frontend%2F1.0.1%2F84460e1b473781d9168853a2a0776f02ac516e6e"
+"@vempain/vempain-common-frontend@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@vempain/vempain-common-frontend@npm:1.0.2::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-common-frontend%2F1.0.2%2Ffba87a7468dca3381738611d397688254d49f5ac"
   dependencies:
     dayjs: "npm:^1.11.23"
   peerDependencies:
@@ -3075,7 +3075,7 @@ __metadata:
     react: ^19.2.5
     react-dom: ^19.2.5
     react-i18next: ^17.0.15
-  checksum: 10c0/6243676476ebed0afe88f122d52513b54a3b040ae6ca4a544bbf431ef7e251197059b87d48e5d9f0891118de326d469d7c4f7115247a44bfccf039255c88bb95
+  checksum: 10c0/1433b2c4bfd625f24d3c67347f96c6327e9d1195fec8e0cf90eddfa2bf4e077e66921aebf60c68649e7fe6aa28b116e352546d08bce1a6db6cf3acb8350771cd
   languageName: node
   linkType: hard
 
@@ -3225,9 +3225,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"antd@npm:^6.6.5":
-  version: 6.6.5
-  resolution: "antd@npm:6.6.5"
+"antd@npm:^6.6.6":
+  version: 6.6.6
+  resolution: "antd@npm:6.6.6"
   dependencies:
     "@ant-design/colors": "npm:^8.0.1"
     "@ant-design/cssinjs": "npm:^2.1.2"
@@ -3252,7 +3252,7 @@ __metadata:
     "@rc-component/menu": "npm:~1.5.0"
     "@rc-component/motion": "npm:^1.3.3"
     "@rc-component/mutate-observer": "npm:^2.0.1"
-    "@rc-component/notification": "npm:~2.0.8"
+    "@rc-component/notification": "npm:~2.1.1"
     "@rc-component/pagination": "npm:~1.4.0"
     "@rc-component/picker": "npm:~1.12.2"
     "@rc-component/progress": "npm:~1.0.3"
@@ -3280,7 +3280,7 @@ __metadata:
   peerDependencies:
     react: ">=18.0.0"
     react-dom: ">=18.0.0"
-  checksum: 10c0/106197e4c9c1581cf90655060296b4f6eb7429f841ce3c1461894a0920459b51ac9a616efa370bd5788147d635eb52716e8367b6fc51c97ff843d6850e31df3d
+  checksum: 10c0/cfc360bd12a727bf7af27db1afb2419d21cab71915f652cb239f27531cf9702770d70eec078ae5ca6a657ea435908e7ba10052b218a0476a5c94846f3fe9e898
   languageName: node
   linkType: hard
 
@@ -3822,15 +3822,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:*, dompurify@npm:^3.4.16":
-  version: 3.4.16
-  resolution: "dompurify@npm:3.4.16"
+"dompurify@npm:*, dompurify@npm:^3.4.17":
+  version: 3.4.17
+  resolution: "dompurify@npm:3.4.17"
   dependencies:
     "@types/trusted-types": "npm:^2.0.7"
   dependenciesMeta:
     "@types/trusted-types":
       optional: true
-  checksum: 10c0/65a901c6b6d489d3e898f67223d81dac66d613cda48f5785f0ed52a4ae320c4b2745490a58c14161e29f0273080fea0a0cb234a9ef892650e1a9b2a7befa07a5
+  checksum: 10c0/6a12251ef5e700fc91b6d96d33e9f8b5fd590c55276f632cf42d182c5808e9f48d5bef435ab26eac235dfcc05ed8fe95e1c8308dcc502bf1050e561f14d0361a
   languageName: node
   linkType: hard
 
@@ -4518,10 +4518,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"highlight-words-core@npm:^1.2.0":
-  version: 1.2.3
-  resolution: "highlight-words-core@npm:1.2.3"
-  checksum: 10c0/473f4ea898c8c3aa20f97951cb6fe23c60ce016f55d280041ec727fdda6a80c2f46d8aa168b771638e2c7eccd97f6c496a1d8eb2be822d4b94bbd031b597130e
+"highlight-words-core@npm:2.0.0":
+  version: 2.0.0
+  resolution: "highlight-words-core@npm:2.0.0"
+  checksum: 10c0/12afa504745813295ca9a8a456786abd33162d7c1646b4e73fec23c0e4f1568f858ed0df060ca0faaddbd289cdb05bd8fe3239478ac7743500576408dc8d0e7a
   languageName: node
   linkType: hard
 
@@ -4599,15 +4599,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^26.4.2, i18next@npm:^26.4.3":
-  version: 26.4.3
-  resolution: "i18next@npm:26.4.3"
+"i18next@npm:^26.4.4":
+  version: 26.4.4
+  resolution: "i18next@npm:26.4.4"
   peerDependencies:
     typescript: ^5 || ^6 || ^7
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/099480c24c18039d78c9cadb04cdcb24a2aca579a21678bfdde89a2007c7109cc41afc34d74ede73aed6fa51fa3ee44752dc042b9e10e144fe13d367a777ed40
+  checksum: 10c0/7d94bb6cea2bdbf293547565d565b12fb0f2a24f462f06f6cc1cd08367f14cc36bd488c7abb01d2b9b827bd46e7d4b0713b44543f7ed0c43f32d1371f85dd305
   languageName: node
   linkType: hard
 
@@ -6063,14 +6063,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-highlight-words@npm:^0.21.1":
-  version: 0.21.1
-  resolution: "react-highlight-words@npm:0.21.1"
+"react-highlight-words@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "react-highlight-words@npm:1.0.0"
   dependencies:
-    highlight-words-core: "npm:^1.2.0"
+    highlight-words-core: "npm:2.0.0"
   peerDependencies:
-    react: ^0.14.0 || ^15.0.0 || ^16.0.0-0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
-  checksum: 10c0/0d3a67f77b2116f9219de294659fd4b3663d082c6b3d6c59d9bfd63a95730642ad747cc20f4b98beca38062645405f0709208411c0369df919276a71c5406e82
+    react: ^16.3.0 || ^17.0.0-0 || ^18.0.0-0 || ^19.0.0-0
+  checksum: 10c0/f834bc891a1175eb38f627981b68e130749ec5fe3054f4b12066fcbb83d88e05254a2d6613b70021d3be2fe76efd695662122f9e8e7c423cd4c1daa7717ba5bb
   languageName: node
   linkType: hard
 
@@ -7098,8 +7098,8 @@ __metadata:
   linkType: hard
 
 "zod@npm:^3.25.0 || ^4.0.0":
-  version: 4.6.5
-  resolution: "zod@npm:4.6.5"
-  checksum: 10c0/32eb6c5e98becbe045675b2141c3611451c16ba567f9779231d79af41c4d651ca1c22f154aef7e6c6e77b929f23e43f1154ca05b82e119e922353725d6776af5
+  version: 4.6.6
+  resolution: "zod@npm:4.6.6"
+  checksum: 10c0/447a3113bb743c54ab839213ff95e9e8c197cc1206f65270c18aac35aa70c47a5c8cab753be911b574df9a8a9801ea74ed6be776575232cae0084e51dab3e970
   languageName: node
   linkType: hard

@@ -119,3 +119,95 @@ describe("ApiTokens", () => {
         expect(list).toHaveBeenCalledTimes(2);
     });
 });
+
+describe("ApiTokens error handling", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        jest.spyOn(console, "error").mockImplementation(() => undefined);
+        jest.spyOn(message, "success").mockImplementation(() => ({}) as never);
+        jest.spyOn(message, "error").mockImplementation(() => ({}) as never);
+    });
+
+    afterEach(() => jest.restoreAllMocks());
+
+    it("reports a failed token list load", async () => {
+        list.mockRejectedValue(new Error("down"));
+        defaultNetwork.mockResolvedValue({network: null, source: "NONE", candidates: []});
+        render(<ApiTokens/>);
+        await waitFor(() => expect(message.error).toHaveBeenCalledWith("Failed to load the API tokens"));
+    });
+
+    it("falls back to manual network entry when the default network can not be fetched and reports a failed creation", async () => {
+        list.mockResolvedValue([]);
+        defaultNetwork.mockRejectedValue(new Error("no network"));
+        createToken.mockRejectedValue(new Error("rejected"));
+        render(<ApiTokens/>);
+        await waitFor(() => expect(list).toHaveBeenCalledTimes(1));
+
+        fireEvent.click(screen.getByText("Create token"));
+        await waitFor(() => expect(defaultNetwork).toHaveBeenCalled());
+        expect(await screen.findByText(/A single address is a \/32/)).toBeTruthy();
+
+        fireEvent.change(screen.getByPlaceholderText("vempain-file-backend production"), {target: {value: "backend"}});
+        fireEvent.change(screen.getByRole("combobox"), {target: {value: "10.0.0.1"}});
+        fireEvent.click(screen.getByText("Create"));
+        await waitFor(() => expect(message.error).toHaveBeenCalledWith("Failed to create the API token"));
+    });
+
+    it("explains a configured default network and closes the created-token modal", async () => {
+        list.mockResolvedValue([]);
+        defaultNetwork.mockResolvedValue({network: "192.168.1.0/24", source: "CONFIGURED", candidates: []});
+        createToken.mockResolvedValue({token: "vat_configuredSECRET", api_token: stored});
+        render(<ApiTokens/>);
+        await waitFor(() => expect(list).toHaveBeenCalledTimes(1));
+
+        fireEvent.click(screen.getByText("Create token"));
+        expect(await screen.findByText(/Pre-filled from the configured default network/)).toBeTruthy();
+        fireEvent.change(screen.getByPlaceholderText("vempain-file-backend production"), {target: {value: "backend"}});
+        fireEvent.click(screen.getByText("Create"));
+        await waitFor(() => expect(screen.getByTestId("created-token").textContent).toContain("vat_configuredSECRET"));
+
+        fireEvent.click(screen.getByText("I have stored the token"));
+        await waitFor(() => expect(screen.queryByTestId("created-token")).toBeNull());
+    });
+
+    it("reports a failed deletion", async () => {
+        list.mockResolvedValue([stored]);
+        defaultNetwork.mockResolvedValue({network: null, source: "NONE", candidates: []});
+        deleteToken.mockRejectedValue(new Error("nope"));
+        render(<ApiTokens/>);
+        fireEvent.click(await screen.findByLabelText("Delete token vat_k3Jd9Qx2"));
+        fireEvent.click(await screen.findByText("Delete"));
+        await waitFor(() => expect(message.error).toHaveBeenCalledWith("Failed to delete the API token"));
+        expect(list).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("ApiTokens modals", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        list.mockResolvedValue([]);
+        defaultNetwork.mockResolvedValue({network: null, source: "NONE", candidates: []});
+        createToken.mockResolvedValue({token: "vat_closeSECRET", api_token: stored});
+    });
+
+    it("closes the creation modal with Cancel and the created-token modal with its close button", async () => {
+        render(<ApiTokens/>);
+        await waitFor(() => expect(list).toHaveBeenCalledTimes(1));
+
+        fireEvent.click(screen.getByText("Create token"));
+        await screen.findByPlaceholderText("vempain-file-backend production");
+        fireEvent.click(screen.getByText("Cancel"));
+        await waitFor(() => expect(screen.queryByPlaceholderText("vempain-file-backend production")).toBeNull());
+
+        fireEvent.click(screen.getByText("Create token"));
+        fireEvent.change(await screen.findByPlaceholderText("vempain-file-backend production"), {target: {value: "backend"}});
+        fireEvent.change(screen.getByRole("combobox"), {target: {value: "10.0.0.1"}});
+        fireEvent.click(screen.getByText("Create"));
+        await waitFor(() => expect(screen.getByTestId("created-token").textContent).toContain("vat_closeSECRET"));
+
+        const closeButtons = screen.getAllByLabelText("Close");
+        fireEvent.click(closeButtons[closeButtons.length - 1]);
+        await waitFor(() => expect(screen.queryByTestId("created-token")).toBeNull());
+    });
+});

@@ -176,7 +176,7 @@ export function ApiTokens() {
                 <Modal open={created !== null} title="API token created" onOk={() => setCreated(null)} onCancel={() => setCreated(null)}
                        cancelButtonProps={{style: {display: "none"}}} okText="I have stored the token" destroyOnHidden>
                     {created !== null && (
-                            <Space direction="vertical" style={{width: "100%"}}>
+                            <Space orientation="vertical" style={{width: "100%"}}>
                                 <Alert type="warning" showIcon title="Copy the token now; it is shown only once and can not be retrieved later."/>
                                 <Typography.Paragraph copyable={{text: created.token}} code data-testid="created-token">{created.token}</Typography.Paragraph>
                                 <Typography.Text type="secondary">

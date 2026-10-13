@@ -1,5 +1,5 @@
 import {useParams} from "react-router-dom";
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {type UIEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {Button, Form, Input, Select, Spin, Switch, Tag, Typography} from "antd";
 import type {RuleObject} from "antd/es/form";
 import {AclEdit} from "./AclEdit";
