@@ -78,3 +78,81 @@ describe("PagePathInput", () => {
         expect(suggestPath).not.toHaveBeenCalled();
     });
 });
+
+describe("PagePathInput failures", () => {
+    beforeEach(() => {
+        jest.useFakeTimers();
+        suggestPath.mockReset();
+    });
+
+    afterEach(() => jest.useRealTimers());
+
+    it("logs a failed suggestion request and offers nothing", async () => {
+        const error = jest.spyOn(console, "error").mockImplementation(() => undefined);
+        suggestPath.mockRejectedValue(new Error("offline"));
+        render(<Host/>);
+        fireEvent.change(screen.getByRole("combobox"), {target: {value: "so"}});
+        await act(async () => {
+            jest.advanceTimersByTime(60);
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+        expect(suggestPath).toHaveBeenCalledWith("so");
+        expect(error).toHaveBeenCalledWith("Failed to fetch page path suggestion:", expect.any(Error));
+        expect(screen.queryByRole("option")).toBeNull();
+        error.mockRestore();
+    });
+});
+
+describe("PagePathInput stale requests", () => {
+    beforeEach(() => {
+        jest.useFakeTimers();
+        suggestPath.mockReset();
+    });
+
+    afterEach(() => jest.useRealTimers());
+
+    async function flush() {
+        await act(async () => {
+            jest.advanceTimersByTime(60);
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+    }
+
+    it("ignores answers and failures of requests that were superseded by a newer keystroke", async () => {
+        const error = jest.spyOn(console, "error").mockImplementation(() => undefined);
+        let resolveFirst: (value: unknown) => void = () => undefined;
+        let rejectSecond: (reason: unknown) => void = () => undefined;
+        suggestPath
+                .mockImplementationOnce(() => new Promise(resolve => {
+                    resolveFirst = resolve;
+                }))
+                .mockImplementationOnce(() => new Promise((_resolve, reject) => {
+                    rejectSecond = reject;
+                }))
+                .mockResolvedValueOnce({prefix: "some/", suggestion: "some/path", matches: 1});
+        render(<Host/>);
+        const input = screen.getByRole("combobox");
+
+        fireEvent.change(input, {target: {value: "so"}});
+        await flush();
+        fireEvent.change(input, {target: {value: "som"}});
+        await flush();
+        fireEvent.change(input, {target: {value: "some/"}});
+        await flush();
+        expect(suggestPath).toHaveBeenCalledTimes(3);
+
+        await act(async () => {
+            resolveFirst({prefix: "so", suggestion: "stale/path", matches: 1});
+            rejectSecond(new Error("stale failure"));
+            await Promise.resolve();
+            await Promise.resolve();
+        });
+
+        expect(screen.queryByRole("option", {name: "stale/path"})).toBeNull();
+        expect(error).not.toHaveBeenCalled();
+        expect(screen.getByRole("option", {name: "some/path"})).toBeTruthy();
+        error.mockRestore();
+    });
+});

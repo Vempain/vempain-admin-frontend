@@ -37,3 +37,17 @@ describe("AclEdit", () => {
         expect(props.acls).toEqual([]);
     });
 });
+
+describe("AclEdit failures", () => {
+    it("logs a failed lookup and still renders the shared editor without users or units", async () => {
+        const error = jest.spyOn(console, "error").mockImplementation(() => undefined);
+        loadUsersAndUnits.mockRejectedValue(new Error("offline"));
+
+        render(<Host/>);
+
+        await waitFor(() => expect(error).toHaveBeenCalledWith("Failed to fetch users and units: ", expect.any(Error)));
+        await waitFor(() => expect(screen.getByTestId("shared-acl-editor")).toBeTruthy());
+        expect(sharedEditor.mock.calls.at(-1)[0].users).toEqual([]);
+        error.mockRestore();
+    });
+});

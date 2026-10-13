@@ -88,3 +88,31 @@ describe("WebSiteDataPublish", () => {
     });
 });
 
+
+describe("WebSiteDataPublish failures", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+        jest.spyOn(console, "error").mockImplementation(() => undefined);
+    });
+
+    afterEach(() => jest.restoreAllMocks());
+
+    it("reports a failed data set load", async () => {
+        const {message} = jest.requireActual("antd");
+        const error = jest.spyOn(message, "error").mockImplementation(() => ({}));
+        getAllDataSets.mockRejectedValue(new Error("down"));
+        render(<WebSiteDataPublish/>);
+        await waitFor(() => expect(error).toHaveBeenCalledWith("Failed to load data sets"));
+    });
+
+    it("reports a failed publish request", async () => {
+        const {message} = jest.requireActual("antd");
+        const error = jest.spyOn(message, "error").mockImplementation(() => ({}));
+        getAllDataSets.mockResolvedValue([buildDataSummary({id: 20, identifier: "music_album_data", description: "Music CD collection"})]);
+        publishDataSet.mockRejectedValue(new Error("rejected"));
+        render(<WebSiteDataPublish/>);
+        await userEvent.click(await screen.findByRole("button", {name: "Release to website"}));
+        await waitFor(() => expect(error).toHaveBeenCalledWith("Failed to publish data set 'music_album_data'"));
+        expect(trackTask).not.toHaveBeenCalled();
+    });
+});

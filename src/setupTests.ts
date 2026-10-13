@@ -47,8 +47,8 @@ if (typeof globalThis.MessageChannel === 'undefined') {
         port2: { onmessage: ((event: { data: unknown }) => void) | null; postMessage: (data: unknown) => void };
 
         constructor() {
-            this.port1 = {onmessage: null, postMessage: data => setTimeout(() => this.port2.onmessage?.({data}), 0)};
-            this.port2 = {onmessage: null, postMessage: data => setTimeout(() => this.port1.onmessage?.({data}), 0)};
+            this.port1 = {onmessage: null, postMessage: data => queueMicrotask(() => this.port2.onmessage?.({data}))};
+            this.port2 = {onmessage: null, postMessage: data => queueMicrotask(() => this.port1.onmessage?.({data}))};
         }
     }
 
@@ -70,3 +70,11 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
 
     Object.defineProperty(globalThis, 'ResizeObserver', {configurable: true, writable: true, value: StubResizeObserver});
 }
+
+// Vite environment of the services and screens; `import.meta.env` is rewritten to `process.env` by jest/importMetaTransformer.cjs
+// (read through globalThis so that this file also compiles under the browser-only application tsconfig)
+const testEnv = (globalThis as unknown as { process: { env: Record<string, string | undefined> } }).process.env;
+testEnv.VITE_APP_API_URL ??= "http://localhost:8080/api";
+testEnv.VITE_APP_FILE_URL ??= "http://localhost:8080/files";
+testEnv.VITE_APP_VEMPAIN_COPYRIGHT_FOOTER ??= "Vempain project © 2024-2025";
+testEnv.VITE_APP_POWERED_BY_VEMPAIN ??= "Powered by <a href=\"https://vempain.poltsi.fi/\">Vempain System</a>";
