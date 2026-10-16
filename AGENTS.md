@@ -45,9 +45,13 @@
 - User and unit management (`src/user/*`) and the ACL editor are the shared screens of `@vempain/vempain-auth-frontend` (`UserList`,
   `UserEditor`, `UnitList`, `UnitEditor`, `AclEditor`) bound to this backend's `userAPI`/`unitAPI` (`src/services/UserAPI.ts`,
   `UnitAPI.ts`, instances of the library's `UserAPI`/`UnitAPI` on `/content-management/users|units`). `src/content/AclEdit.tsx` is only
-  the wrapper that loads this backend's users and units for the shared `AclEditor`; the editors keep its `acls`/`parentForm` contract.
-  The ACL rules (create implies read, "All" button) and the nested-unit cycle check live and are tested in the library; here
-  `src/__tests__/AclEdit.test.tsx` covers the wrapper and `src/__tests__/PagePathInput.test.tsx` the path input.
+  the wrapper that loads this backend's users and units for the shared `AclEditor` (the `AclVO` adapter of the library's `AclRowsEditor`,
+  the one ACL row editor of all Vempain frontends); the content editors (page, form, layout, component, gallery) keep its
+  `acls`/`parentForm` contract. The ACL row rules (either a user or a unit, read required, delete needs modify, create implies read,
+  "All" button) and the nested-unit cycle check live and are tested in the auth library, never in a local copy here; here
+  `src/__tests__/AclEdit.test.tsx` covers the wrapper with the library editor stubbed and `src/__tests__/PagePathInput.test.tsx` the path input.
+  Any new shared ACL component, rule or helper this SPA needs is added to `@vempain/vempain-auth-frontend` (the home of all shared ACL
+  functionality) and consumed from there, never written here or in `vempain-common-frontend`.
 - Editor integration: `PageEditor.tsx` and `PagePublish.tsx` are the reference host for `RichTextEditor` and its `dataProviders`; keep them aligned
   with the rt-editor integration guide.
 - Page-gallery links are derived from the body, never edited by hand: `PageEditor.tsx` passes `onEmbedsChange` to the editor,
