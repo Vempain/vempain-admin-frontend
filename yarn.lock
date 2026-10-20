@@ -3023,18 +3023,18 @@ __metadata:
     dayjs: "npm:^1.11.23"
     dompurify: "npm:^3.4.17"
     env-cmd: "npm:^11.0.0"
-    eslint: "npm:^10.12.0"
+    eslint: "npm:^10.13.0"
     eslint-plugin-react-hooks: "npm:^7.1.1"
     eslint-plugin-react-refresh: "npm:^0.5.7"
     globals: "npm:^17.13.0"
-    i18next: "npm:^26.4.5"
+    i18next: "npm:^26.4.7"
     jest: "npm:^30.5.2"
     jest-environment-jsdom: "npm:^30.5.2"
     rc-virtual-list: "npm:^3.19.2"
     react: "npm:^19.3.1"
     react-dom: "npm:^19.3.1"
     react-highlight-words: "npm:^1.0.0"
-    react-i18next: "npm:^17.0.16"
+    react-i18next: "npm:^17.0.20"
     react-router-dom: "npm:^7.18.4"
     ts-jest: "npm:^29.4.15"
     typescript: "npm:^6.0.3"
@@ -4029,9 +4029,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^10.12.0":
-  version: 10.12.0
-  resolution: "eslint@npm:10.12.0"
+"eslint@npm:^10.13.0":
+  version: 10.13.0
+  resolution: "eslint@npm:10.13.0"
   dependencies:
     "@eslint-community/eslint-utils": "npm:^4.8.0"
     "@eslint-community/regexpp": "npm:^4.12.2"
@@ -4070,7 +4070,7 @@ __metadata:
       optional: true
   bin:
     eslint: bin/eslint.js
-  checksum: 10c0/1302ce8a7df2f67fe8f4014b2f9449bd38eb86903ba7b841d9a8ca5a5daf8ee15442861ab870e96c0074d5f333b405d7b2f16388981f807db410cc3a02178af9
+  checksum: 10c0/4a28e85de458f13306d30f07df21b58109056bd8bd691b6158952d95e126cf742db2eb09562e3f1c1cc0154ee44dedc789f8ced8d0d8da48e82a689aa9cb1c0d
   languageName: node
   linkType: hard
 
@@ -4599,7 +4599,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^26.4.4, i18next@npm:^26.4.5":
+"i18next@npm:^26.4.4":
   version: 26.4.5
   resolution: "i18next@npm:26.4.5"
   peerDependencies:
@@ -4608,6 +4608,18 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/e3c8fc1a53f0c52ee04b524c773fe1b21bf4d11919b0be76424d37783fce5cc51f32a1f7fc30e17d67e101c5ad955cfc4ce890eaed2bdb61e5da9f5a71d69faf
+  languageName: node
+  linkType: hard
+
+"i18next@npm:^26.4.7":
+  version: 26.4.7
+  resolution: "i18next@npm:26.4.7"
+  peerDependencies:
+    typescript: ^5 || ^6 || ^7
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/cf282613ad426fd1c4607487ed3d54eadc01a08f7e1e3ecca7aa4235cab72451ec322d30aee4028146cbfa88652456b727089cecfdd5b4667316d64001316692
   languageName: node
   linkType: hard
 
@@ -6093,6 +6105,28 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/4e5e1b6a79228532fb51140fbbb26d019fe48d0d600213b81ece5d66c4d3b99b94cf97c54cd6c49bb4af6ff8504baa8327397f9ddf264455ad3fa6ea114cffa2
+  languageName: node
+  linkType: hard
+
+"react-i18next@npm:^17.0.20":
+  version: 17.0.20
+  resolution: "react-i18next@npm:17.0.20"
+  dependencies:
+    "@babel/runtime": "npm:^7.29.7"
+    html-parse-stringify: "npm:^4.0.1"
+    use-sync-external-store: "npm:^1.6.0"
+  peerDependencies:
+    i18next: ">= 26.2.0"
+    react: ">= 16.8.0"
+    typescript: ^5 || ^6 || ^7
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+    typescript:
+      optional: true
+  checksum: 10c0/6f64a038abf8365c2fcbad3cba40b1f89d1ea9a598e93ba73347022f8827cc532effa462ecf9a33246e8c88021d55d847f6daf8b34b21fb35514805398a59901
   languageName: node
   linkType: hard
 
