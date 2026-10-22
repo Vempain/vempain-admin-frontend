@@ -29,4 +29,7 @@ export interface SiteFileResponse {
     creator_url: string | null;
 
     location: LocationResponse | null;
+
+    /** When the file was last released to the website, null when never */
+    published: string | null;
 }

@@ -37,6 +37,24 @@
   `vempain.admin.api-token.private-network`, with every attached private network offered as an alternative; otherwise entered by hand), validated client-side by
   `isValidNetwork` (`src/tools/networkTools.ts`) and again by the backend, future expiry) and delete. The token string is
   shown in a modal exactly once after creation; the list only shows the prefix. Tested in `src/__tests__/ApiTokens.test.tsx`.
+- Every resource that is released to the website carries `published` (snake_case, `null` = never released): `PageResponse`,
+  `GalleryResponse`/`FileGroupListResponse` (`Dayjs | null`, like the other audit timestamps of `AbstractResponse`), `SiteFileResponse`
+  and `DataSummaryResponse`/`DataResponse` (ISO strings). The lists show it as a column: `PageList` and `GalleryList` ("Published",
+  server-sorted by `published`), `SiteFileList` ("Published", with milliseconds like the other file timestamps) and
+  `WebSiteDataPublish` ("Released"); a never-released row reads "Not published" / "Not released". It is read-only and never sent in a
+  request. Tested in `src/__tests__/file/GalleryList.test.tsx`, `src/__tests__/file/galleryScreens.test.tsx` and
+  `src/__tests__/WebSiteDataPublish.test.tsx`.
+- Every one of those lists has the "Only modified after publish" filter (`src/main/ReleaseFilterSwitch.tsx`, an antd `Switch` with that
+  accessible name): on, only the resources whose website copy is outdated are shown, i.e. released once and modified after that
+  release (`published` and `modified` both set, `published < modified`). The server-paged lists send it as `modified_after_publish`
+  (`PagePagedRequest`, `GalleryPagedRequest`, `SiteFilePagedRequest`; `GenericFileList` owns the switch for the typed site file lists)
+  and the backend filters; `WebSiteDataPublish` filters its loaded data sets client-side with `isModifiedAfterPublish`
+  (`src/tools/releaseTools.ts`, `updated_at` is the data set's modification time). Keep the rule in that helper and in the backend's
+  `ReleaseState` identical. Tested in `src/__tests__/tools/releaseTools.test.ts` and the list tests above plus
+  `src/__tests__/content/PageList.test.tsx`.
+- `src/website/WebSiteConfiguration.tsx` shows the audit trail of each site configuration row ("Modified by"/"Modified" from
+  `WebSiteConfigurationResponse.modifier`/`modified`, the admin user's nick and the time of the last update; a dash when never
+  updated, `creator`/`created` are null for the seeded rows). Tested in `src/__tests__/website/WebSiteConfiguration.test.tsx`.
 - `src/main/MetadataForm.tsx` is the read-only audit trail (created by / created / modified by / modified) of every editor: a compact
   antd `Descriptions` line, never inputs. It resolves user ids to "name (login)" through `resolveUserName` (`src/tools/userNames.ts`, `userAPI.findById` with a
   session cache) and

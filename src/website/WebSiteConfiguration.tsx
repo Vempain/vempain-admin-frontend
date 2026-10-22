@@ -3,6 +3,7 @@ import type {ColumnsType} from "antd/es/table";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {type WebSiteConfigurationRequest, type WebSiteConfigurationResponse, WebSiteConfigurationTypeEnum} from "../models";
 import {webSiteManagementAPI} from "../services";
+import {formatDateTime} from "../tools";
 
 const parseConfigValue = (config: WebSiteConfigurationResponse) => {
     const raw = config.config_value ?? "";
@@ -143,6 +144,20 @@ export function WebSiteConfiguration() {
                         );
                 }
             }
+        },
+        {
+            title: "Modified by",
+            dataIndex: "modifier",
+            key: "modifier",
+            width: 140,
+            render: (value: string | null | undefined) => value ? value : <Typography.Text type="secondary">—</Typography.Text>
+        },
+        {
+            title: "Modified",
+            dataIndex: "modified",
+            key: "modified",
+            width: 160,
+            render: (value: string | null | undefined) => value ? formatDateTime(value) : <Typography.Text type="secondary">—</Typography.Text>
         },
         {
             title: "Actions",

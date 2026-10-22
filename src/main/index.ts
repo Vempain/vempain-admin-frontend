@@ -4,3 +4,4 @@ export {MetadataForm} from './MetadataForm';
 export {SubmitResultHandler} from './SubmitResultHandler';
 export {TopBar} from './TopBar';
 export {ProtectedRoute} from './ProtectedRoute';
+export {ReleaseFilterSwitch} from './ReleaseFilterSwitch';

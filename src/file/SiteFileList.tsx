@@ -97,6 +97,19 @@ export function SiteFileList({fileType, title}: Props) {
                 return <></>;
             },
         },
+        {
+            title: "Published",
+            dataIndex: "published",
+            key: "published",
+            sorter: true,
+            render: (_, record) => {
+                if (record.published) {
+                    return (<>{formatDateTimeWithMs(record.published)}</>);
+                }
+
+                return <>Not published</>;
+            },
+        },
     ];
 
     return (

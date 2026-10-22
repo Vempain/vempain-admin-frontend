@@ -7,7 +7,7 @@ import {
     QueryDetailEnum
 } from "../../models";
 import {AbstractAPI, type PagedRequest, type PagedResponse} from "@vempain/vempain-auth-frontend";
-import type {GalleryPublishRequest} from "../../models/Requests/Files";
+import type {GalleryPagedRequest, GalleryPublishRequest} from "../../models/Requests/Files";
 
 class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryResponse> {
     public async findPageableWithoutFiles(request: PagedRequest): Promise<PagedResponse<GalleryResponse>> {
@@ -17,7 +17,7 @@ class GalleryAPI extends AbstractAPI<GalleryRequest, GalleryResponse> {
         return response.data;
     }
 
-    public async findPageableList(request: PagedRequest): Promise<PagedResponse<FileGroupListResponse>> {
+    public async findPageableList(request: GalleryPagedRequest): Promise<PagedResponse<FileGroupListResponse>> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
         const response = await this.axiosInstance.post<PagedResponse<FileGroupListResponse>>("paged-list", request);
