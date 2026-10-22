@@ -3,7 +3,8 @@ import type {ColumnsType} from "antd/es/table";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import type {DataSummaryResponse} from "../models";
 import {dataAPI} from "../services";
-import {formatDateTime} from "../tools";
+import {formatDateTime, isModifiedAfterPublish} from "../tools";
+import {ReleaseFilterSwitch} from "../main/ReleaseFilterSwitch";
 import {useTaskProgress} from "@vempain/vempain-common-frontend";
 
 const MUSIC_KEYWORDS = ["music", "album", "song", "cd", "audio"] as const;
@@ -23,6 +24,7 @@ export function WebSiteDataPublish() {
     const [dataSets, setDataSets] = useState<DataSummaryResponse[]>([]);
     const [loading, setLoading] = useState(false);
     const [publishingIdentifier, setPublishingIdentifier] = useState<string | null>(null);
+    const [modifiedAfterPublish, setModifiedAfterPublish] = useState(false);
     const {trackTask} = useTaskProgress();
 
     const loadDataSets = useCallback(async () => {
@@ -42,18 +44,23 @@ export function WebSiteDataPublish() {
         void loadDataSets();
     }, [loadDataSets]);
 
+    // A data set is "modified" when its admin copy was updated (updated_at); the filter keeps the sets whose site table is older than that
+    const visibleDataSets = useMemo(() => {
+        return modifiedAfterPublish ? dataSets.filter((item) => isModifiedAfterPublish(item.published, item.updated_at)) : dataSets;
+    }, [dataSets, modifiedAfterPublish]);
+
     const musicDataSets = useMemo(() => {
-        return dataSets.filter((item) => includesAnyKeyword(buildSearchText(item), MUSIC_KEYWORDS));
-    }, [dataSets]);
+        return visibleDataSets.filter((item) => includesAnyKeyword(buildSearchText(item), MUSIC_KEYWORDS));
+    }, [visibleDataSets]);
 
     const gpsTimeSeriesDataSets = useMemo(() => {
-        return dataSets.filter((item) => {
+        return visibleDataSets.filter((item) => {
             if (normalize(item.type) !== "time_series") {
                 return false;
             }
             return includesAnyKeyword(buildSearchText(item), GPS_KEYWORDS);
         });
-    }, [dataSets]);
+    }, [visibleDataSets]);
 
     const handlePublish = useCallback(async (identifier: string) => {
         setPublishingIdentifier(identifier);
@@ -93,6 +100,12 @@ export function WebSiteDataPublish() {
             dataIndex: "generated",
             key: "generated",
             render: (_, record) => formatDateTime(record.generated)
+        },
+        {
+            title: "Released",
+            dataIndex: "published",
+            key: "published",
+            render: (_, record) => record.published ? formatDateTime(record.published) : "Not released"
         },
         {
             title: "Actions",
@@ -138,6 +151,7 @@ export function WebSiteDataPublish() {
                     <Typography.Text type="secondary">
                         Total matching music data sets: {musicDataSets.length}
                     </Typography.Text>
+                    <ReleaseFilterSwitch checked={modifiedAfterPublish} onChange={setModifiedAfterPublish}/>
                 </Space>
 
                 {renderDataSetSection(

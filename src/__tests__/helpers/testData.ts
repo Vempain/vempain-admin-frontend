@@ -142,6 +142,7 @@ export function siteFile(overrides: Partial<SiteFileResponse> = {}): SiteFileRes
         creator_country: null,
         creator_url: null,
         location: null,
+        published: null,
         ...overrides
     };
 }
@@ -158,6 +159,7 @@ export function galleryResponse(overrides: Partial<GalleryResponse> = {}): Galle
         created: dayjs(CREATED),
         modifier: null,
         modified: null,
+        published: null,
         ...overrides
     };
 }
@@ -174,6 +176,7 @@ export function fileGroupListResponse(overrides: Partial<FileGroupListResponse> 
         created: dayjs(CREATED),
         modifier: null,
         modified: null,
+        published: null,
         ...overrides
     };
 }
@@ -228,6 +231,10 @@ export function webSiteConfiguration(overrides: Partial<WebSiteConfigurationResp
         config_type: WebSiteConfigurationTypeEnum.STRING,
         config_default: "Vempain",
         config_value: "My site",
+        creator: null,
+        created: null,
+        modifier: null,
+        modified: null,
         ...overrides
     };
 }

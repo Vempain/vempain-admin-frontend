@@ -16,7 +16,7 @@ import {TaskStatusEnum, useTaskProgress} from "@vempain/vempain-common-frontend"
 import {fileSystemAPI, galleryAPI} from "../services";
 import {Link} from "react-router-dom";
 import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, ReloadOutlined} from "@ant-design/icons";
-import {SubmitResultHandler} from "../main";
+import {ReleaseFilterSwitch, SubmitResultHandler} from "../main";
 import {PublishSchedule} from "../content";
 import dayjs, {type Dayjs} from "dayjs";
 import {formatDateTime} from "../tools";
@@ -30,7 +30,8 @@ interface GalleryListItem {
     modifyPrivilege: boolean,
     deletePrivilege: boolean,
     created: Dayjs,
-    modified: Dayjs | null
+    modified: Dayjs | null,
+    published: Dayjs | null
 }
 
 export function GalleryList() {
@@ -40,13 +41,15 @@ export function GalleryList() {
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<dayjs.Dayjs | null>(null);
     const [selectedGalleryIds, setSelectedGalleryIds] = useState<number[]>([]);
+    const [modifiedAfterPublish, setModifiedAfterPublish] = useState<boolean>(false);
     const {trackTask} = useTaskProgress();
 
     const paged = usePagedTable<GalleryListItem>(async (request) => {
         const response = await galleryAPI.findPageableList({
             ...request,
             sort_by: request.sort_by === "name" ? "short_name" : request.sort_by,
-            filter_column: request.filter_column === "name" ? "short_name" : request.filter_column
+            filter_column: request.filter_column === "name" ? "short_name" : request.filter_column,
+            modified_after_publish: modifiedAfterPublish
         });
         return {
             ...response, content: response.content.map((gallery) => ({
@@ -54,6 +57,7 @@ export function GalleryList() {
                 name: gallery.short_name,
                 created: gallery.created,
                 modified: gallery.modified,
+                published: gallery.published,
                 description: gallery.description,
                 fileCount: gallery.file_count,
                 createPrivilege: aclTool.hasPrivilege(PrivilegeEnum.CREATE, userSession?.id, userSession?.units, gallery.acls),
@@ -65,7 +69,7 @@ export function GalleryList() {
         defaultSortBy: "id",
         defaultDirection: "ASC",
         defaultPageSize: 25,
-        deps: [userSession?.id, userSession?.units?.map((unit) => unit.id).join(",")]
+        deps: [userSession?.id, userSession?.units?.map((unit) => unit.id).join(","), modifiedAfterPublish]
     });
 
     const columns: VempainColumnsType<GalleryListItem> = [
@@ -117,6 +121,19 @@ export function GalleryList() {
                 }
 
                 return formatDateTime(record.modified);
+            }
+        },
+        {
+            title: "Published",
+            dataIndex: "published",
+            key: "published",
+            sorter: true,
+            render: (_text, record) => {
+                if (record.published === null) {
+                    return "Not published";
+                }
+
+                return formatDateTime(record.published);
             }
         },
         {
@@ -301,6 +318,7 @@ export function GalleryList() {
                             >Refresh all gallery files</Button>
                         </Space>
                         <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
+                        <ReleaseFilterSwitch checked={modifiedAfterPublish} onChange={setModifiedAfterPublish}/>
                         {paged.contextHolder}
                         <VempainTable
                                 dataSource={paged.dataSource}

@@ -176,7 +176,8 @@ export function GalleryEdit() {
                     modified: null,
                     short_name: "",
                     description: "",
-                    site_files: []
+                    site_files: [],
+                    published: null
                 };
                 setGallery(base);
                 setSendButtonText("Create");

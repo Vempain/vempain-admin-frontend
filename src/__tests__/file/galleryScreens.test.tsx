@@ -215,7 +215,7 @@ describe("SiteFileCard", () => {
 describe("SiteFileList", () => {
     it("lists the site files of the given type with formatted columns", async () => {
         siteFileAPI.getPagedSiteFiles.mockResolvedValue(pagedResponse([
-            siteFile({modified: "2026-01-03T11:30:00.250Z"}),
+            siteFile({modified: "2026-01-03T11:30:00.250Z", published: "2026-01-04T09:15:00.500Z"}),
             siteFile({id: 22, file_name: "beach.jpg", file_type: undefined as unknown as FileTypeEnum})
         ]));
         render(<SiteFileList fileType={FileTypeEnum.IMAGE} title="Image Files"/>);
@@ -234,11 +234,22 @@ describe("SiteFileList", () => {
         expect(within(row).getByText("2.000 KB")).toBeInTheDocument();
         expect(within(row).getByText("IMAGE", {selector: ".ant-tag"})).toBeInTheDocument();
         expect(within(row).getByText(/2026-01-03 \d\d:30:00:250/)).toBeInTheDocument();
+        expect(within(row).getByText(/2026-01-04 \d\d:15:00:500/)).toBeInTheDocument();
         const other = screen.getByText("beach.jpg").closest("tr") as HTMLElement;
         expect(other.querySelector(".ant-tag")).toBeNull();
+        expect(within(other).getByText("Not published")).toBeInTheDocument();
 
         fireEvent.click(screen.getByText("File name"));
         await waitFor(() => expect(siteFileAPI.getPagedSiteFiles).toHaveBeenLastCalledWith(expect.objectContaining({sort_by: "file_name"})));
+        fireEvent.click(screen.getByText("Published"));
+        await waitFor(() => expect(siteFileAPI.getPagedSiteFiles).toHaveBeenLastCalledWith(expect.objectContaining({sort_by: "published"})));
+
+        expect(siteFileAPI.getPagedSiteFiles).toHaveBeenLastCalledWith(expect.objectContaining({modified_after_publish: false}));
+        fireEvent.click(screen.getByRole("switch", {name: "Only modified after publish"}));
+        await waitFor(() => expect(siteFileAPI.getPagedSiteFiles).toHaveBeenLastCalledWith(expect.objectContaining({
+            file_type: "IMAGE",
+            modified_after_publish: true
+        })));
     });
 
     it("renders without a title", async () => {

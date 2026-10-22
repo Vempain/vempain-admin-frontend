@@ -58,6 +58,18 @@ describe("PageList", () => {
         await waitFor(() => expect(pageAPI.findPageable).toHaveBeenCalledTimes(3));
     });
 
+    it("asks the backend for only the pages modified after their last publish when the filter is on", async () => {
+        renderList();
+        await screen.findByText("First page");
+        expect(pageAPI.findPageable).toHaveBeenLastCalledWith(expect.objectContaining({modified_after_publish: false}));
+
+        fireEvent.click(screen.getByRole("switch", {name: "Only modified after publish"}));
+        await waitFor(() => expect(pageAPI.findPageable).toHaveBeenLastCalledWith(expect.objectContaining({modified_after_publish: true})));
+
+        fireEvent.click(screen.getByRole("switch", {name: "Only modified after publish"}));
+        await waitFor(() => expect(pageAPI.findPageable).toHaveBeenLastCalledWith(expect.objectContaining({modified_after_publish: false})));
+    });
+
     it("publishes all pages as a background task and reloads the list once it has finished", async () => {
         renderList();
         await screen.findByText("First page");

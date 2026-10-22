@@ -11,3 +11,4 @@ export {sanitizeHtmlFragment} from './richTextSecurity';
 export type {LastEmbedType} from './embedTools';
 export {isValidNetwork} from './networkTools';
 export {galleryIdsFromEmbeds, sameGalleryIds} from './pageGalleryTools';
+export {isModifiedAfterPublish} from './releaseTools';

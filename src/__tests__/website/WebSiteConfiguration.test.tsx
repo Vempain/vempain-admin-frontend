@@ -20,7 +20,9 @@ const pageSize = webSiteConfiguration({
     config_key: "site.page_size",
     config_type: WebSiteConfigurationTypeEnum.NUMBER,
     config_default: "10",
-    config_value: "20"
+    config_value: "20",
+    modifier: "alice",
+    modified: "2026-01-06T08:00:00Z"
 });
 const dark = webSiteConfiguration({
     id: "site.dark",
@@ -68,6 +70,10 @@ describe("WebSiteConfiguration", () => {
         expect(within(row("site.limit")).getByRole("spinbutton")).toHaveValue("0");
         expect(within(row("site.tags")).getAllByText("—").length).toBeGreaterThan(0);
         expect(within(row("site.title")).getByRole("button", {name: "Update"})).toBeDisabled();
+        // The audit trail of the site row: who last updated the value and when, a dash when never updated
+        expect(within(row("site.page_size")).getByText("alice")).toBeInTheDocument();
+        expect(within(row("site.page_size")).getByText(/2026-01-06 \d\d:00/)).toBeInTheDocument();
+        expect(within(row("site.title")).getAllByText("—").length).toBe(2);
     });
 
     it("updates a text value once it differs from the stored one", async () => {

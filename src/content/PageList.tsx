@@ -3,12 +3,13 @@ import {Button, Space, Spin, Switch} from "antd";
 import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
-import type {PageResponse} from "../models";
+import type {PagePagedRequest, PageResponse} from "../models";
 import {pageAPI, userAPI} from "../services";
 import dayjs from "dayjs";
 import {PublishSchedule} from "./PublishSchedule";
 import {usePagedTable, UserName, VempainTable} from "@vempain/vempain-auth-frontend";
 import {useTaskProgress} from "@vempain/vempain-common-frontend";
+import {ReleaseFilterSwitch} from "../main/ReleaseFilterSwitch";
 
 export function PageList() {
     const [spinMessage, setSpinMessage] = useState("Loading page list...");
@@ -16,10 +17,15 @@ export function PageList() {
     const [schedulePublish, setSchedulePublish] = useState(false);
     const [publishDate, setPublishDate] = useState<dayjs.Dayjs | null>(null);
     const {trackTask} = useTaskProgress();
-    const paged = usePagedTable<PageResponse>(request => pageAPI.findPageable(request), {
+    const [modifiedAfterPublish, setModifiedAfterPublish] = useState(false);
+    const paged = usePagedTable<PageResponse>(request => {
+        const pagedRequest: PagePagedRequest = {...request, modified_after_publish: modifiedAfterPublish};
+        return pageAPI.findPageable(pagedRequest);
+    }, {
         defaultSortBy: "id",
         defaultDirection: "ASC",
-        defaultPageSize: 25
+        defaultPageSize: 25,
+        deps: [modifiedAfterPublish]
     });
 
     const columns: ColumnsType<PageResponse> = useMemo(() => [
@@ -96,6 +102,7 @@ export function PageList() {
                         </h1>
                         <Button type="primary" onClick={publishAll}>Publish all pages</Button>
                         <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
+                        <ReleaseFilterSwitch checked={modifiedAfterPublish} onChange={setModifiedAfterPublish}/>
                         <VempainTable
                                 dataSource={paged.dataSource}
                                 columns={columns}

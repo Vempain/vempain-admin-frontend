@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import {fireEvent, render, screen, waitFor, within} from "@testing-library/react";
 import {message} from "antd";
 import {MemoryRouter} from "react-router-dom";
@@ -51,7 +52,8 @@ describe("GalleryList", () => {
                 description: "Snow",
                 file_count: 0,
                 acls: [acl({user: 99, create_privilege: false, modify_privilege: false, delete_privilege: false})],
-                modified: fileGroupListResponse().created
+                modified: fileGroupListResponse().created,
+                published: dayjs("2026-01-05T08:00:00Z")
             })
         ]));
         galleryAPI.publishAll.mockResolvedValue({result: "OK", message: "", timestamp: "", task});
@@ -72,16 +74,30 @@ describe("GalleryList", () => {
         expect(within(row("Summer")).getByText("Summer pictures")).toBeInTheDocument();
         expect(within(row("Summer")).getByText("3")).toBeInTheDocument();
         expect(within(row("Summer")).getByText("-")).toBeInTheDocument();
+        expect(within(row("Summer")).getByText("Not published")).toBeInTheDocument();
         expect(within(row("Summer")).getAllByRole("link").map(link => link.getAttribute("href")))
                 .toEqual(["/galleries/12/edit", "/galleries/12/delete", "/galleries/12/publish", "/galleries/12/refresh"]);
         expect(within(row("Winter")).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/galleries/13/edit"]);
         expect(within(row("Winter")).queryByText("-")).toBeNull();
+        expect(within(row("Winter")).queryByText("Not published")).toBeNull();
+        expect(within(row("Winter")).getByText(/2026-01-05 \d\d:00/)).toBeInTheDocument();
         expect(screen.getByRole("link", {name: "plus-circle"})).toHaveAttribute("href", "/galleries/0/edit");
 
         fireEvent.click(screen.getByText("Name"));
         await waitFor(() => expect(galleryAPI.findPageableList).toHaveBeenLastCalledWith(expect.objectContaining({sort_by: "short_name"})));
         fireEvent.click(screen.getByText("Description"));
         await waitFor(() => expect(galleryAPI.findPageableList).toHaveBeenLastCalledWith(expect.objectContaining({sort_by: "description"})));
+        fireEvent.click(screen.getByText("Published"));
+        await waitFor(() => expect(galleryAPI.findPageableList).toHaveBeenLastCalledWith(expect.objectContaining({sort_by: "published"})));
+    });
+
+    it("asks the backend for only the galleries modified after their last publish when the filter is on", async () => {
+        renderList();
+        await screen.findByText("Summer");
+        expect(galleryAPI.findPageableList).toHaveBeenLastCalledWith(expect.objectContaining({modified_after_publish: false}));
+
+        fireEvent.click(screen.getByRole("switch", {name: "Only modified after publish"}));
+        await waitFor(() => expect(galleryAPI.findPageableList).toHaveBeenLastCalledWith(expect.objectContaining({modified_after_publish: true})));
     });
 
     it("publishes all galleries as a background task and reloads once it has finished", async () => {
@@ -99,7 +115,8 @@ describe("GalleryList", () => {
         galleryAPI.publishAll.mockResolvedValue({result: "OK", message: "", timestamp: "", task: null});
         renderList();
         await screen.findByText("Summer");
-        fireEvent.click(screen.getByRole("switch"));
+        // The first switch is the publish schedule, the second one the "modified after publish" filter
+        fireEvent.click(screen.getAllByRole("switch")[0]);
         const picker = await screen.findByPlaceholderText("Select date");
         fireEvent.mouseDown(picker);
         fireEvent.change(picker, {target: {value: "2026-15-04 10:30"}});
