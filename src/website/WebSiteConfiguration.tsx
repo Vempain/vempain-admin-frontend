@@ -3,7 +3,7 @@ import type {ColumnsType} from "antd/es/table";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {type WebSiteConfigurationRequest, type WebSiteConfigurationResponse, WebSiteConfigurationTypeEnum} from "../models";
 import {webSiteManagementAPI} from "../services";
-import {formatDateTime} from "../tools";
+import {formatDateTime, stickyTableHeader} from "../tools";
 
 const parseConfigValue = (config: WebSiteConfigurationResponse) => {
     const raw = config.config_value ?? "";
@@ -187,6 +187,7 @@ export function WebSiteConfiguration() {
             <div>
                 <Typography.Title level={3}>Web site configuration</Typography.Title>
                 <Table
+                        sticky={stickyTableHeader}
                         rowKey={(record) => record.id}
                         loading={loading}
                         columns={columns}

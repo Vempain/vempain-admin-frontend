@@ -3,6 +3,7 @@ import type {ScheduleTriggerResponse} from "../models";
 import {scheduleAPI} from "../services";
 import type {ColumnsType} from "antd/lib/table";
 import {Button, Spin, Table} from "antd";
+import {stickyTableHeader} from "../tools";
 
 function SystemScheduleList() {
     const [loading, setLoading] = useState<boolean>(true);
@@ -59,6 +60,7 @@ function SystemScheduleList() {
                     <h1 key={"systemScheduleListHeader"}>System schedule List</h1>
 
                     {systemScheduleList.length > 0 && <Table
+                            sticky={stickyTableHeader}
                             dataSource={systemScheduleList}
                             columns={columns}
                             key={"systemScheduleListTable"}

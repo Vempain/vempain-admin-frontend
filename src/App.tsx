@@ -24,8 +24,8 @@ import {ItemPublishingList, ItemPublishTrigger, SystemScheduleList, SystemSchedu
 import {Login, Logout} from "@vempain/vempain-auth-frontend";
 import {FileTypeEnum} from "./models";
 import {SiteFileList} from "./file/SiteFileList.tsx";
-import {WebSiteConfiguration, WebSiteDataPublish, WebSiteUserList} from "./website";
-import {ApiTokens} from "./administration";
+import {TagBlacklist, WebSiteConfiguration, WebSiteDataPublish, WebSiteUserList} from "./website";
+import {ApiTokens, Statistics} from "./administration";
 import {TaskProgressProvider, TaskProgressTray} from "@vempain/vempain-common-frontend";
 import {taskAPI} from "./services";
 
@@ -109,6 +109,9 @@ function App() {
                                     <Route path={"/administration/web-site-configuration"} element={<WebSiteConfiguration/>}/>
                                     <Route path={"/administration/data-publish"} element={<WebSiteDataPublish/>}/>
                                     <Route path={"/administration/api-tokens"} element={<ApiTokens/>}/>
+                                    <Route path={"/administration/tag-blacklist"} element={<TagBlacklist/>}/>
+                                    {/* System management */}
+                                    <Route path={"/administration/statistics"} element={<Statistics/>}/>
                                 </Route>
                             </Routes>
                         </div>

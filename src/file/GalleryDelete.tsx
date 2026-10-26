@@ -1,6 +1,6 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {formatDateTimeWithMs} from "../tools";
+import {formatDateTimeWithMs, stickyTableHeader} from "../tools";
 import type {SiteFileResponse} from "../models";
 import {type GalleryResponse} from "../models";
 import {SubmitResultHandler} from "../main";
@@ -111,6 +111,7 @@ export function GalleryDelete() {
                             <h3>List of files associated with the gallery</h3>
 
                             {siteFileList.length > 0 && <Table
+                                    sticky={stickyTableHeader}
                                     dataSource={siteFileList.map((item, index) => ({...item, key: `row_${index}`}))}
                                     columns={siteFileColumns}
                             />}

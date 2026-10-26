@@ -19,7 +19,7 @@ import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, Rel
 import {ReleaseFilterSwitch, SubmitResultHandler} from "../main";
 import {PublishSchedule} from "../content";
 import dayjs, {type Dayjs} from "dayjs";
-import {formatDateTime} from "../tools";
+import {formatDateTime, stickyTableHeader} from "../tools";
 
 interface GalleryListItem {
     id: number;
@@ -321,6 +321,7 @@ export function GalleryList() {
                         <ReleaseFilterSwitch checked={modifiedAfterPublish} onChange={setModifiedAfterPublish}/>
                         {paged.contextHolder}
                         <VempainTable
+                                sticky={stickyTableHeader}
                                 dataSource={paged.dataSource}
                                 columns={columns}
                                 dataMode={"server"}

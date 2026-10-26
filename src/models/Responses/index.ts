@@ -1,3 +1,4 @@
+export type {AdminStatisticsResponse, StatisticsCount, StatisticsMonthlyCount, StatisticsPublishState, StatisticsUserCount} from './AdminStatisticsResponse';
 export type {ComponentVO} from './ComponentVO';
 export type {DataResponse} from './DataResponse';
 export type {DataSummaryResponse} from './DataSummaryResponse';
@@ -10,10 +11,12 @@ export type {PublishResponse} from './PublishResponse';
 export type {PublishScheduleResponse} from './PublishScheduleResponse';
 export type {ScheduleTriggerResponse} from './ScheduleTriggerResponse';
 export type {StringListVO} from './StringListVO';
+export type {TagBlacklistResponse} from './TagBlacklistResponse';
 export type {TestVO} from './TestVO';
 export type {WebSiteAclResponse} from './WebSiteAclResponse';
 export type {WebSiteAclUsersResponse} from './WebSiteAclUsersResponse';
 export type {WebSiteResourceResponse} from './WebSiteResourceResponse';
+export type {InternalLinkResponse} from './InternalLinkResponse';
 export type {WebSiteUserResponse} from './WebSiteUserResponse';
 export type {WebSiteConfigurationResponse} from './WebSiteConfigurationResponse';
 

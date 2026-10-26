@@ -7,6 +7,8 @@ export {formAPI} from './FormAPI';
 export {layoutAPI} from './LayoutAPI';
 export {pageAPI} from './PageAPI';
 export {scheduleAPI} from './ScheduleAPI';
+export {statisticsAPI} from './StatisticsAPI';
+export {tagBlacklistAPI} from './TagBlacklistAPI';
 export {unitAPI} from './UnitAPI';
 export {userAPI} from './UserAPI';
 export {webSiteManagementAPI} from './WebSiteManagementAPI';

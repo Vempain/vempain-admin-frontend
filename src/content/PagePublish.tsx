@@ -11,7 +11,7 @@ import {PublishSchedule} from "./PublishSchedule";
 import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
 import {useTaskProgress} from "@vempain/vempain-common-frontend";
 import type {ColumnsType} from "antd/lib/table";
-import {sanitizeRichText} from "../tools";
+import {sanitizeRichText, stickyTableHeader} from "../tools";
 
 const defaultDataProviders: EmbedDataProviders = {
     findGalleries: (params) => galleryAPI.findPageableList(params),
@@ -131,6 +131,7 @@ export function PagePublish() {
                                       dataProviders={mergedDataProviders}
                             />
                             {galleryList.length > 0 && <Table key={"galleryList"}
+                                                              sticky={stickyTableHeader}
                                                               columns={galleryColumns}
                                                               dataSource={galleryList}
                                                               pagination={false}/>}

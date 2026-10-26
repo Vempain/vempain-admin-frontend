@@ -4,6 +4,7 @@ import {
     ApartmentOutlined,
     AppstoreOutlined,
     AudioOutlined,
+    BarChartOutlined,
     ClockCircleOutlined,
     ContainerOutlined,
     DatabaseOutlined,
@@ -27,6 +28,7 @@ import {
     SettingOutlined,
     SnippetsOutlined,
     SwapOutlined,
+    TagsOutlined,
     UserAddOutlined,
     UsergroupAddOutlined,
     UserOutlined,
@@ -197,12 +199,17 @@ export function TopBar() {
                         label: (<Link to={"/administration/api-tokens"}>API tokens</Link>),
                         key: "api-tokens",
                         icon: <KeyOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/administration/tag-blacklist"}>Tag blacklist</Link>),
+                        key: "tag-blacklist",
+                        icon: <TagsOutlined/>
                     }
                 ],
             },
             {
-                label: "User Management",
-                key: "userManagement",
+                label: "System Management",
+                key: "systemManagement",
                 icon: <UserOutlined/>,
                 children: [
                     {
@@ -214,6 +221,11 @@ export function TopBar() {
                         label: (<Link to={"/units"}>Units</Link>),
                         key: "units",
                         icon: <UsergroupAddOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/administration/statistics"}>Statistics</Link>),
+                        key: "statistics",
+                        icon: <BarChartOutlined/>
                     }
                 ],
             }] || []),

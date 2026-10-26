@@ -54,7 +54,8 @@ describe("ItemPublishingList", () => {
         expect(within(row).getByText("Trigger").closest("a")).toHaveAttribute("href", "/schedule/publish/31/trigger");
 
         for (const header of ["ID", "Publish time", "Status", "Message", "Type", "Publish ID"]) {
-            fireEvent.click(screen.getByText(header));
+            // The sticky header repeats the titles in a hidden measure row, so the sort clicks target the header cells
+            fireEvent.click(screen.getByRole("columnheader", {name: new RegExp(`^${header}\\b`)}));
         }
         expect(screen.getAllByRole("row").length).toBeGreaterThan(2);
     });
@@ -123,7 +124,8 @@ describe("SystemScheduleList", () => {
         const row = screen.getByText("nightly-cleanup").closest("tr") as HTMLElement;
         expect(within(row).getByText("Trigger").closest("a")).toHaveAttribute("href", "/schedule/system/nightly-cleanup/trigger");
         for (const header of ["ID", "Schedule Name", "Status"]) {
-            fireEvent.click(screen.getByText(header));
+            // The sticky header repeats the titles in a hidden measure row, so the sort clicks target the header cells
+            fireEvent.click(screen.getByRole("columnheader", {name: new RegExp(`^${header}\\b`)}));
         }
     });
 
