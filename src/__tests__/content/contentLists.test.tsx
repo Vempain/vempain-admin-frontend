@@ -51,8 +51,11 @@ describe("content lists", () => {
         expect(headerButtons.map(link => link.getAttribute("href"))).toEqual(["/components/3/edit", "/components/3/delete"]);
         expect(within(row("Footer component")).getAllByRole("link").map(link => link.getAttribute("href"))).toEqual(["/components/4/edit"]);
         expect(screen.getByRole("link", {name: "plus-circle"})).toHaveAttribute("href", "/components/0/edit");
+        // The header stays visible below the 60px top bar while a long list is scrolled
+        expect(document.querySelector(".ant-table-sticky-holder")).toHaveStyle({top: "60px"});
 
-        fireEvent.click(screen.getByText("Component Name"));
+        // The sticky header repeats the titles in a hidden measure row, so the sort click targets the header cell
+        fireEvent.click(screen.getByRole("columnheader", {name: /Component Name/}));
         await waitFor(() => expect(componentFindPageable).toHaveBeenLastCalledWith(expect.objectContaining({sort_by: "comp_name"})));
         fireEvent.click(screen.getByRole("switch"));
         await waitFor(() => expect(componentFindPageable).toHaveBeenCalledTimes(3));

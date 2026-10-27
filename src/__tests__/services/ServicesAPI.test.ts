@@ -260,6 +260,10 @@ describe("webSiteManagementAPI", () => {
         expect(await webSiteManagementAPI.getAllWebAcls()).toEqual([{id: 3}]);
         expect(axiosStub.get).toHaveBeenLastCalledWith("/acls");
 
+        respond(axiosStub.get, [{type: "PAGE", title: "About", path: "about"}]);
+        expect(await webSiteManagementAPI.findInternalLinks("ab", 5)).toEqual([{type: "PAGE", title: "About", path: "about"}]);
+        expect(axiosStub.get).toHaveBeenLastCalledWith("/links", {params: {search: "ab", limit: 5}});
+
         respond(axiosStub.get, {acl_id: 3, users: []});
         expect(await webSiteManagementAPI.getWebUsersByWebAclId(3)).toEqual({acl_id: 3, users: []});
         expect(axiosStub.get).toHaveBeenLastCalledWith("/acls/3/users");

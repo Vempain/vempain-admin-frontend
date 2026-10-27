@@ -1,5 +1,5 @@
 import {useMemo, useState} from "react";
-import {Button, Space, Spin, Switch} from "antd";
+import {Button, Space, Spin, Switch, Tag} from "antd";
 import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
@@ -10,6 +10,7 @@ import {PublishSchedule} from "./PublishSchedule";
 import {usePagedTable, UserName, VempainTable} from "@vempain/vempain-auth-frontend";
 import {useTaskProgress} from "@vempain/vempain-common-frontend";
 import {ReleaseFilterSwitch} from "../main/ReleaseFilterSwitch";
+import {stickyTableHeader} from "../tools";
 
 export function PageList() {
     const [spinMessage, setSpinMessage] = useState("Loading page list...");
@@ -36,6 +37,10 @@ export function PageList() {
         {title: "Secure", dataIndex: "secure", key: "secure", sorter: true},
         {title: "Index List", dataIndex: "index_list", key: "index_list", sorter: true},
         {title: "Title", dataIndex: "title", key: "title", sorter: true, searchable: true},
+        {
+            title: "Tags", dataIndex: "tags", key: "tags", searchable: false,
+            render: (_, record) => (record.tags ?? []).map(tag => <Tag key={tag}>{tag}</Tag>)
+        },
         {title: "Locked", dataIndex: "locked", key: "locked", sorter: true},
         {title: "Creator", dataIndex: "creator", key: "creator", sorter: true, render: (_, record) => <UserName userAPI={userAPI} id={record.creator}/>},
         {title: "Created", dataIndex: "created", key: "created", sorter: true, render: (_, record) => dayjs(record.created).format("YYYY.MM.DD HH:mm")},
@@ -104,6 +109,7 @@ export function PageList() {
                         <PublishSchedule setSchedulePublish={setSchedulePublish} setPublishDate={setPublishDate}/>
                         <ReleaseFilterSwitch checked={modifiedAfterPublish} onChange={setModifiedAfterPublish}/>
                         <VempainTable
+                                sticky={stickyTableHeader}
                                 dataSource={paged.dataSource}
                                 columns={columns}
                                 dataMode={"server"}

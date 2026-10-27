@@ -9,6 +9,7 @@ const formAPI = {findPageable: jest.fn()};
 const galleryAPI = {findById: jest.fn(), findPageableList: jest.fn()};
 const siteFileAPI = {getPagedSiteFiles: jest.fn()};
 const dataAPI = {getAllDataSets: jest.fn()};
+const webSiteManagementAPI = {findInternalLinks: jest.fn()};
 const aclEdit = jest.fn();
 
 jest.mock("@vempain/vempain-auth-frontend", () => ({
@@ -28,7 +29,8 @@ jest.mock("../../services", () => ({
     formAPI: {findPageable: (...a: unknown[]) => formAPI.findPageable(...a)},
     galleryAPI: {findById: (...a: unknown[]) => galleryAPI.findById(...a), findPageableList: (...a: unknown[]) => galleryAPI.findPageableList(...a)},
     siteFileAPI: {getPagedSiteFiles: (...a: unknown[]) => siteFileAPI.getPagedSiteFiles(...a)},
-    dataAPI: {getAllDataSets: (...a: unknown[]) => dataAPI.getAllDataSets(...a)}
+    dataAPI: {getAllDataSets: (...a: unknown[]) => dataAPI.getAllDataSets(...a)},
+    webSiteManagementAPI: {findInternalLinks: (...a: unknown[]) => webSiteManagementAPI.findInternalLinks(...a)}
 }));
 
 // Like the shared editor, the stub keeps the ACL rows in the parent form's `acls` field (unless the host already registers it)
@@ -56,7 +58,7 @@ beforeEach(() => {
     jest.spyOn(console, "debug").mockImplementation(() => undefined);
     jest.spyOn(console, "log").mockImplementation(() => undefined);
     useSession.mockReturnValue({userSession: {id: SESSION_USER_ID}});
-    pageAPI.findById.mockResolvedValue(pageResponse({body: "<p>Hello</p><script>x()</script><!--vps:embed:gallery:12-->"}));
+    pageAPI.findById.mockResolvedValue(pageResponse({body: "<p>Hello</p><script>x()</script><!--vps:embed:gallery:12-->", tags: ["travel", "finland"]}));
     pageAPI.findPageable.mockResolvedValue(pagedResponse(otherPages, {last: false}));
     pageAPI.create.mockImplementation(async (values: unknown) => ({...(values as object), id: 20}));
     pageAPI.update.mockImplementation(async (values: unknown) => values);
@@ -120,7 +122,7 @@ describe("PageEditor", () => {
 
         fireEvent.click(screen.getByText("Save page"));
         await waitFor(() => expect(pageAPI.update).toHaveBeenCalledTimes(1));
-        expect(pageAPI.update.mock.calls[0][0]).toMatchObject({id: 9, title: "First page", gallery_ids: [12]});
+        expect(pageAPI.update.mock.calls[0][0]).toMatchObject({id: 9, title: "First page", gallery_ids: [12], tags: ["travel", "finland"]});
         expect(await screen.findByText("Page updated")).toBeInTheDocument();
     });
 
@@ -163,6 +165,17 @@ describe("PageEditor", () => {
         expect(galleryAPI.findPageableList).toHaveBeenCalledWith({page: 0, size: 10});
         await providers.getAllDataSets({type: "time_series", search: "gps"});
         expect(dataAPI.getAllDataSets).toHaveBeenCalledWith({type: "time_series", search: "gps"});
+
+        // The link dialog gets the published pages and files as website hrefs
+        webSiteManagementAPI.findInternalLinks.mockResolvedValue([
+            {type: "PAGE", title: "About us", path: "about"},
+            {type: "SITE_FILE", title: "document/2024/trip report.pdf", path: "document/2024/trip report.pdf"}
+        ]);
+        expect(await providers.findInternalLinks({search: "ab", limit: 20})).toEqual([
+            {href: "/pages/about", label: "About us", kind: "page"},
+            {href: "/file/document/2024/trip%20report.pdf", label: "document/2024/trip report.pdf", kind: "file"}
+        ]);
+        expect(webSiteManagementAPI.findInternalLinks).toHaveBeenCalledWith("ab", 20);
 
         await providers.getPagedSiteFiles({
             page: "1",

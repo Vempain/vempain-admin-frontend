@@ -3,7 +3,7 @@ import type {ColumnsType} from "antd/es/table";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import type {DataSummaryResponse} from "../models";
 import {dataAPI} from "../services";
-import {formatDateTime, isModifiedAfterPublish} from "../tools";
+import {formatDateTime, isModifiedAfterPublish, stickyTableHeader} from "../tools";
 import {ReleaseFilterSwitch} from "../main/ReleaseFilterSwitch";
 import {useTaskProgress} from "@vempain/vempain-common-frontend";
 
@@ -130,6 +130,7 @@ export function WebSiteDataPublish() {
                         <Empty description={emptyDescription} image={Empty.PRESENTED_IMAGE_SIMPLE}/>
                 ) : (
                         <Table<DataSummaryResponse>
+                                sticky={stickyTableHeader}
                                 rowKey={(record) => record.identifier}
                                 columns={columns}
                                 dataSource={items}

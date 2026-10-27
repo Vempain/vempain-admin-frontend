@@ -8,6 +8,7 @@ import type {ColumnsType} from "antd/lib/table";
 import dayjs, {Dayjs} from "dayjs";
 import {SubmitResultHandler} from "../main";
 import {ActionResult, type SubmitResult, validateParamId} from "@vempain/vempain-auth-frontend";
+import {stickyTableHeader} from "../tools";
 
 // Define the loading messages
 const spinMessages: Record<string, string> = {
@@ -130,6 +131,7 @@ function ItemPublishTrigger() {
                         <h2>Publish Schedule Trigger</h2>
                         {publishSchedule !== null && <>
                             <Table key={"scheduleTable"}
+                                   sticky={stickyTableHeader}
                                    columns={columns}
                                    dataSource={[publishSchedule]}
                                    pagination={false}/>

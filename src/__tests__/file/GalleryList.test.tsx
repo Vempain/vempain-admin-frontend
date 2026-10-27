@@ -83,11 +83,12 @@ describe("GalleryList", () => {
         expect(within(row("Winter")).getByText(/2026-01-05 \d\d:00/)).toBeInTheDocument();
         expect(screen.getByRole("link", {name: "plus-circle"})).toHaveAttribute("href", "/galleries/0/edit");
 
-        fireEvent.click(screen.getByText("Name"));
+        // The sticky header repeats the titles in a hidden measure row, so the sort clicks target the header cells
+        fireEvent.click(screen.getByRole("columnheader", {name: /^Name\b/}));
         await waitFor(() => expect(galleryAPI.findPageableList).toHaveBeenLastCalledWith(expect.objectContaining({sort_by: "short_name"})));
-        fireEvent.click(screen.getByText("Description"));
+        fireEvent.click(screen.getByRole("columnheader", {name: /^Description\b/}));
         await waitFor(() => expect(galleryAPI.findPageableList).toHaveBeenLastCalledWith(expect.objectContaining({sort_by: "description"})));
-        fireEvent.click(screen.getByText("Published"));
+        fireEvent.click(screen.getByRole("columnheader", {name: /^Published\b/}));
         await waitFor(() => expect(galleryAPI.findPageableList).toHaveBeenLastCalledWith(expect.objectContaining({sort_by: "published"})));
     });
 

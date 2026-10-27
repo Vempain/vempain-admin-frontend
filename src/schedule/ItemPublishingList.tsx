@@ -5,7 +5,7 @@ import {ContentTypeEnum} from "../models";
 import type {ColumnsType} from "antd/lib/table";
 import {scheduleAPI} from "../services";
 import dayjs from "dayjs";
-import {contentTypeEnumToTag, formatDateTime, publishStatusEnumToTag} from "../tools";
+import {contentTypeEnumToTag, formatDateTime, publishStatusEnumToTag, stickyTableHeader} from "../tools";
 
 function ItemPublishingList() {
     const [loading, setLoading] = useState<boolean>(true);
@@ -91,6 +91,7 @@ function ItemPublishingList() {
                     <h1 key={"publishScheduleListHeader"}>Publish schedule List</h1>
 
                     {publishScheduleList.length > 0 && <Table
+                            sticky={stickyTableHeader}
                             dataSource={publishScheduleList}
                             columns={columns}
                             key={"publishScheduleListTable"}/>}

@@ -5,7 +5,7 @@ import {DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons"
 import {Link} from "react-router-dom";
 import {type ComponentVO} from "../models";
 import {aclTool, PrivilegeEnum, usePagedTable, UserName, useSession, VempainTable} from "@vempain/vempain-auth-frontend";
-import {formatDateTime} from "../tools";
+import {formatDateTime, stickyTableHeader} from "../tools";
 import {componentAPI, userAPI} from "../services";
 
 export function ComponentList() {
@@ -88,6 +88,7 @@ export function ComponentList() {
 
                     {paged.contextHolder}
                     {paged.dataSource.length > 0 && <VempainTable
+                            sticky={stickyTableHeader}
                             dataSource={paged.dataSource}
                             columns={columns}
                             dataMode={"server"}

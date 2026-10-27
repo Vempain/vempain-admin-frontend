@@ -12,4 +12,6 @@ export interface PageResponse extends AbstractResponse {
     header: string;
     body: string;
     published: Dayjs | null;
+    /** Tags (subject names) of the page, published to the website with it */
+    tags: string[];
 }

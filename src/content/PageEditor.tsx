@@ -12,11 +12,11 @@ import {
     type SiteFileQueryParams,
 } from '@vempain/vempain-rt-editor';
 import {MetadataForm, SubmitResultHandler} from "../main";
-import {dataAPI, formAPI, galleryAPI, pageAPI, siteFileAPI} from "../services";
+import {dataAPI, formAPI, galleryAPI, pageAPI, siteFileAPI, webSiteManagementAPI} from "../services";
 import {aclTool, type AclVO, ActionResult, type SubmitResult, useSession, validateParamId} from "@vempain/vempain-auth-frontend";
 import {type FileTypeEnum, type FormVO, type PageRequest, type PageResponse, type SiteFilePagedRequest} from "../models";
 import dayjs from "dayjs";
-import {galleryIdsFromEmbeds, sameGalleryIds, sanitizeRichText} from "../tools";
+import {galleryIdsFromEmbeds, sameGalleryIds, sanitizeRichText, toInternalLinkTarget} from "../tools";
 
 // Define the loading messages
 const spinMessages: Record<string, string> = {
@@ -55,6 +55,8 @@ const defaultDataProviders: EmbedDataProviders = {
     findGalleries: (params) => galleryAPI.findPageableList(params),
     getPagedSiteFiles: (params) => siteFileAPI.getPagedSiteFiles(toSiteFilePagedRequest(params)),
     getAllDataSets: (params?: DataSetQueryParams) => dataAPI.getAllDataSets(params),
+    // The link dialog offers only what is published on the website, as hrefs of the website's page and file routes
+    findInternalLinks: ({search, limit}) => webSiteManagementAPI.findInternalLinks(search, limit).then(links => links.map(toInternalLinkTarget)),
 };
 
 export function PageEditor() {
@@ -230,6 +232,7 @@ export function PageEditor() {
                             title: "",
                             header: "",
                             body: "",
+                            tags: [],
                             acls: defaultAcls,
                             locked: false,
                             creator: 0,
@@ -364,6 +367,10 @@ export function PageEditor() {
                         </Form.Item>
                         <Form.Item name={"header"} label={"Header"}>
                             <Input/>
+                        </Form.Item>
+                        <Form.Item name={"tags"} label={"Tags"} tooltip={"Published to the website with the page and shown next to its title"}>
+                            <Select mode={"tags"} tokenSeparators={[","]} placeholder={"Type a tag and press Enter"} aria-label={"Tags"}
+                                    open={false}/>
                         </Form.Item>
                         <Form.Item name={"body"} label={"Body"}>
                             <RtEditor dataProviders={mergedDataProviders} onEmbedsChange={handleEmbedsChange}/>

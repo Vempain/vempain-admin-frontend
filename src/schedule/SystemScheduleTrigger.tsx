@@ -6,6 +6,7 @@ import {Button, InputNumber, Space, Spin, Table} from "antd";
 import type {ColumnsType} from "antd/lib/table";
 import {SubmitResultHandler} from "../main";
 import {ActionResult, type SubmitResult} from "@vempain/vempain-auth-frontend";
+import {stickyTableHeader} from "../tools";
 
 function SystemScheduleTrigger() {
     const {paramName} = useParams();
@@ -94,6 +95,7 @@ function SystemScheduleTrigger() {
                         <h2>System Schedule Trigger: {scheduleName}</h2>
                         {schedule !== null && <>
                             <Table key={"scheduleTable"}
+                                   sticky={stickyTableHeader}
                                    columns={columns}
                                    dataSource={[schedule]}
                                    pagination={false}/>

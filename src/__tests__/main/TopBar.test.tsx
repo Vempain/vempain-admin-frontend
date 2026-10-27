@@ -27,7 +27,8 @@ describe("TopBar", () => {
         expect(screen.getByText("File Management")).toBeInTheDocument();
         expect(screen.getByText("Schedule Management")).toBeInTheDocument();
         expect(screen.getByText("Web Site Management")).toBeInTheDocument();
-        expect(screen.getByText("User Management")).toBeInTheDocument();
+        expect(screen.getByText("System Management")).toBeInTheDocument();
+        expect(screen.queryByText("User Management")).not.toBeInTheDocument();
         expect(screen.getByText("Profile (admin)")).toBeInTheDocument();
         expect(screen.queryByLabelText("Open menu")).not.toBeInTheDocument();
         expect(screen.getByAltText("Home").closest("a")).toHaveAttribute("href", "/");
@@ -59,5 +60,26 @@ describe("TopBar", () => {
 
         fireEvent.click(screen.getByLabelText("Close"));
         await waitFor(() => expect(document.querySelector(".ant-drawer-open")).toBeNull());
+    });
+
+    it("lists the tag blacklist under Web Site Management", async () => {
+        setScreenWidthMatches(false);
+        renderTopBar();
+
+        fireEvent.click(await screen.findByLabelText("Open menu"));
+        fireEvent.click(await screen.findByText("Web Site Management"));
+        expect((await screen.findByText("Tag blacklist")).closest("a")).toHaveAttribute("href", "/administration/tag-blacklist");
+        expect(screen.getByText("API tokens").closest("a")).toHaveAttribute("href", "/administration/api-tokens");
+    });
+
+    it("lists users, units and statistics under System Management", async () => {
+        setScreenWidthMatches(false);
+        renderTopBar();
+
+        fireEvent.click(await screen.findByLabelText("Open menu"));
+        fireEvent.click(await screen.findByText("System Management"));
+        expect((await screen.findByText("Users")).closest("a")).toHaveAttribute("href", "/users");
+        expect(screen.getByText("Units").closest("a")).toHaveAttribute("href", "/units");
+        expect(screen.getByText("Statistics").closest("a")).toHaveAttribute("href", "/administration/statistics");
     });
 });

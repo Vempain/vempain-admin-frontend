@@ -14,7 +14,7 @@ import {
 import {WebSiteResourceTypeEnum as WebSiteResourceTypeValues} from "../models/WebSiteResourceTypeEnum";
 import VirtualList from "rc-virtual-list";
 import {userAPI, webSiteManagementAPI} from "../services";
-import {formatDateTime} from "../tools";
+import {formatDateTime, stickyTableHeader} from "../tools";
 import {UserName} from "@vempain/vempain-auth-frontend";
 
 const PAGE_SIZE = 100;
@@ -402,6 +402,7 @@ export function WebSiteUserList() {
                 </div>
 
                 <Table<WebSiteUserResponse>
+                        sticky={stickyTableHeader}
                         rowKey={(record) => String(resolveUserId(record) ?? record.username)}
                         columns={columns}
                         dataSource={users}

@@ -20,6 +20,10 @@ void i18n
                         steps: "{{completed}} / {{total}} steps",
                         failedSteps: "{{count}} failed",
                         revertedSteps: "{{count}} reverted",
+                        remainingUnderMinute: "less than a minute left",
+                        remainingMinutes: "about {{minutes}} min left",
+                        remainingWholeHours: "about {{hours}} h left",
+                        remainingHours: "about {{hours}} h {{minutes}} min left",
                         close: "Close",
                         cancel: "Cancel",
                         cancelError: "Failed to cancel the task"

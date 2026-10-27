@@ -1,5 +1,6 @@
 import {AbstractAPI, type PagedResponse} from "@vempain/vempain-auth-frontend";
 import {
+    type InternalLinkResponse,
     type WebSiteAclRequest,
     type WebSiteAclResponse,
     type WebSiteAclUsersResponse,
@@ -81,6 +82,16 @@ class WebSiteManagementAPI extends AbstractAPI<WebSiteUserRequest, WebSiteUserRe
     }
 
     // Web site resource Management
+    /**
+     * The published pages (by title or path) and published files (by path) containing the search text, pages first; the internal link targets
+     * of the page editor
+     */
+    async findInternalLinks(search: string, limit = 20): Promise<InternalLinkResponse[]> {
+        this.setAuthorizationHeader();
+        const response = await this.axiosInstance.get<InternalLinkResponse[]>("/links", {params: {search, limit}});
+        return response.data;
+    }
+
     async getResources(request: WebSiteResourcePagedRequest): Promise<PagedResponse<WebSiteResourceResponse>> {
         this.setAuthorizationHeader();
         this.axiosInstance.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';

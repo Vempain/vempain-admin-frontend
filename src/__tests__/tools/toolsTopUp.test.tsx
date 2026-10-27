@@ -2,6 +2,7 @@ import {render, screen} from "@testing-library/react";
 import {contentTypeEnumToTag, publishStatusEnumToTag} from "../../tools/enum2Tags";
 import {isWebSiteAclResponse, isWebSiteResourceResponse, isWebSiteUserResponse} from "../../tools/WebSiteTools";
 import {getPaginationConfig} from "../../tools/tablePaginationConfig";
+import {stickyTableHeader, TOP_BAR_HEIGHT} from "../../tools/tableStickyConfig";
 import {formatDate} from "../../tools/timeTools";
 import {normalizeYoutubeEmbedUrl} from "../../tools/urlSecurity";
 import {sanitizeHtmlFragment, sanitizeRichText} from "../../tools/richTextSecurity";
@@ -124,5 +125,12 @@ describe("sanitizeRichText", () => {
         expect(sanitized).toContain("<!--vps:embed:video:3-->");
         expect(sanitized).not.toContain("<!--vps:embed:image:");
         expect(sanitized).not.toContain("<!--vps:embed:audio:");
+    });
+});
+
+describe("tableStickyConfig", () => {
+    it("docks the sticky table header right below the fixed top bar", () => {
+        expect(stickyTableHeader).toEqual({offsetHeader: TOP_BAR_HEIGHT});
+        expect(TOP_BAR_HEIGHT).toBe(60);
     });
 });

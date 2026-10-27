@@ -27,7 +27,20 @@
   backend prefix (`/content-management/...`, `/admin-management/...`, `/schedule-management/...`). Call `this.setAuthorizationHeader()` before requests.
 - JSON contracts are snake_case end to end; TS models mirror the backend DTO field names. Never rename fields to camelCase ad hoc.
 - Do not add TypeScript `enum`; use `as const` objects plus a derived type (see `src/models/FileTypeEnum.ts`).
-- Route changes must be reflected in both `src/App.tsx` and `src/main/TopBar.tsx`.
+- Route changes must be reflected in both `src/App.tsx` and `src/main/TopBar.tsx`. The top bar's last dropdown is `System Management`
+  (users, units and the Statistics screen); there is no separate user management menu any more.
+- Page tags: `PageEditor` has a `tags` field (`Select mode="tags"`, comma or Enter separates them) saved as `PageRequest.tags` and shown as
+  `PageResponse.tags`; `PageList` renders them in a Tags column. Tested in `src/__tests__/content/PageEditor.test.tsx` and
+  `src/__tests__/content/PageList.test.tsx`.
+- `src/website/TagBlacklist.tsx` (`/administration/tag-blacklist`, Web Site Management > Tag blacklist) manages the tags that are never
+  published to the website through `tagBlacklistAPI` (`GET|POST|DELETE /admin-management/tag-blacklist`, models `TagBlacklistRequest`/
+  `TagBlacklistResponse`): an inline add form, the table with who added each tag and a confirmed remove. Tested in
+  `src/__tests__/website/TagBlacklist.test.tsx` and `src/__tests__/main/TopBar.test.tsx`.
+- `src/administration/Statistics.tsx` (`/administration/statistics`) renders `GET /admin-management/statistics` (`statisticsAPI`,
+  `AdminStatisticsResponse` in `src/models/Responses`): resource totals, site files by type, published/not published, created and published
+  per month, resources per user with the per-type sub table, pages by form, forms by layout and component, pages and site files by path. Charts
+  come from `@ant-design/charts` (`Column`, `Line`, mocked in tests); resource type labels live in `src/tools/statisticsTools.ts`. Tested in
+  `src/__tests__/Statistics.test.tsx` and `src/__tests__/main/TopBar.test.tsx`.
 - `PageEditor.tsx`: the path field is `PagePathInput` (`AutoComplete` fed by `pageAPI.suggestPath`, debounced; the backend answers with the
   parent path shared by the readable pages whose path starts with the typed text, never a full existing path), and a new page starts
   with one ACL row granting the signed-in user every privilege (`useSession().userSession.id`).
@@ -71,7 +84,9 @@
   Any new shared ACL component, rule or helper this SPA needs is added to `@vempain/vempain-auth-frontend` (the home of all shared ACL
   functionality) and consumed from there, never written here or in `vempain-common-frontend`.
 - Editor integration: `PageEditor.tsx` and `PagePublish.tsx` are the reference host for `RichTextEditor` and its `dataProviders`; keep them aligned
-  with the rt-editor integration guide.
+  with the rt-editor integration guide. The `findInternalLinks` provider answers the editor's link dialog with the published pages and files
+  of the website (`webSiteManagementAPI.findInternalLinks` -> `GET /admin-management/site/links`), mapped by `tools/internalLinkTools.ts` to the
+  website's routes (`/pages/<path>`, `/file/<path>`, every segment URL-encoded); the website route prefixes live only there.
 - Page-gallery links are derived from the body, never edited by hand: `PageEditor.tsx` passes `onEmbedsChange` to the editor,
   `galleryIdsFromEmbeds` (`src/tools/pageGalleryTools.ts`) keeps the ids of the `gallery` embeds and the hero `carousel` embeds in body
   order, the editor shows them as a read-only "Galleries" summary (names via `galleryAPI.findById`), and the page save sends them as

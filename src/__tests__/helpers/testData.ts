@@ -114,6 +114,7 @@ export function pageResponse(overrides: Partial<PageResponse> = {}): PageRespons
         modifier: 2,
         modified: dayjs(MODIFIED),
         published: null,
+        tags: [],
         ...overrides
     };
 }

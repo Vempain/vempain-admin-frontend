@@ -12,3 +12,4 @@ export type {WebSiteResourcePagedRequest} from './WebSiteResourcePagedRequest';
 export type {ApiTokenRequest} from "./ApiTokenRequest";
 export type {PageRequest} from "./PageRequest";
 export type {PagePagedRequest} from "./PagePagedRequest";
+export type {TagBlacklistRequest} from "./TagBlacklistRequest";

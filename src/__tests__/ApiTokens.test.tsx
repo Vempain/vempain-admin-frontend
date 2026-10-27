@@ -55,6 +55,8 @@ describe("ApiTokens", () => {
         expect(screen.getByText("file backend")).toBeTruthy();
         expect(screen.getByText("10.0.0.0/24")).toBeTruthy();
         expect(screen.getByText("never")).toBeTruthy();
+        // The unpaged token list keeps its header visible below the 60px top bar while scrolling
+        expect(document.querySelector(".ant-table-sticky-holder")).toHaveStyle({top: "60px"});
     });
 
     it("creates a token and shows the secret once", async () => {

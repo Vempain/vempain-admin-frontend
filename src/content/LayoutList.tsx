@@ -4,7 +4,7 @@ import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {type LayoutVO} from "../models";
-import {formatDateTime} from "../tools";
+import {formatDateTime, stickyTableHeader} from "../tools";
 import {aclTool, PrivilegeEnum, usePagedTable, UserName, useSession, VempainTable} from "@vempain/vempain-auth-frontend";
 import {layoutAPI, userAPI} from "../services";
 
@@ -52,6 +52,7 @@ export function LayoutList() {
                     </h1>
                     {paged.contextHolder}
                     {paged.dataSource.length > 0 && <VempainTable
+                            sticky={stickyTableHeader}
                             dataSource={paged.dataSource}
                             columns={columns}
                             dataMode={"server"}

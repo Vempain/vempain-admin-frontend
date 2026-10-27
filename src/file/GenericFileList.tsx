@@ -4,6 +4,7 @@ import type {ColumnsType} from "antd/es/table";
 import {type PagedResponse, usePagedTable, VempainTable} from "@vempain/vempain-auth-frontend";
 import type {SiteFilePagedRequest} from "../models";
 import {ReleaseFilterSwitch} from "../main/ReleaseFilterSwitch";
+import {stickyTableHeader} from "../tools";
 
 interface PageableApi<T> {
     getPagedSiteFiles(request: SiteFilePagedRequest): Promise<PagedResponse<T>>;
@@ -35,6 +36,7 @@ export function GenericFileList<T extends { id: number }>({valueObjectColumns, a
                     <Space vertical={true} size={"middle"} style={{width: "100%"}}>
                         <ReleaseFilterSwitch checked={modifiedAfterPublish} onChange={setModifiedAfterPublish}/>
                         <VempainTable dataSource={paged.dataSource}
+                                      sticky={stickyTableHeader}
                                       columns={valueObjectColumns}
                                       dataMode={"server"}
                                       paged={paged}

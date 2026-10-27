@@ -28,7 +28,7 @@ describe("PageList", () => {
         jest.spyOn(console, "error").mockImplementation(() => undefined);
         jest.spyOn(window, "confirm").mockReturnValue(true);
         pageAPI.findPageable.mockResolvedValue(pagedResponse([
-            pageResponse({published: dayjs("2026-01-05T08:00:00Z")}),
+            pageResponse({published: dayjs("2026-01-05T08:00:00Z"), tags: ["travel", "finland"]}),
             pageResponse({id: 10, title: "Second page", page_path: "/news/second", modifier: null, modified: null})
         ]));
         pageAPI.publishAll.mockResolvedValue({result: "OK", message: "", timestamp: "", task});
@@ -43,6 +43,8 @@ describe("PageList", () => {
     it("lists the pages with their timestamps and the edit, delete and publish actions", async () => {
         renderList();
         expect(await screen.findByText("First page")).toBeInTheDocument();
+        expect(screen.getByText("travel")).toHaveClass("ant-tag");
+        expect(screen.getByText("finland")).toHaveClass("ant-tag");
         expect(pageAPI.findPageable).toHaveBeenCalledWith(expect.objectContaining({page: 0, size: 25, sort_by: "id", direction: "ASC"}));
         await waitFor(() => expect(within(row("First page")).getAllByText("Admin (admin)").length).toBe(2));
         expect(within(row("First page")).getByText(dayjs("2026-01-02T10:00:00Z").format("YYYY.MM.DD HH:mm"))).toBeInTheDocument();
@@ -52,7 +54,8 @@ describe("PageList", () => {
                 .toEqual(["/pages/9/edit", "/pages/9/delete", "/pages/9/publish"]);
         expect(screen.getByRole("link", {name: "plus-circle"})).toHaveAttribute("href", "/pages/0/edit");
 
-        fireEvent.click(screen.getByText("Title"));
+        // The sticky header repeats the titles in a hidden measure row, so the sort clicks target the header cells
+        fireEvent.click(screen.getByRole("columnheader", {name: /^Title\b/}));
         await waitFor(() => expect(pageAPI.findPageable).toHaveBeenLastCalledWith(expect.objectContaining({sort_by: "title"})));
         fireEvent.click(screen.getAllByRole("switch")[0]);
         await waitFor(() => expect(pageAPI.findPageable).toHaveBeenCalledTimes(3));

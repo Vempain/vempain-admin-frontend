@@ -239,9 +239,10 @@ describe("SiteFileList", () => {
         expect(other.querySelector(".ant-tag")).toBeNull();
         expect(within(other).getByText("Not published")).toBeInTheDocument();
 
-        fireEvent.click(screen.getByText("File name"));
+        // The sticky header repeats the titles in a hidden measure row, so the sort clicks target the header cells
+        fireEvent.click(screen.getByRole("columnheader", {name: /^File name\b/}));
         await waitFor(() => expect(siteFileAPI.getPagedSiteFiles).toHaveBeenLastCalledWith(expect.objectContaining({sort_by: "file_name"})));
-        fireEvent.click(screen.getByText("Published"));
+        fireEvent.click(screen.getByRole("columnheader", {name: /^Published\b/}));
         await waitFor(() => expect(siteFileAPI.getPagedSiteFiles).toHaveBeenLastCalledWith(expect.objectContaining({sort_by: "published"})));
 
         expect(siteFileAPI.getPagedSiteFiles).toHaveBeenLastCalledWith(expect.objectContaining({modified_after_publish: false}));
