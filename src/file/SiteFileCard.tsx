@@ -90,7 +90,7 @@ export function SiteFileCard({siteFile}: SiteFileCardProps) {
     const hasDetails = detailDescriptions.length > 0 || (metadataItems && metadataItems.length > 0);
 
     return (
-            <Card size="small" style={{marginBottom: 12}} bodyStyle={{padding: 12}}>
+            <Card size="small" style={{marginBottom: 12}} styles={{body: {padding: 12}}}>
                 <Descriptions bordered column={4} size="small">
                     {summaryItems.map(item => (
                             <Descriptions.Item key={item.key} label={item.label}>

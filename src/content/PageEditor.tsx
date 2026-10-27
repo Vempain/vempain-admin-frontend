@@ -89,6 +89,8 @@ export function PageEditor() {
             () => defaultDataProviders,
             [],
     );
+    // The CSS typed into the page style field is previewed on the editor canvas as it is typed
+    const pageStyle = Form.useWatch<string | null | undefined>("page_style", pageForm);
 
     const loadPageOptions = useCallback(async (pageNumber: number, search: string, append: boolean, force = false) => {
         if (pageOptionsLoadingRef.current && !force) {
@@ -232,6 +234,7 @@ export function PageEditor() {
                             title: "",
                             header: "",
                             body: "",
+                            page_style: null,
                             tags: [],
                             acls: defaultAcls,
                             locked: false,
@@ -255,7 +258,13 @@ export function PageEditor() {
     function onFinish(values: PageResponse): void {
         console.debug("onFinish", values);
         // The gallery links travel with the page: the backend replaces them with the galleries the body embeds
-        const safeValues: PageRequest = {...values, body: sanitizeRichText(values.body), gallery_ids: galleryIds};
+        const safeValues: PageRequest = {
+            ...values,
+            body: sanitizeRichText(values.body),
+            // blank CSS is no CSS
+            page_style: values.page_style?.trim() ? values.page_style : null,
+            gallery_ids: galleryIds,
+        };
 
         for (let i = 0; i < safeValues.acls.length; i++) {
             safeValues.acls[i] = aclTool.completeAcl(safeValues.acls[i]);
@@ -341,22 +350,16 @@ export function PageEditor() {
                             <Select
                                     placeholder={"Select a form"}
                                     showSearch={true}
-                            >
-                                <Select.Option value={0} key={"emptyForm"}>None</Select.Option>
-                                {formList.map(form => {
-                                    return (
-                                            <Select.Option key={form.id} value={form.id}>
-                                                {form.name}
-                                            </Select.Option>);
-                                })}
-                            </Select>
+                                    options={[
+                                        {value: 0, label: "None"},
+                                        ...formList.map(form => ({value: form.id, label: form.name}))
+                                    ]}
+                            />
                         </Form.Item>
                         <Form.Item name={"parent_id"} label={"Parent Page"}>
                             <Select
                                     placeholder={"Select a parent page"}
-                                    showSearch={true}
-                                    filterOption={false}
-                                    onSearch={handlePageSearch}
+                                    showSearch={{filterOption: false, onSearch: handlePageSearch}}
                                     onPopupScroll={handlePagePopupScroll}
                                     loading={pageOptionsLoading}
                                     options={[{label: 'None', value: 0}, ...pageList.map(p => ({label: p.page_path, value: p.id}))]}
@@ -373,7 +376,13 @@ export function PageEditor() {
                                     open={false}/>
                         </Form.Item>
                         <Form.Item name={"body"} label={"Body"}>
-                            <RtEditor dataProviders={mergedDataProviders} onEmbedsChange={handleEmbedsChange}/>
+                            <RtEditor dataProviders={mergedDataProviders} onEmbedsChange={handleEmbedsChange} pageStyle={pageStyle}/>
+                        </Form.Item>
+                        <Form.Item name={"page_style"} label={"Page style"}
+                                   tooltip={"CSS of this page only, published with it. Style the page canvas with .vps-page-canvas and override the "
+                                           + "website's default style (for example its :root variables); the body above previews the canvas rules"}>
+                            <Input.TextArea rows={6} aria-label={"Page style"} placeholder={".vps-page-canvas { max-width: 60rem; }"}
+                                            style={{fontFamily: "monospace"}} spellCheck={false}/>
                         </Form.Item>
                         <Form.Item label={"Galleries"} key={"page-galleries"}
                                    tooltip={"The galleries embedded in the body are linked to the page and published with it"}>

@@ -11,7 +11,18 @@ if (!globalThis.TextEncoder) {
             readonly encoding = 'utf-8';
 
             encode(input = '') {
-                return Uint8Array.from(unescape(encodeURIComponent(input)), (character) => character.charCodeAt(0));
+                // UTF-8 bytes from the percent-encoded form (the legacy unescape() helper is deprecated)
+                const encoded = encodeURIComponent(input);
+                const bytes: number[] = [];
+                for (let index = 0; index < encoded.length; index++) {
+                    if (encoded[index] === '%') {
+                        bytes.push(parseInt(encoded.slice(index + 1, index + 3), 16));
+                        index += 2;
+                    } else {
+                        bytes.push(encoded.charCodeAt(index));
+                    }
+                }
+                return Uint8Array.from(bytes);
             }
         },
     });

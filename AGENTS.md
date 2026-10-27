@@ -87,6 +87,13 @@
   with the rt-editor integration guide. The `findInternalLinks` provider answers the editor's link dialog with the published pages and files
   of the website (`webSiteManagementAPI.findInternalLinks` -> `GET /admin-management/site/links`), mapped by `tools/internalLinkTools.ts` to the
   website's routes (`/pages/<path>`, `/file/<path>`, every segment URL-encoded); the website route prefixes live only there.
+  The gallery, site file and data set providers hand the backend responses to the editor unchanged, so their `published` timestamp (null when never released to
+  the website) reaches the editor's dialogs, which mark such a resource with a warning triangle; keep the
+  field when mapping these responses.
+- Page style: `PageEditor.tsx` edits the page's custom CSS in the "Page style" field (`page_style`, a monospace text area; blank is saved as
+  null) and previews it on the editor canvas through the editor's `pageStyle` prop (`Form.useWatch`); `PagePublish.tsx` passes it to the
+  read-only preview. The CSS is published with the page and applied by the website while the page is shown; authors target the canvas as
+  `.vps-page-canvas` and may override the website's default style (its `:root` variables), which the editor preview cannot show.
 - Page-gallery links are derived from the body, never edited by hand: `PageEditor.tsx` passes `onEmbedsChange` to the editor,
   `galleryIdsFromEmbeds` (`src/tools/pageGalleryTools.ts`) keeps the ids of the `gallery` embeds and the hero `carousel` embeds in body
   order, the editor shows them as a read-only "Galleries" summary (names via `galleryAPI.findById`), and the page save sends them as
@@ -115,6 +122,9 @@ yarn lint
 yarn test
 yarn build
 ```
+
+`yarn lint` is type-aware (`parserOptions.projectService`) and fails on `@typescript-eslint/no-deprecated`: any use of functionality that the type declarations
+mark `@deprecated` (Ant Design props, DOM or library APIs) must be replaced by the documented successor. CI runs it before the build.
 
 - CI uses the reusable `frontend-spa.yaml` workflow from `vempain-workflows` (tests on PRs, Docker image on `main`).
 - Do not commit `dist/`, `coverage/`, `node_modules/` or local environment files.

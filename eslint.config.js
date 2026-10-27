@@ -56,4 +56,18 @@ export default [
             'react-hooks/exhaustive-deps': 'warn',
         },
     },
+    {
+        // Type-aware rules for the sources and tests; the root-level mocks and setup files belong to no tsconfig project and keep the plain rules
+        files: ['src/**/*.{ts,tsx}'],
+        languageOptions: {
+            parserOptions: {
+                projectService: true,
+                tsconfigRootDir: import.meta.dirname,
+            },
+        },
+        rules: {
+            // Deprecated 3rd-party functionality (anything its type declarations mark @deprecated: Ant Design props, DOM and library APIs) fails the lint
+            '@typescript-eslint/no-deprecated': 'error',
+        },
+    },
 ];

@@ -106,6 +106,7 @@ export function pageResponse(overrides: Partial<PageResponse> = {}): PageRespons
         index_list: true,
         title: "First page",
         header: "First",
+        page_style: null,
         body: "<p>Hello</p>",
         acls: [acl()],
         locked: false,
