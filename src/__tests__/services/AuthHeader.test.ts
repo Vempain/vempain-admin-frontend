@@ -1,11 +1,19 @@
 import {authHeader} from "../../services/AuthHeader";
 
 describe("authHeader", () => {
-    afterEach(() => localStorage.clear());
+    afterEach(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+    });
 
     it("returns the bearer header of the stored session", () => {
         localStorage.setItem("vempainUser", JSON.stringify({token: "abc"}));
         expect(authHeader()).toEqual({Authorization: "Bearer abc"});
+    });
+
+    it("returns the bearer header of a window-only session kept in session storage", () => {
+        sessionStorage.setItem("vempainUser", JSON.stringify({token: "win"}));
+        expect(authHeader()).toEqual({Authorization: "Bearer win"});
     });
 
     it("returns an empty header without a session or token", () => {

@@ -33,7 +33,7 @@ const {rtEditorTestHooks} = jest.requireActual("@vempain/vempain-rt-editor") as 
 beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(console, "error").mockImplementation(() => undefined);
-    pageAPI.findById.mockResolvedValue(pageResponse({body: "<p>Hello</p><script>x()</script>"}));
+    pageAPI.findById.mockResolvedValue(pageResponse({body: "<p>Hello</p><script>x()</script>", page_style: ".vps-page-canvas { color: red; }"}));
     pageAPI.publish.mockResolvedValue({result: "OK", message: "", timestamp: "", task: null});
     galleryAPI.findListByPage.mockResolvedValue([fileGroupListResponse()]);
     galleryAPI.findPageableList.mockResolvedValue({content: []});
@@ -81,6 +81,8 @@ describe("PagePublish", () => {
         const editor = await screen.findByTestId("rich-text-editor");
         expect(editor).toHaveValue("<p>Hello</p>");
         expect(editor).toHaveAttribute("readonly");
+        // the read-only preview shows the page with its own style
+        expect(screen.getByTestId("rich-text-editor-page-style")).toHaveTextContent(".vps-page-canvas { color: red; }");
         expect(screen.getByText("Summer")).toBeInTheDocument();
         expect(screen.getByText("Summer pictures")).toBeInTheDocument();
         expect(screen.getByText("3")).toBeInTheDocument();

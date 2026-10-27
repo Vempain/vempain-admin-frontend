@@ -129,6 +129,7 @@ export function PagePublish() {
                                       value={page.body}
                                       readOnly={true}
                                       dataProviders={mergedDataProviders}
+                                      pageStyle={page.page_style}
                             />
                             {galleryList.length > 0 && <Table key={"galleryList"}
                                                               sticky={stickyTableHeader}

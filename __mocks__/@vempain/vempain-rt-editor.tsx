@@ -13,11 +13,12 @@ export interface RichTextEditorProps {
     onEmbedsChange?: (embeds: unknown[]) => void;
     readOnly?: boolean;
     dataProviders?: Record<string, (params?: unknown) => Promise<unknown>>;
+    pageStyle?: string | null;
 }
 
 export const rtEditorTestHooks: { dataProviders?: Record<string, (params?: unknown) => Promise<unknown>> } = {};
 
-export function RichTextEditor({value, onChange, onEmbedsChange, readOnly, dataProviders}: RichTextEditorProps) {
+export function RichTextEditor({value, onChange, onEmbedsChange, readOnly, dataProviders, pageStyle}: RichTextEditorProps) {
     const body = value ?? "";
 
     useEffect(() => {
@@ -39,5 +40,10 @@ export function RichTextEditor({value, onChange, onEmbedsChange, readOnly, dataP
                 }));
     }, [body, onEmbedsChange]);
 
-    return <textarea data-testid="rich-text-editor" readOnly={readOnly} value={body} onChange={event => onChange?.(event.target.value)}/>;
+    return (
+            <>
+                {pageStyle?.trim() && <style data-testid="rich-text-editor-page-style">{pageStyle}</style>}
+                <textarea data-testid="rich-text-editor" readOnly={readOnly} value={body} onChange={event => onChange?.(event.target.value)}/>
+            </>
+    );
 }

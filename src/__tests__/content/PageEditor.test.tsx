@@ -58,7 +58,9 @@ beforeEach(() => {
     jest.spyOn(console, "debug").mockImplementation(() => undefined);
     jest.spyOn(console, "log").mockImplementation(() => undefined);
     useSession.mockReturnValue({userSession: {id: SESSION_USER_ID}});
-    pageAPI.findById.mockResolvedValue(pageResponse({body: "<p>Hello</p><script>x()</script><!--vps:embed:gallery:12-->", tags: ["travel", "finland"]}));
+    pageAPI.findById.mockResolvedValue(pageResponse({
+        body: "<p>Hello</p><script>x()</script><!--vps:embed:gallery:12-->", tags: ["travel", "finland"], page_style: "p { color: red; }"
+    }));
     pageAPI.findPageable.mockResolvedValue(pagedResponse(otherPages, {last: false}));
     pageAPI.create.mockImplementation(async (values: unknown) => ({...(values as object), id: 20}));
     pageAPI.update.mockImplementation(async (values: unknown) => values);
@@ -83,6 +85,10 @@ describe("PageEditor", () => {
         await selectOption(screen.getByLabelText("Form"), "Article form");
         fireEvent.change(screen.getByLabelText("Title"), {target: {value: "Holiday"}});
         fireEvent.change(screen.getByLabelText("Header"), {target: {value: "Summer holiday"}});
+        // the page style is previewed on the editor canvas as it is typed
+        expect(screen.queryByTestId("rich-text-editor-page-style")).toBeNull();
+        fireEvent.change(screen.getByLabelText("Page style"), {target: {value: ".vps-page-canvas { max-width: 60rem; }"}});
+        expect(await screen.findByTestId("rich-text-editor-page-style")).toHaveTextContent(".vps-page-canvas { max-width: 60rem; }");
         fireEvent.change(screen.getByTestId("rich-text-editor"), {
             target: {value: "<p>Pics</p><!--vps:embed:gallery:12--><!--vps:embed:carousel:[{\"title\":\"a\",\"body\":\"b\"}]:true:false:500--><!--vps:embed:hero:13:type:carousel--><!--vps:embed:hero:14:type:image-->"}
         });
@@ -94,7 +100,9 @@ describe("PageEditor", () => {
         fireEvent.click(screen.getByText("Save page"));
         await waitFor(() => expect(pageAPI.create).toHaveBeenCalledTimes(1));
         const payload = pageAPI.create.mock.calls[0][0];
-        expect(payload).toMatchObject({id: 0, form_id: 5, title: "Holiday", header: "Summer holiday", gallery_ids: [12, 13]});
+        expect(payload).toMatchObject({
+            id: 0, form_id: 5, title: "Holiday", header: "Summer holiday", gallery_ids: [12, 13], page_style: ".vps-page-canvas { max-width: 60rem; }"
+        });
         expect(payload.body).toContain("<!--vps:embed:gallery:12-->");
         expect(payload.acls[0]).toMatchObject({user: SESSION_USER_ID});
         expect(await screen.findByText("Page created")).toBeInTheDocument();
@@ -117,12 +125,17 @@ describe("PageEditor", () => {
         expect(await screen.findByText("Edit page 'First page'")).toBeInTheDocument();
         const editor = await screen.findByTestId("rich-text-editor");
         expect(editor).toHaveValue("<p>Hello</p><!--vps:embed:gallery:12-->");
+        expect(screen.getByLabelText("Page style")).toHaveValue("p { color: red; }");
+        expect(screen.getByTestId("rich-text-editor-page-style")).toHaveTextContent("p { color: red; }");
         expect(await screen.findByTestId("page-gallery-12")).toHaveTextContent("#12");
         await waitFor(() => expect(screen.getAllByText("Admin (admin)").length).toBe(2));
 
+        // a page style cleared to whitespace is saved as no style
+        fireEvent.change(screen.getByLabelText("Page style"), {target: {value: "   "}});
+        await waitFor(() => expect(screen.queryByTestId("rich-text-editor-page-style")).toBeNull());
         fireEvent.click(screen.getByText("Save page"));
         await waitFor(() => expect(pageAPI.update).toHaveBeenCalledTimes(1));
-        expect(pageAPI.update.mock.calls[0][0]).toMatchObject({id: 9, title: "First page", gallery_ids: [12], tags: ["travel", "finland"]});
+        expect(pageAPI.update.mock.calls[0][0]).toMatchObject({id: 9, title: "First page", gallery_ids: [12], tags: ["travel", "finland"], page_style: null});
         expect(await screen.findByText("Page updated")).toBeInTheDocument();
     });
 

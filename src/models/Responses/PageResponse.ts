@@ -11,6 +11,8 @@ export interface PageResponse extends AbstractResponse {
     title: string;
     header: string;
     body: string;
+    /** Custom CSS of the page, published with it and applied by the website while the page is shown; null for none */
+    page_style: string | null;
     published: Dayjs | null;
     /** Tags (subject names) of the page, published to the website with it */
     tags: string[];

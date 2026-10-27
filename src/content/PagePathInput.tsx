@@ -58,7 +58,7 @@ export function PagePathInput({value, onChange, placeholder, debounceMs = PAGE_P
             <AutoComplete
                     value={value}
                     options={options}
-                    onSearch={search}
+                    showSearch={{onSearch: search}}
                     onChange={next => onChange?.(next)}
                     placeholder={placeholder}
                     data-testid="page-path-input"

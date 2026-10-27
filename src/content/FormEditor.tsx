@@ -144,15 +144,11 @@ export function FormEditor() {
                             <Select
                                     placeholder={"Select a layout"}
                                     showSearch={true}
-                            >
-                                <Select.Option value={null} key={"empty"}>None</Select.Option>
-                                {layoutList.map(layout => {
-                                    return (
-                                            <Select.Option key={layout.id} value={layout.id}>
-                                                {layout.layout_name}
-                                            </Select.Option>);
-                                })}
-                            </Select>
+                                    options={[
+                                        {value: null, label: "None"},
+                                        ...layoutList.map(layout => ({value: layout.id, label: layout.layout_name}))
+                                    ]}
+                            />
                         </Form.Item>
 
 
@@ -182,20 +178,13 @@ export function FormEditor() {
                                                         >
                                                             <Select
                                                                     placeholder="Select a component"
-                                                                    showSearch
-                                                                    optionFilterProp="children"
+                                                                    showSearch={{optionFilterProp: "label"}}
                                                                     style={{width: "300px"}}
-                                                            >
-                                                                <Select.Option value={"empty"} key="empty">
-                                                                    None
-                                                                </Select.Option>
-                                                                {componentList.map(component => {
-                                                                    return (
-                                                                            <Select.Option key={component.id} value={component.id}>
-                                                                                {component.comp_name}
-                                                                            </Select.Option>);
-                                                                })}
-                                                            </Select>
+                                                                    options={[
+                                                                        {value: "empty", label: "None"},
+                                                                        ...componentList.map(component => ({value: component.id, label: component.comp_name}))
+                                                                    ]}
+                                                            />
                                                         </Form.Item>
                                                         <Button onClick={() => remove(field.name)}
                                                                 type="text"
