@@ -3027,14 +3027,14 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^7.1.1"
     eslint-plugin-react-refresh: "npm:^0.5.7"
     globals: "npm:^17.13.0"
-    i18next: "npm:^26.5.4"
+    i18next: "npm:^26.5.7"
     jest: "npm:^30.5.2"
     jest-environment-jsdom: "npm:^30.5.2"
     rc-virtual-list: "npm:^3.19.2"
     react: "npm:^19.3.1"
     react-dom: "npm:^19.3.1"
     react-highlight-words: "npm:^1.0.0"
-    react-i18next: "npm:^17.1.0"
+    react-i18next: "npm:^17.1.5"
     react-router-dom: "npm:^7.18.4"
     ts-jest: "npm:^29.4.15"
     typescript: "npm:^6.0.3"
@@ -4599,7 +4599,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:^26.5.3, i18next@npm:^26.5.4":
+"i18next@npm:^26.5.3":
   version: 26.5.4
   resolution: "i18next@npm:26.5.4"
   peerDependencies:
@@ -4608,6 +4608,18 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/b2ee46803cf19c565d3b80f9a8542ca4fcc92d96434202926f09e032d08e20188d6640434cd3f7987b7a1144cd3c2e034d27f51129a31ca18db8b8cea475c11f
+  languageName: node
+  linkType: hard
+
+"i18next@npm:^26.5.7":
+  version: 26.5.7
+  resolution: "i18next@npm:26.5.7"
+  peerDependencies:
+    typescript: ^5 || ^6 || ^7
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/c5da205990515dfc0a963682d98506927ed51b5232d87e95b447bbae574d089be551c1c14ccc80ca25fb97665fc321a489009745082b626f665a8be68ea0e8af
   languageName: node
   linkType: hard
 
@@ -6093,6 +6105,28 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/5ba9de18304f8fc20511de9f64f2a71594cb607c55b06692463867721f256770ae71489639bd96554bc556b5b310d495cff526ebbbaac091f9bae0ca8f547f24
+  languageName: node
+  linkType: hard
+
+"react-i18next@npm:^17.1.5":
+  version: 17.1.5
+  resolution: "react-i18next@npm:17.1.5"
+  dependencies:
+    "@babel/runtime": "npm:^7.29.7"
+    html-parse-stringify: "npm:^4.0.1"
+    use-sync-external-store: "npm:^1.6.0"
+  peerDependencies:
+    i18next: ">= 26.2.0"
+    react: ">= 16.8.0"
+    typescript: ^5 || ^6 || ^7
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+    typescript:
+      optional: true
+  checksum: 10c0/d48f8024d3a197d06dd280c917929e01732e5a2c345c9619b75bdcd9af17f86827feea0913a3623cb95020e46ddaffaf7ba3a7cf0abb9c180674b7fc749c4e95
   languageName: node
   linkType: hard
 
