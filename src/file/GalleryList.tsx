@@ -73,30 +73,40 @@ export function GalleryList() {
     });
 
     const columns: VempainColumnsType<GalleryListItem> = [
+        // The ID identifies the row and stays with the action buttons however narrow the table gets; the other columns are
+        // dropped least important first when they do not fit (see the priorities)
         {
             title: "ID",
             dataIndex: "id",
             key: "id",
             sorter: true,
+            mobile: true,
+            width: 80,
         },
         {
             title: "Name",
             dataIndex: "name",
             key: "name",
             sorter: true,
-            searchable: true
+            searchable: true,
+            priority: 1,
+            minWidth: 180,
         },
         {
             title: "Description",
             dataIndex: "description",
             key: "description",
             sorter: true,
-            searchable: true
+            searchable: true,
+            priority: 6,
+            minWidth: 240,
         },
         {
             title: "File count",
             dataIndex: "fileCount",
             key: "fileCount",
+            priority: 4,
+            width: 110,
             render: (_, record: GalleryListItem) => {
                 return (<div key={`${record.id}-fileCount`}>{record.fileCount}</div>);
             }
@@ -106,6 +116,8 @@ export function GalleryList() {
             dataIndex: "created",
             key: "created",
             sorter: true,
+            priority: 5,
+            minWidth: 170,
             render: (_text, record) => {
                 return formatDateTime(record.created);
             }
@@ -115,6 +127,8 @@ export function GalleryList() {
             dataIndex: "modified",
             key: "modified",
             sorter: true,
+            priority: 3,
+            minWidth: 170,
             render: (_text, record) => {
                 if (record.modified === null) {
                     return "-";
@@ -128,6 +142,8 @@ export function GalleryList() {
             dataIndex: "published",
             key: "published",
             sorter: true,
+            priority: 2,
+            minWidth: 170,
             render: (_text, record) => {
                 if (record.published === null) {
                     return "Not published";
@@ -139,6 +155,7 @@ export function GalleryList() {
         {
             title: "Action",
             key: "action",
+            width: 210,
             render: (_text: Record<string, unknown>, record: GalleryListItem) => (
                     <Space key={`${record.id}-buttonSpace`}>
                         <Button

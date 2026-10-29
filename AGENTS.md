@@ -57,6 +57,19 @@
   `WebSiteDataPublish` ("Released"); a never-released row reads "Not published" / "Not released". It is read-only and never sent in a
   request. Tested in `src/__tests__/file/GalleryList.test.tsx`, `src/__tests__/file/galleryScreens.test.tsx` and
   `src/__tests__/WebSiteDataPublish.test.tsx`.
+- The typed file lists (`SiteFileList` over `GenericFileList`, routes `/images`, `/videos`, ... of `App.tsx`) act on single file resources
+  without any gallery: every row has a publish button (`siteFileAPI.publishSelectedFiles({file_ids: [id]})`, `POST
+  /content-management/file/site-files/publish-selected`, 202 with the `PUBLISH_SELECTED_FILES` task tracked through `trackTask`, the list
+  reloads when it finishes) and a delete button behind an antd `Popconfirm` (`siteFileAPI.delete(id)`, `DELETE
+  /content-management/file/site-files/{id}`, removes the file from the admin and its metadata from the website), and the rows can be
+  selected for "Publish selected files (n)", one task for the batch like the gallery list. `GenericFileList` takes the columns as a
+  builder `(reload) => columns` and a `toolbar(reload)` so that the actions reload the current page; the backend enforces the
+  privileges (modify to publish, delete to delete), the SPA shows the actions on every row. Tested in `src/__tests__/file/SiteFileList.test.tsx`.
+- Tables never grow wider than their container: `VempainTable` (`@vempain/vempain-auth-frontend`) drops the columns that do not fit
+  into the expandable row, least important first, down to the identifying column and the actions. The lists rank their columns with
+  `priority` (1 = kept longest), flag the identifying column `mobile` (the ID in `GalleryList` and `PageList`, the file name in
+  `SiteFileList`) and give the action column and the fixed-size columns a `width`, the others a `minWidth`; a new list column needs
+  these hints too, or it is dropped first.
 - Every one of those lists has the "Only modified after publish" filter (`src/main/ReleaseFilterSwitch.tsx`, an antd `Switch` with that
   accessible name): on, only the resources whose website copy is outdated are shown, i.e. released once and modified after that
   release (`published` and `modified` both set, `published < modified`). The server-paged lists send it as `modified_after_publish`
@@ -90,8 +103,10 @@
   The gallery, site file and data set providers hand the backend responses to the editor unchanged, so their `published` timestamp (null when never released to
   the website) reaches the editor's dialogs, which mark such a resource with a warning triangle; keep the
   field when mapping these responses.
-- Page style: `PageEditor.tsx` edits the page's custom CSS in the "Page style" field (`page_style`, a monospace text area; blank is saved as
-  null) and previews it on the editor canvas through the editor's `pageStyle` prop (`Form.useWatch`); `PagePublish.tsx` passes it to the
+- Page style: `PageEditor.tsx` edits the page's custom CSS in the "Page style" field (`page_style`; blank is saved as null) with the
+  library's `PageStyleEditor` (`@vempain/vempain-rt-editor`: a CSS text mode and a visual mode switched in the field, both editing the
+  same string; the Jest stub in `__mocks__/@vempain/vempain-rt-editor.tsx` renders it as the text area with the `aria-label` "Page style")
+  and previews it on the editor canvas through the editor's `pageStyle` prop (`Form.useWatch`); `PagePublish.tsx` passes it to the
   read-only preview. The CSS is published with the page and applied by the website while the page is shown; authors target the canvas as
   `.vps-page-canvas` and may override the website's default style (its `:root` variables), which the editor preview cannot show.
 - Page-gallery links are derived from the body, never edited by hand: `PageEditor.tsx` passes `onEmbedsChange` to the editor,
@@ -125,6 +140,10 @@ yarn build
 
 `yarn lint` is type-aware (`parserOptions.projectService`) and fails on `@typescript-eslint/no-deprecated`: any use of functionality that the type declarations
 mark `@deprecated` (Ant Design props, DOM or library APIs) must be replaced by the documented successor. CI runs it before the build.
+
+`yarn build` type-checks with `tsc -b`: `tsconfig.json` is a solution file (`files: []` plus references to `tsconfig.app.json` and
+`tsconfig.node.json`), which a plain `tsc` accepts without checking a single source, so only the `-b` form fails the build on type errors
+(`vite build` alone never does). `tsconfig.test.json` is not referenced; the test sources are type-checked by ts-jest while the tests run.
 
 - CI uses the reusable `frontend-spa.yaml` workflow from `vempain-workflows` (tests on PRs, Docker image on `main`).
 - Do not commit `dist/`, `coverage/`, `node_modules/` or local environment files.

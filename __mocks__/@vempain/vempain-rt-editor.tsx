@@ -47,3 +47,20 @@ export function RichTextEditor({value, onChange, onEmbedsChange, readOnly, dataP
             </>
     );
 }
+
+export interface PageStyleEditorProps {
+    value?: string | null;
+    onChange?: (css: string) => void;
+    readOnly?: boolean;
+    rows?: number;
+    placeholder?: string;
+    "aria-label"?: string;
+}
+
+/** The style editor reduced to its CSS text mode: the host contract is a controlled string like an input's. */
+export function PageStyleEditor({value, onChange, readOnly, rows, placeholder, "aria-label": ariaLabel = "Page style"}: PageStyleEditorProps) {
+    return (
+            <textarea data-testid="page-style-editor" aria-label={ariaLabel} readOnly={readOnly} rows={rows} placeholder={placeholder}
+                      value={value ?? ""} onChange={event => onChange?.(event.target.value)}/>
+    );
+}

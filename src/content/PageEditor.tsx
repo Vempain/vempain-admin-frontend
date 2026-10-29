@@ -8,6 +8,7 @@ import {
     type DataSetQueryParams,
     type EmbedDataProviders,
     type EmbedDescriptor,
+    PageStyleEditor,
     RichTextEditor as RtEditor,
     type SiteFileQueryParams,
 } from '@vempain/vempain-rt-editor';
@@ -380,9 +381,9 @@ export function PageEditor() {
                         </Form.Item>
                         <Form.Item name={"page_style"} label={"Page style"}
                                    tooltip={"CSS of this page only, published with it. Style the page canvas with .vps-page-canvas and override the "
-                                           + "website's default style (for example its :root variables); the body above previews the canvas rules"}>
-                            <Input.TextArea rows={6} aria-label={"Page style"} placeholder={".vps-page-canvas { max-width: 60rem; }"}
-                                            style={{fontFamily: "monospace"}} spellCheck={false}/>
+                                           + "website's default style (for example its :root variables); the body above previews the canvas rules. "
+                                           + "Switch to Visual to pick the page's elements and properties from lists instead of writing CSS"}>
+                            <PageStyleEditor rows={6} aria-label={"Page style"} placeholder={".vps-page-canvas { max-width: 60rem; }"}/>
                         </Form.Item>
                         <Form.Item label={"Galleries"} key={"page-galleries"}
                                    tooltip={"The galleries embedded in the body are linked to the page and published with it"}>

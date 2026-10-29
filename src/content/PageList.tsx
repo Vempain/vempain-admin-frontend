@@ -1,13 +1,12 @@
 import {useMemo, useState} from "react";
 import {Button, Space, Spin, Switch, Tag} from "antd";
-import type {ColumnsType} from "antd/lib/table";
 import {Link} from "react-router-dom";
 import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled} from "@ant-design/icons";
 import type {PagePagedRequest, PageResponse} from "../models";
 import {pageAPI, userAPI} from "../services";
 import dayjs from "dayjs";
 import {PublishSchedule} from "./PublishSchedule";
-import {usePagedTable, UserName, VempainTable} from "@vempain/vempain-auth-frontend";
+import {usePagedTable, UserName, VempainTable, type VempainColumnsType} from "@vempain/vempain-auth-frontend";
 import {useTaskProgress} from "@vempain/vempain-common-frontend";
 import {ReleaseFilterSwitch} from "../main/ReleaseFilterSwitch";
 import {stickyTableHeader} from "../tools";
@@ -29,26 +28,27 @@ export function PageList() {
         deps: [modifiedAfterPublish]
     });
 
-    const columns: ColumnsType<PageResponse> = useMemo(() => [
-        {title: "ID", dataIndex: "id", key: "id", sorter: true},
-        {title: "Parent ID", dataIndex: "parent_id", key: "parent_id", sorter: true},
-        {title: "Form ID", dataIndex: "form_id", key: "form_id", sorter: true},
-        {title: "Path", dataIndex: "page_path", key: "page_path", sorter: true, searchable: true},
-        {title: "Secure", dataIndex: "secure", key: "secure", sorter: true},
-        {title: "Index List", dataIndex: "index_list", key: "index_list", sorter: true},
-        {title: "Title", dataIndex: "title", key: "title", sorter: true, searchable: true},
+    const columns: VempainColumnsType<PageResponse> = useMemo(() => [
+        {title: "ID", dataIndex: "id", key: "id", sorter: true, mobile: true, width: 80},
+        {title: "Parent ID", dataIndex: "parent_id", key: "parent_id", sorter: true, priority: 12, width: 110},
+        {title: "Form ID", dataIndex: "form_id", key: "form_id", sorter: true, priority: 11, width: 100},
+        {title: "Path", dataIndex: "page_path", key: "page_path", sorter: true, searchable: true, priority: 2, minWidth: 180},
+        {title: "Secure", dataIndex: "secure", key: "secure", sorter: true, priority: 9, width: 100},
+        {title: "Index List", dataIndex: "index_list", key: "index_list", sorter: true, priority: 10, width: 120},
+        {title: "Title", dataIndex: "title", key: "title", sorter: true, searchable: true, priority: 1, minWidth: 180},
         {
-            title: "Tags", dataIndex: "tags", key: "tags", searchable: false,
+            title: "Tags", dataIndex: "tags", key: "tags", searchable: false, priority: 7, minWidth: 160,
             render: (_, record) => (record.tags ?? []).map(tag => <Tag key={tag}>{tag}</Tag>)
         },
-        {title: "Locked", dataIndex: "locked", key: "locked", sorter: true},
-        {title: "Creator", dataIndex: "creator", key: "creator", sorter: true, render: (_, record) => <UserName userAPI={userAPI} id={record.creator}/>},
-        {title: "Created", dataIndex: "created", key: "created", sorter: true, render: (_, record) => dayjs(record.created).format("YYYY.MM.DD HH:mm")},
-        {title: "Modifier", dataIndex: "modifier", key: "modifier", sorter: true, render: (_, record) => <UserName userAPI={userAPI} id={record.modifier}/>},
+        {title: "Locked", dataIndex: "locked", key: "locked", sorter: true, priority: 8, width: 100},
+        {title: "Creator", dataIndex: "creator", key: "creator", sorter: true, priority: 6, minWidth: 140, render: (_, record) => <UserName userAPI={userAPI} id={record.creator}/>},
+        {title: "Created", dataIndex: "created", key: "created", sorter: true, priority: 5, minWidth: 150, render: (_, record) => dayjs(record.created).format("YYYY.MM.DD HH:mm")},
+        {title: "Modifier", dataIndex: "modifier", key: "modifier", sorter: true, priority: 4, minWidth: 140, render: (_, record) => <UserName userAPI={userAPI} id={record.modifier}/>},
         {
             title: "Modified",
             dataIndex: "modified",
             key: "modified",
+            priority: 3, minWidth: 150,
             sorter: true,
             render: (_, record) => record.modified === null ? "-" : dayjs(record.modified).format("YYYY.MM.DD HH:mm")
         },
@@ -56,12 +56,14 @@ export function PageList() {
             title: "Published",
             dataIndex: "published",
             key: "published",
+            priority: 2, minWidth: 150,
             sorter: true,
             render: (_, record) => record.published === null ? "-" : dayjs(record.published).format("YYYY.MM.DD HH:mm")
         },
         {
             title: "Action",
             key: "action",
+            width: 160,
             render: (_text: Record<string, unknown>, record: PageResponse) => (
                     <Space>
                         <Button type="primary" href={`/pages/${record.id}/edit`}><EditOutlined/></Button>
