@@ -12,7 +12,7 @@
     "prestart": "node generateBuildInfo.js",
     "start": "env-cmd -f .env.local vite",
     "start-combined": "env-cmd -f .env.combined vite --port 4000",
-    "build": "yarn prebuild && tsc && env-cmd -f .env.prod vite build",
+    "build": "yarn prebuild && tsc -b && env-cmd -f .env.prod vite build",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage .",
@@ -23,22 +23,22 @@
     "lint:fix": "eslint . --ext ts,tsx --fix"
   },
   "dependencies": {
-    "@ant-design/charts" : "^2.6.7",
+    "@ant-design/charts": "^2.6.7",
     "@ant-design/icons": "^6.3.4",
-    "@vempain/vempain-auth-frontend" : "^2.3.3",
-    "@vempain/vempain-common-frontend" : "^1.0.7",
-    "@vempain/vempain-rt-editor" : "1.0.29",
-    "antd" : "^6.6.8",
-    "axios": "^1.20.0",
+    "@vempain/vempain-auth-frontend": "^2.3.4",
+    "@vempain/vempain-common-frontend": "^1.0.8",
+    "@vempain/vempain-rt-editor": "1.0.30",
+    "antd": "^6.6.8",
+    "axios": "^1.21.0",
     "dayjs": "^1.11.23",
     "dompurify": "^3.4.17",
-    "i18next" : "^26.5.11",
+    "i18next": "^26.5.11",
     "rc-virtual-list": "^3.19.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-highlight-words": "^1.0.0",
-    "react-i18next" : "^17.1.9",
-    "react-router-dom": "^7.18.4",
+    "react-i18next": "^17.1.9",
+    "react-router-dom": "^7.18.5",
     "web-vitals": "^6.2.3"
   },
   "devDependencies": {
@@ -65,8 +65,8 @@
     "jest-environment-jsdom": "^30.5.2",
     "ts-jest": "^29.4.15",
     "typescript": "^6.0.3",
-    "typescript-eslint" : "^8.72.1",
-    "vite" : "^8.3.5"
+    "typescript-eslint": "^8.72.1",
+    "vite": "^8.3.5"
   },
   "browserslist": {
     "production": [
