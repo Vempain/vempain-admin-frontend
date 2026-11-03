@@ -21,6 +21,11 @@
 | `src/__tests__/`                             | Jest tests (`*.test.ts(x)`); screens using `useTaskProgress` mock `@vempain/vempain-common-frontend` |
 | `__mocks__/`                                 | Jest mocks for assets/styles                                                                         |
 
+- Every table is the shared `VempainTable` of `@vempain/vempain-auth-frontend` (`ApiTokens` and `TagBlacklist` included), never a raw Ant
+  Design `Table`, and no screen passes `scroll={{x: ...}}`: a horizontally scrolling table is sized by its content and grew past the
+  viewport (the library drops `scroll.x` anyway). The table fits its container by moving columns into the expandable row, so screens rank
+  their columns with `priority` and give action columns a `width`.
+
 ## Conventions
 
 - Services: `class XxxAPI extends AbstractAPI<Request, Response>`, exported as a singleton created with `import.meta.env.VITE_APP_API_URL` and the
@@ -29,9 +34,12 @@
 - Do not add TypeScript `enum`; use `as const` objects plus a derived type (see `src/models/FileTypeEnum.ts`).
 - Route changes must be reflected in both `src/App.tsx` and `src/main/TopBar.tsx`. The top bar's last dropdown is `System Management`
   (users, units and the Statistics screen); there is no separate user management menu any more.
-- Page tags: `PageEditor` has a `tags` field (`Select mode="tags"`, comma or Enter separates them) saved as `PageRequest.tags` and shown as
-  `PageResponse.tags`; `PageList` renders them in a Tags column. Tested in `src/__tests__/content/PageEditor.test.tsx` and
-  `src/__tests__/content/PageList.test.tsx`.
+- Page tags: `PageEditor` has a `tags` field (`PageTagsInput`, a `Select mode="tags"`; comma or Enter separates them) saved as
+  `PageRequest.tags` and shown as `PageResponse.tags`; `PageList` renders them in a Tags column. The suggestions come from `tagAPI.search`
+  (`GET /content-management/tags?search=&limit=`, `TagResponse` = `id` + `tag_name`, debounced like `PagePathInput`, the first tags when the
+  field opens): the admin backend's tags, which are the tags of the published files (sent by the file backend with every publish) and of the
+  pages. The admin SPA never calls the file backend for tags; a new tag typed here becomes an admin tag when the page is saved. Tested in
+  `src/__tests__/content/PageTagsInput.test.tsx`, `src/__tests__/content/PageEditor.test.tsx` and `src/__tests__/content/PageList.test.tsx`.
 - `src/website/TagBlacklist.tsx` (`/administration/tag-blacklist`, Web Site Management > Tag blacklist) manages the tags that are never
   published to the website through `tagBlacklistAPI` (`GET|POST|DELETE /admin-management/tag-blacklist`, models `TagBlacklistRequest`/
   `TagBlacklistResponse`): an inline add form, the table with who added each tag and a confirmed remove. Tested in
@@ -41,6 +49,14 @@
   per month, resources per user with the per-type sub table, pages by form, forms by layout and component, pages and site files by path. Charts
   come from `@ant-design/charts` (`Column`, `Line`, mocked in tests); resource type labels live in `src/tools/statisticsTools.ts`. Tested in
   `src/__tests__/Statistics.test.tsx` and `src/__tests__/main/TopBar.test.tsx`.
+- `PageEditor.tsx` and `src/file/GalleryEdit.tsx` save through a `SplitActionButton` of `@vempain/vempain-common-frontend`
+  (`htmlType="submit"`, the selected key in the editor's `saveAction` state): "Save page" / "Create" / "Update" save as before, the
+  "... and publish" action saves and then publishes the saved page or gallery at once
+  (`pageAPI.publish` / `galleryAPI.publish` with the created or edited id, no schedule, no message) and hands the 202 task to
+  `useTaskProgress().trackTask`;
+  a failed publish is reported next to the successful save, the page is not rolled back. Picking an action in the menu only changes the
+  label, the main part runs it. The Jest stub of the library (`__mocks__/@vempain/vempain-common-frontend.tsx`) renders one button per
+  action (`<testid>-option-<key>`) and the main part (`<testid>-main`); keep it aligned with the library's props.
 - `PageEditor.tsx`: the path field is `PagePathInput` (`AutoComplete` fed by `pageAPI.suggestPath`, debounced; the backend answers with the
   parent path shared by the readable pages whose path starts with the typed text, never a full existing path), and a new page starts
   with one ACL row granting the signed-in user every privilege (`useSession().userSession.id`).
@@ -57,6 +73,22 @@
   `WebSiteDataPublish` ("Released"); a never-released row reads "Not published" / "Not released". It is read-only and never sent in a
   request. Tested in `src/__tests__/file/GalleryList.test.tsx`, `src/__tests__/file/galleryScreens.test.tsx` and
   `src/__tests__/WebSiteDataPublish.test.tsx`.
+- Data sets are ACL-bearing resources of the admin backend (its `V1011`): `DataSummaryResponse`/`DataResponse` carry `acl_id`, `acls`
+  (`AclVO[]`), `locked`, `creator`, `created`, `modifier` and `modified` (ISO strings; the former `created_at`/`updated_at` are gone) and
+  `WebSiteDataPublish` shows them as the "ACL", "Creator" (`UserName` of the auth library through `userAPI`), "Created", "Modifier" and
+  "Modified" columns next to "Generated" and "Released". The grantees are entered on the file SPA side when the set is created; this SPA
+  only shows them. The screen is one `VempainTable` in server mode over `usePagedTable` (`dataAPI.findPageableDataSets`, default sort
+  `identifier` ascending, 25 rows): every column sorts on the backend, identifier/type/description carry the column text filter
+  (`filter_column`), the other columns are `searchable: false`; the former client-side music/GPS keyword sections are gone, the unpaged
+  `dataAPI.getAllDataSets` stays for the GPS embed discovery of the page editor. Tested in `src/__tests__/WebSiteDataPublish.test.tsx`.
+- `SiteFileMap` (`src/file/SiteFileMap.tsx`, route `/map`, menu File Management > Map) is the map of the published site files with GPS
+  coordinates: the `MapView` of `@vempain/vempain-common-frontend` over `mapAPI` (`src/services/MapAPI.ts`, the admin backend's `MapAPI`
+  endpoints at `/map`, which cluster the readable site files on the backend), the tile server of `src/tools/mapConfig.ts`
+  (`VITE_MAP_TILE_URL`/`VITE_MAP_ATTRIBUTION`, OpenStreetMap by default), tag suggestions through `tagAPI.search`, the thumbnail through
+  `SiteFileThumbnail` (`siteFileAPI.getThumbnail`, `GET /content-management/file/site-files/{id}/thumbnail` as a blob, the only file content
+  this SPA fetches) and the details as a `Descriptions` (`SiteFileMapDetails`, coordinates as value + hemisphere). `leaflet`/`react-leaflet`
+  are dependencies of this SPA for it. The `MapView`/`MapAPI` stubs live in `__mocks__/@vempain/vempain-common-frontend.tsx`
+  (`MAP_STUB_FILE`). Tested in `src/__tests__/file/SiteFileMap.test.tsx`.
 - The typed file lists (`SiteFileList` over `GenericFileList`, routes `/images`, `/videos`, ... of `App.tsx`) act on single file resources
   without any gallery: every row has a publish button (`siteFileAPI.publishSelectedFiles({file_ids: [id]})`, `POST
   /content-management/file/site-files/publish-selected`, 202 with the `PUBLISH_SELECTED_FILES` task tracked through `trackTask`, the list
@@ -74,8 +106,9 @@
   accessible name): on, only the resources whose website copy is outdated are shown, i.e. released once and modified after that
   release (`published` and `modified` both set, `published < modified`). The server-paged lists send it as `modified_after_publish`
   (`PagePagedRequest`, `GalleryPagedRequest`, `SiteFilePagedRequest`; `GenericFileList` owns the switch for the typed site file lists)
-  and the backend filters; `WebSiteDataPublish` filters its loaded data sets client-side with `isModifiedAfterPublish`
-  (`src/tools/releaseTools.ts`, `updated_at` is the data set's modification time). Keep the rule in that helper and in the backend's
+  and the backend filters; `WebSiteDataPublish` is server-paged too (`dataAPI.findPageableDataSets`, `DataPagedRequest` with
+  `modified_after_publish`, `POST /content-management/data/paged`), so the data set filter is applied by the backend as well.
+  `isModifiedAfterPublish` (`src/tools/releaseTools.ts`) remains for client-side uses. Keep the rule in that helper and in the backend's
   `ReleaseState` identical. Tested in `src/__tests__/tools/releaseTools.test.ts` and the list tests above plus
   `src/__tests__/content/PageList.test.tsx`.
 - `src/website/WebSiteConfiguration.tsx` shows the audit trail of each site configuration row ("Modified by"/"Modified" from
@@ -94,6 +127,13 @@
   `acls`/`parentForm` contract. The ACL row rules (either a user or a unit, read required, delete needs modify, create implies read,
   "All" button) and the nested-unit cycle check live and are tested in the auth library, never in a local copy here; here
   `src/__tests__/AclEdit.test.tsx` covers the wrapper with the library editor stubbed and `src/__tests__/PagePathInput.test.tsx` the path input.
+  The lists with selectable ACL-bearing rows, `GalleryList` and the typed `SiteFileList`, carry the library's `AclBulkUpdateButton`
+  ("Permissions of selected (n)") above the table: it opens the shared `AclBulkEditor`, which grants the same rows to every selected
+  resource through `aclAPI.bulkUpdate` (`POST /content-management/acls/bulk`, `ADD` merges, `REPLACE` rewrites; the backend skips the
+  ACLs the user may not modify). The ACL ids come from the rows (`FileGroupListResponse.acls[0].acl_id`, `SiteFileResponse.acl_id`) and
+  are kept per selected id so a selection across pages stays complete; `reportAclBulkUpdate` (`src/tools/aclBulkMessages.ts`) turns the
+  outcome into the success/skipped messages and the list reloads. `src/services/AclAPI.ts` extends the library's `AclAPI`. Tested in
+  `src/__tests__/file/GalleryList.test.tsx` and `SiteFileList.test.tsx` (real library dialog, mocked services).
   Any new shared ACL component, rule or helper this SPA needs is added to `@vempain/vempain-auth-frontend` (the home of all shared ACL
   functionality) and consumed from there, never written here or in `vempain-common-frontend`.
 - Editor integration: `PageEditor.tsx` and `PagePublish.tsx` are the reference host for `RichTextEditor` and its `dataProviders`; keep them aligned

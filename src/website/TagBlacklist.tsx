@@ -1,7 +1,7 @@
-import {Button, Form, Input, message, Popconfirm, Spin, Table, Typography} from "antd";
+import {Button, Form, Input, message, Popconfirm, Spin, Typography} from "antd";
 import type {ColumnsType} from "antd/es/table";
 import {DeleteOutlined, PlusCircleFilled, TagsOutlined} from "@ant-design/icons";
-import {UserName} from "@vempain/vempain-auth-frontend";
+import {UserName, VempainTable} from "@vempain/vempain-auth-frontend";
 import dayjs from "dayjs";
 import {useCallback, useEffect, useState} from "react";
 import type {TagBlacklistRequest, TagBlacklistResponse} from "../models";
@@ -86,7 +86,7 @@ export function TagBlacklist() {
                     </Form.Item>
                 </Form>
                 <Spin spinning={loading}>
-                    <Table dataSource={entries} columns={columns} rowKey="id" pagination={false} scroll={{x: "max-content"}} sticky={stickyTableHeader}
+                    <VempainTable dataSource={entries} columns={columns} rowKey="id" pagination={false} sticky={stickyTableHeader}
                            locale={{emptyText: "No tags are blacklisted"}}/>
                 </Spin>
             </div>

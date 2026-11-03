@@ -2,14 +2,20 @@ import {act, fireEvent, screen, waitFor} from "@testing-library/react";
 import {PageEditor} from "../../content/PageEditor";
 import {formVO, galleryResponse, pagedResponse, pageResponse, SESSION_USER_ID} from "../helpers/testData";
 import {renderAt, selectOption} from "../helpers/renderUtils";
+import * as commonFrontend from "@vempain/vempain-common-frontend";
+
+// The manual Jest stub of the library (__mocks__/@vempain/vempain-common-frontend.tsx) exposes the task tracking spy; it must be read from
+// the same module instance the editor imports (jest.requireMock would instantiate a second copy of the stub)
+const {trackTaskMock} = commonFrontend as unknown as { trackTaskMock: jest.Mock };
 
 const useSession = jest.fn();
-const pageAPI = {findById: jest.fn(), findPageable: jest.fn(), create: jest.fn(), update: jest.fn(), suggestPath: jest.fn()};
+const pageAPI = {findById: jest.fn(), findPageable: jest.fn(), create: jest.fn(), update: jest.fn(), suggestPath: jest.fn(), publish: jest.fn()};
 const formAPI = {findPageable: jest.fn()};
 const galleryAPI = {findById: jest.fn(), findPageableList: jest.fn()};
 const siteFileAPI = {getPagedSiteFiles: jest.fn()};
 const dataAPI = {getAllDataSets: jest.fn()};
 const webSiteManagementAPI = {findInternalLinks: jest.fn()};
+const tagAPI = {search: jest.fn()};
 const aclEdit = jest.fn();
 
 jest.mock("@vempain/vempain-auth-frontend", () => ({
@@ -24,13 +30,15 @@ jest.mock("../../services", () => ({
         findPageable: (...a: unknown[]) => pageAPI.findPageable(...a),
         create: (...a: unknown[]) => pageAPI.create(...a),
         update: (...a: unknown[]) => pageAPI.update(...a),
-        suggestPath: (...a: unknown[]) => pageAPI.suggestPath(...a)
+        suggestPath: (...a: unknown[]) => pageAPI.suggestPath(...a),
+        publish: (...a: unknown[]) => pageAPI.publish(...a)
     },
     formAPI: {findPageable: (...a: unknown[]) => formAPI.findPageable(...a)},
     galleryAPI: {findById: (...a: unknown[]) => galleryAPI.findById(...a), findPageableList: (...a: unknown[]) => galleryAPI.findPageableList(...a)},
     siteFileAPI: {getPagedSiteFiles: (...a: unknown[]) => siteFileAPI.getPagedSiteFiles(...a)},
     dataAPI: {getAllDataSets: (...a: unknown[]) => dataAPI.getAllDataSets(...a)},
-    webSiteManagementAPI: {findInternalLinks: (...a: unknown[]) => webSiteManagementAPI.findInternalLinks(...a)}
+    webSiteManagementAPI: {findInternalLinks: (...a: unknown[]) => webSiteManagementAPI.findInternalLinks(...a)},
+    tagAPI: {search: (...a: unknown[]) => tagAPI.search(...a)}
 }));
 
 // Like the shared editor, the stub keeps the ACL rows in the parent form's `acls` field (unless the host already registers it)
@@ -70,6 +78,9 @@ beforeEach(() => {
     galleryAPI.findPageableList.mockResolvedValue(pagedResponse([]));
     siteFileAPI.getPagedSiteFiles.mockResolvedValue(pagedResponse([]));
     dataAPI.getAllDataSets.mockResolvedValue([]);
+    tagAPI.search.mockResolvedValue([]);
+    pageAPI.publish.mockResolvedValue({result: "OK", message: "", timestamp: "", task: {task_id: "task-1", type: "PUBLISH_PAGE", title: "Publish", status: "QUEUED", total_steps: 1}});
+    trackTaskMock.mockReset();
 });
 
 afterEach(() => jest.restoreAllMocks());
@@ -109,6 +120,52 @@ describe("PageEditor", () => {
         expect(screen.getByText("Back").closest("a")).toHaveAttribute("href", "/pages");
     });
 
+    it("saves and publishes in one step when that action is picked on the split button", async () => {
+        renderAt(<PageEditor/>, {route: "/pages/0/edit", path});
+        await screen.findByTestId("rich-text-editor");
+        await selectOption(screen.getByLabelText("Form"), "Article form");
+        fireEvent.change(screen.getByLabelText("Title"), {target: {value: "Holiday"}});
+
+        // picking the action only changes the label of the main button
+        fireEvent.click(screen.getByTestId("page-save-option-save-and-publish"));
+        expect(screen.getByTestId("page-save-main")).toHaveTextContent("Save and publish");
+        expect(pageAPI.create).not.toHaveBeenCalled();
+        expect(pageAPI.publish).not.toHaveBeenCalled();
+
+        fireEvent.click(screen.getByTestId("page-save-main"));
+        await waitFor(() => expect(pageAPI.publish).toHaveBeenCalledTimes(1));
+        expect(pageAPI.create).toHaveBeenCalledTimes(1);
+        // the created page (id 20 from the create answer) is published right away, without a schedule
+        expect(pageAPI.publish).toHaveBeenCalledWith({id: 20, publish_message: "", publish_schedule: false, publish_date_time: null});
+        expect(await screen.findByText("Page created, publishing started, follow it in the task tray")).toBeInTheDocument();
+        expect(trackTaskMock).toHaveBeenCalledWith(expect.objectContaining({task_id: "task-1"}));
+    });
+
+    it("reports a saved page whose publishing failed and publishes an edited page by its own id", async () => {
+        pageAPI.publish.mockRejectedValue(new Error("offline"));
+        renderAt(<PageEditor/>, {route: "/pages/9/edit", path});
+        await screen.findByTestId("rich-text-editor");
+        fireEvent.click(screen.getByTestId("page-save-option-save-and-publish"));
+        fireEvent.click(screen.getByTestId("page-save-main"));
+        await waitFor(() => expect(pageAPI.publish).toHaveBeenCalledTimes(1));
+        expect(pageAPI.update).toHaveBeenCalledTimes(1);
+        expect(pageAPI.publish.mock.calls[0][0]).toMatchObject({id: 9, publish_schedule: false});
+        expect(await screen.findByText("Page updated, but the publishing failed, publish it again from the page list")).toBeInTheDocument();
+        expect(trackTaskMock).not.toHaveBeenCalled();
+    });
+
+    it("saves without publishing while the plain save action is selected", async () => {
+        renderAt(<PageEditor/>, {route: "/pages/9/edit", path});
+        await screen.findByTestId("rich-text-editor");
+        fireEvent.click(screen.getByTestId("page-save-option-save-and-publish"));
+        fireEvent.click(screen.getByTestId("page-save-option-save"));
+        expect(screen.getByTestId("page-save-main")).toHaveTextContent("Save page");
+        fireEvent.click(screen.getByTestId("page-save-main"));
+        await waitFor(() => expect(pageAPI.update).toHaveBeenCalledTimes(1));
+        expect(await screen.findByText("Page updated")).toBeInTheDocument();
+        expect(pageAPI.publish).not.toHaveBeenCalled();
+    });
+
     it("refuses to save without a valid form", async () => {
         useSession.mockReturnValue({userSession: null});
         renderAt(<PageEditor/>, {route: "/pages/0/edit", path});
@@ -117,6 +174,22 @@ describe("PageEditor", () => {
         fireEvent.click(screen.getByText("Save page"));
         expect(await screen.findByText("Please select a valid form")).toBeInTheDocument();
         expect(pageAPI.create).not.toHaveBeenCalled();
+    });
+
+    it("looks an embedded gallery up once even when the backend answers an empty body for it", async () => {
+        // A gallery the user may not read (or that no longer exists) used to answer 200 with an empty body; the name stayed unresolved and the
+        // editor asked for it again on every state update, flooding the backend. The id is shown and the lookup is not repeated.
+        galleryAPI.findById.mockResolvedValue("");
+        renderAt(<PageEditor/>, {route: "/pages/9/edit", path});
+        expect(await screen.findByTestId("page-gallery-12")).toHaveTextContent("#12");
+        await waitFor(() => expect(screen.getAllByText("Admin (admin)").length).toBe(2));
+
+        // a further render cycle of the editor does not trigger another lookup
+        fireEvent.change(screen.getByLabelText("Page style"), {target: {value: "p { color: blue; }"}});
+        await waitFor(() => expect(screen.getByTestId("rich-text-editor-page-style")).toHaveTextContent("p { color: blue; }"));
+        await new Promise(resolve => setTimeout(resolve, 50));
+        expect(galleryAPI.findById).toHaveBeenCalledTimes(1);
+        expect(galleryAPI.findById).toHaveBeenCalledWith(12, null);
     });
 
     it("edits an existing page with its body sanitized and shows the ids of unreadable galleries", async () => {

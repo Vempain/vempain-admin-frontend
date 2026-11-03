@@ -5,6 +5,13 @@ import type {SiteFilePagedRequest, SiteFilePublishRequest, SiteFileRequest} from
 // AbstractAPI<REQUEST, RESPONSE>
 export class SiteFileAPI extends AbstractAPI<SiteFileRequest, SiteFileResponse> {
 
+    /** The thumbnail image of a site file (GET /site-files/{id}/thumbnail), the generated thumbnail or the image itself; 404 when it has none */
+    public async getThumbnail(siteFileId: number): Promise<Blob> {
+        this.setAuthorizationHeader();
+        const response = await this.axiosInstance.get<Blob>(`/${siteFileId}/thumbnail`, {responseType: "blob"});
+        return response.data;
+    }
+
     public async getPagedSiteFiles(request: SiteFilePagedRequest): Promise<PagedResponse<SiteFileResponse>> {
         this.setAuthorizationHeader();
         const response = await this.axiosInstance.post<PagedResponse<SiteFileResponse>>("/paged", request);

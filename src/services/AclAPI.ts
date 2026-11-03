@@ -1,6 +1,7 @@
-import {AbstractAPI, type AclVO} from "@vempain/vempain-auth-frontend";
+import {AclAPI as SharedAclAPI, type AclVO} from "@vempain/vempain-auth-frontend";
 
-class AclAPI extends AbstractAPI<AclVO, AclVO> {
+/** The library's ACL client (listing and the bulk update of the lists' selected resources) with the null grantees of the rows read as 0 */
+class AclAPI extends SharedAclAPI {
     private static convertNullUserUnit(aclList: AclVO[]): AclVO[] {
         for (let i = 0; i < aclList.length; i++) {
             if (aclList[i].unit === null) {

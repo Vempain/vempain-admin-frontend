@@ -3,6 +3,8 @@ import type {FileTypeEnum} from "../../FileTypeEnum.ts";
 
 export interface SiteFileResponse {
     id: number;
+    /** The ACL of the file, the one its permissions are set through */
+    acl_id: number;
     file_name: string;
     file_path: string;
     file_type: FileTypeEnum;

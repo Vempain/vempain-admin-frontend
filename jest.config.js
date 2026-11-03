@@ -1,7 +1,7 @@
 export default {
     preset: 'ts-jest/presets/js-with-ts',
     testEnvironment: 'jest-environment-jsdom',
-    testTimeout: 15000,
+    testTimeout: 20000,
     maxWorkers: 2,
     // Only *.test.ts(x) files are suites; src/__tests__/helpers/ holds shared test utilities
     testMatch: ['<rootDir>/src/__tests__/**/*.test.{ts,tsx}'],

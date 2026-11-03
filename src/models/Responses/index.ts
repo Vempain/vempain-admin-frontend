@@ -12,6 +12,7 @@ export type {PublishScheduleResponse} from './PublishScheduleResponse';
 export type {ScheduleTriggerResponse} from './ScheduleTriggerResponse';
 export type {StringListVO} from './StringListVO';
 export type {TagBlacklistResponse} from './TagBlacklistResponse';
+export type {TagResponse} from './TagResponse';
 export type {TestVO} from './TestVO';
 export type {WebSiteAclResponse} from './WebSiteAclResponse';
 export type {WebSiteAclUsersResponse} from './WebSiteAclUsersResponse';

@@ -1,11 +1,11 @@
 import {Button, message, Popconfirm, Space, Tag} from "antd";
 import {CloudUploadOutlined, DeleteOutlined} from "@ant-design/icons";
 import {GenericFileList} from "./GenericFileList";
-import {siteFileAPI, userAPI} from "../services";
+import {aclAPI, siteFileAPI, unitAPI, userAPI} from "../services";
 import type {FileTypeEnum, SiteFileResponse} from "../models";
-import {formatDateTimeWithMs, formatFileSize} from "../tools";
+import {formatDateTimeWithMs, formatFileSize, reportAclBulkUpdate} from "../tools";
 import {type Key, useMemo, useState} from "react";
-import {UserName, type VempainColumnsType} from "@vempain/vempain-auth-frontend";
+import {AclBulkUpdateButton, UserName, type VempainColumnsType} from "@vempain/vempain-auth-frontend";
 import {useTaskProgress} from "@vempain/vempain-common-frontend";
 
 interface Props {
@@ -16,6 +16,9 @@ interface Props {
 export function SiteFileList({fileType, title}: Props) {
     const requestParams = useMemo(() => ({file_type: fileType}), [fileType]);
     const [selectedFileIds, setSelectedFileIds] = useState<number[]>([]);
+    // The ACL of every selected file (rows of other pages included), so the bulk permission button follows every selection change
+    const [selectedAclByFile, setSelectedAclByFile] = useState<Record<number, number>>({});
+    const selectedAclIds = selectedFileIds.map((id) => selectedAclByFile[id] ?? 0).filter((aclId) => aclId > 0);
     const [actionLoading, setActionLoading] = useState<boolean>(false);
     const {trackTask} = useTaskProgress();
 
@@ -66,9 +69,17 @@ export function SiteFileList({fileType, title}: Props) {
 
     const rowSelection = {
         selectedRowKeys: selectedFileIds,
-        onChange: (selectedRowKeys: Key[]) => setSelectedFileIds(selectedRowKeys as number[]),
+        onChange: (selectedRowKeys: Key[], selectedRows: SiteFileResponse[]) => {
+            setSelectedFileIds(selectedRowKeys as number[]);
+            setSelectedAclByFile(Object.fromEntries(selectedRows.map((file) => [file.id, file.acl_id])));
+        },
         preserveSelectedRowKeys: true,
     };
+
+    function clearSelection(): void {
+        setSelectedFileIds([]);
+        setSelectedAclByFile({});
+    }
 
     const columnsFor = (reload: () => void): VempainColumnsType<SiteFileResponse> => [
         // The file name identifies the row and stays with the actions however narrow the table gets; the other columns are
@@ -245,6 +256,12 @@ export function SiteFileList({fileType, title}: Props) {
                                     >
                                         Publish selected files ({selectedFileIds.length})
                                     </Button>
+                                    <AclBulkUpdateButton aclIds={selectedAclIds} aclAPI={aclAPI} userAPI={userAPI} unitAPI={unitAPI}
+                                                         onUpdated={(response) => {
+                                                             reportAclBulkUpdate(response, "files");
+                                                             clearSelection();
+                                                             reload();
+                                                         }}/>
                                 </Space>
                         )}
                 />

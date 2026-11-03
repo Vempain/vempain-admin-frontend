@@ -123,6 +123,7 @@ export function pageResponse(overrides: Partial<PageResponse> = {}): PageRespons
 export function siteFile(overrides: Partial<SiteFileResponse> = {}): SiteFileResponse {
     return {
         id: 21,
+        acl_id: 210,
         file_name: "sunset.jpg",
         file_path: "/2026/sunset.jpg",
         file_type: FileTypeEnum.IMAGE,

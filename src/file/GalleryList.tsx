@@ -1,6 +1,7 @@
 import {type Key, useState} from "react";
 import {Button, message, Space, Spin} from "antd";
 import {
+    AclBulkUpdateButton,
     aclTool,
     ActionResult,
     PrivilegeEnum,
@@ -13,16 +14,18 @@ import {
 import type {GalleryPublishRequest} from "../models/Requests/Files";
 import type {RefreshResponse} from "../models";
 import {TaskStatusEnum, useTaskProgress} from "@vempain/vempain-common-frontend";
-import {fileSystemAPI, galleryAPI} from "../services";
+import {aclAPI, fileSystemAPI, galleryAPI, unitAPI, userAPI} from "../services";
 import {Link} from "react-router-dom";
 import {CloudUploadOutlined, DeleteOutlined, EditOutlined, PlusCircleFilled, ReloadOutlined} from "@ant-design/icons";
 import {ReleaseFilterSwitch, SubmitResultHandler} from "../main";
 import {PublishSchedule} from "../content";
 import dayjs, {type Dayjs} from "dayjs";
-import {formatDateTime, stickyTableHeader} from "../tools";
+import {formatDateTime, reportAclBulkUpdate, stickyTableHeader} from "../tools";
 
 interface GalleryListItem {
     id: number;
+    /** The ACL of the gallery, the one its permissions are set through (0 when the response carries no ACL rows) */
+    aclId: number;
     name: string;
     description: string;
     fileCount: number;
@@ -41,6 +44,9 @@ export function GalleryList() {
     const [schedulePublish, setSchedulePublish] = useState<boolean>(false);
     const [publishDate, setPublishDate] = useState<dayjs.Dayjs | null>(null);
     const [selectedGalleryIds, setSelectedGalleryIds] = useState<number[]>([]);
+    // The ACL of every selected gallery (rows of other pages included), so the bulk permission button follows every selection change
+    const [selectedAclByGallery, setSelectedAclByGallery] = useState<Record<number, number>>({});
+    const selectedAclIds = selectedGalleryIds.map((id) => selectedAclByGallery[id] ?? 0).filter((aclId) => aclId > 0);
     const [modifiedAfterPublish, setModifiedAfterPublish] = useState<boolean>(false);
     const {trackTask} = useTaskProgress();
 
@@ -54,6 +60,7 @@ export function GalleryList() {
         return {
             ...response, content: response.content.map((gallery) => ({
                 id: gallery.id,
+                aclId: gallery.acls?.[0]?.acl_id ?? 0,
                 name: gallery.short_name,
                 created: gallery.created,
                 modified: gallery.modified,
@@ -202,9 +209,17 @@ export function GalleryList() {
 
     const rowSelection = {
         selectedRowKeys: selectedGalleryIds,
-        onChange: (selectedRowKeys: Key[]) => setSelectedGalleryIds(selectedRowKeys as number[]),
+        onChange: (selectedRowKeys: Key[], selectedRows: GalleryListItem[]) => {
+            setSelectedGalleryIds(selectedRowKeys as number[]);
+            setSelectedAclByGallery(Object.fromEntries(selectedRows.map((gallery) => [gallery.id, gallery.aclId])));
+        },
         preserveSelectedRowKeys: true,
     };
+
+    function clearSelection(): void {
+        setSelectedGalleryIds([]);
+        setSelectedAclByGallery({});
+    }
 
     function publishAll(): void {
         const publishAll = window.confirm("Are you sure you want to publish all " + (paged.pagination.total ?? 0) + " galleries?");
@@ -250,7 +265,7 @@ export function GalleryList() {
                         trackTask(response.task, {onFinished: () => paged.reload()});
                     }
                     message.success("Selected galleries publishing started");
-                    setSelectedGalleryIds([]);
+                    clearSelection();
                 })
                 .catch((error) => {
                     console.error("Error publishing selected galleries:", error);
@@ -328,6 +343,12 @@ export function GalleryList() {
                             >
                                 Publish selected galleries ({selectedGalleryIds.length})
                             </Button>
+                            <AclBulkUpdateButton aclIds={selectedAclIds} aclAPI={aclAPI} userAPI={userAPI} unitAPI={unitAPI}
+                                                 onUpdated={(response) => {
+                                                     reportAclBulkUpdate(response, "galleries");
+                                                     clearSelection();
+                                                     paged.reload();
+                                                 }}/>
                             <Button type={"primary"}
                                     onClick={refreshhAll}
                                     style={{background: "fuchsia"}}

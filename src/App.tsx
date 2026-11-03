@@ -24,6 +24,7 @@ import {ItemPublishingList, ItemPublishTrigger, SystemScheduleList, SystemSchedu
 import {Login, Logout} from "@vempain/vempain-auth-frontend";
 import {FileTypeEnum} from "./models";
 import {SiteFileList} from "./file/SiteFileList.tsx";
+import {SiteFileMap} from "./file/SiteFileMap.tsx";
 import {TagBlacklist, WebSiteConfiguration, WebSiteDataPublish, WebSiteUserList} from "./website";
 import {ApiTokens, Statistics} from "./administration";
 import {TaskProgressProvider, TaskProgressTray} from "@vempain/vempain-common-frontend";
@@ -89,6 +90,7 @@ function App() {
                                     <Route path={"/unknowns"} element={<SiteFileList fileType={FileTypeEnum.UNKNOWN} title="Unknown Files"/>}/>
                                     <Route path={"/vectors"} element={<SiteFileList fileType={FileTypeEnum.VECTOR} title="Vector Files"/>}/>
                                     <Route path={"/videos"} element={<SiteFileList fileType={FileTypeEnum.VIDEO} title="Video Files"/>}/>
+                                    <Route path={"/map"} element={<SiteFileMap/>}/>
                                     <Route path={"/galleries"} element={<GalleryList/>}/>
                                     <Route path={"/galleries/:paramId/delete"} element={<GalleryDelete/>}/>
                                     <Route path={"/galleries/:paramId/edit"} element={<GalleryEdit/>}/>

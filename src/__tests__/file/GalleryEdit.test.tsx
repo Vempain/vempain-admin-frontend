@@ -2,9 +2,13 @@ import {fireEvent, screen, waitFor} from "@testing-library/react";
 import {GalleryEdit} from "../../file/GalleryEdit";
 import {galleryResponse, pagedResponse, SESSION_USER_ID, siteFile} from "../helpers/testData";
 import {renderAt, selectOption} from "../helpers/renderUtils";
+import * as commonFrontend from "@vempain/vempain-common-frontend";
+
+// The manual Jest stub of the library exposes the task tracking spy; read it from the module instance the editor imports
+const {trackTaskMock} = commonFrontend as unknown as { trackTaskMock: jest.Mock };
 
 const useSession = jest.fn();
-const galleryAPI = {findById: jest.fn(), create: jest.fn(), update: jest.fn()};
+const galleryAPI = {findById: jest.fn(), create: jest.fn(), update: jest.fn(), publish: jest.fn()};
 const siteFileAPI = {getPagedSiteFiles: jest.fn()};
 const aclEdit = jest.fn();
 
@@ -17,7 +21,8 @@ jest.mock("../../services", () => ({
     galleryAPI: {
         findById: (...a: unknown[]) => galleryAPI.findById(...a),
         create: (...a: unknown[]) => galleryAPI.create(...a),
-        update: (...a: unknown[]) => galleryAPI.update(...a)
+        update: (...a: unknown[]) => galleryAPI.update(...a),
+        publish: (...a: unknown[]) => galleryAPI.publish(...a)
     },
     siteFileAPI: {getPagedSiteFiles: (...a: unknown[]) => siteFileAPI.getPagedSiteFiles(...a)}
 }));
@@ -55,6 +60,8 @@ beforeEach(() => {
     galleryAPI.findById.mockResolvedValue(galleryResponse({site_files: [files[0]]}));
     galleryAPI.create.mockResolvedValue(galleryResponse({id: 30}));
     galleryAPI.update.mockResolvedValue(galleryResponse());
+    galleryAPI.publish.mockResolvedValue({result: "OK", message: "", timestamp: "", task: {task_id: "task-g", type: "PUBLISH_GALLERY", title: "Publish", status: "QUEUED", total_steps: 1}});
+    trackTaskMock.mockReset();
     siteFileAPI.getPagedSiteFiles.mockResolvedValue(pagedResponse(files));
 });
 
@@ -90,6 +97,39 @@ describe("GalleryEdit", () => {
         expect(galleryAPI.create.mock.calls[0][0]).toMatchObject({id: 0, short_name: "Trip", description: "Road trip", site_files_id: [22], acls: []});
         expect(await screen.findByText("Gallery created")).toBeInTheDocument();
         expect(screen.getByText("Back").closest("a")).toHaveAttribute("href", "/galleries");
+    });
+
+    it("creates and publishes a gallery in one step when that action is picked on the split button", async () => {
+        renderAt(<GalleryEdit/>, {route: "/galleries/0/edit", path});
+        await screen.findByText("Create Gallery 0");
+        fireEvent.change(screen.getByLabelText("Short Name"), {target: {value: "Trip"}});
+        fireEvent.change(screen.getByLabelText("Description"), {target: {value: "Road trip"}});
+
+        // picking the action only changes the label
+        fireEvent.click(screen.getByTestId("gallery-save-option-save-and-publish"));
+        expect(screen.getByTestId("gallery-save-main")).toHaveTextContent("Create and publish");
+        expect(galleryAPI.create).not.toHaveBeenCalled();
+
+        fireEvent.click(screen.getByTestId("gallery-save-main"));
+        await waitFor(() => expect(galleryAPI.publish).toHaveBeenCalledTimes(1));
+        // the created gallery (id 30 from the create answer) is published right away, without a schedule
+        expect(galleryAPI.publish).toHaveBeenCalledWith({id: 30, publish_message: "", publish_schedule: false, publish_date_time: null});
+        expect(await screen.findByText("Gallery created, publishing started, follow it in the task tray")).toBeInTheDocument();
+        expect(trackTaskMock).toHaveBeenCalledWith(expect.objectContaining({task_id: "task-g"}));
+    });
+
+    it("reports an updated gallery whose publishing failed", async () => {
+        galleryAPI.publish.mockRejectedValue(new Error("offline"));
+        renderAt(<GalleryEdit/>, {route: "/galleries/12/edit", path});
+        await screen.findByText("Update Gallery 12");
+        await screen.findByDisplayValue("Summer");
+        fireEvent.click(screen.getByTestId("gallery-save-option-save-and-publish"));
+        expect(screen.getByTestId("gallery-save-main")).toHaveTextContent("Update and publish");
+        fireEvent.click(screen.getByTestId("gallery-save-main"));
+        await waitFor(() => expect(galleryAPI.publish).toHaveBeenCalledTimes(1));
+        expect(galleryAPI.publish.mock.calls[0][0]).toMatchObject({id: 12, publish_schedule: false});
+        expect(await screen.findByText("Gallery updated, but the publishing failed, publish it again from the gallery list")).toBeInTheDocument();
+        expect(trackTaskMock).not.toHaveBeenCalled();
     });
 
     it("refuses to create a gallery without the required fields", async () => {

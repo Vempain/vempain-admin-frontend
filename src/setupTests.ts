@@ -87,5 +87,5 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
 const testEnv = (globalThis as unknown as { process: { env: Record<string, string | undefined> } }).process.env;
 testEnv.VITE_APP_API_URL ??= "http://localhost:8080/api";
 testEnv.VITE_APP_FILE_URL ??= "http://localhost:8080/files";
-testEnv.VITE_APP_VEMPAIN_COPYRIGHT_FOOTER ??= "Vempain project © 2024-2025";
+testEnv.VITE_APP_VEMPAIN_COPYRIGHT_FOOTER ??= "Vempain project © 2024-2026";
 testEnv.VITE_APP_POWERED_BY_VEMPAIN ??= "Powered by <a href=\"https://vempain.poltsi.fi/\">Vempain System</a>";
