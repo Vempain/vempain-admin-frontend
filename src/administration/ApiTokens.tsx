@@ -1,4 +1,4 @@
-import {Alert, AutoComplete, Button, DatePicker, Form, Input, message, Modal, Popconfirm, Space, Spin, Table, Tag, Typography} from "antd";
+import {Alert, AutoComplete, Button, DatePicker, Form, Input, message, Modal, Popconfirm, Space, Spin, Tag, Typography} from "antd";
 import type {ColumnsType} from "antd/es/table";
 import {DeleteOutlined, KeyOutlined, PlusCircleFilled} from "@ant-design/icons";
 import {useCallback, useEffect, useState} from "react";
@@ -6,7 +6,7 @@ import dayjs, {type Dayjs} from "dayjs";
 import {type ApiTokenCreatedResponse, type ApiTokenNetworkResponse, ApiTokenNetworkSource, type ApiTokenRequest, type ApiTokenResponse} from "../models";
 import {apiTokenAPI, userAPI} from "../services";
 import {formatDateTime, isValidNetwork, stickyTableHeader} from "../tools";
-import {UserName} from "@vempain/vempain-auth-frontend";
+import {UserName, VempainTable} from "@vempain/vempain-auth-frontend";
 
 interface TokenFormValues {
     description: string;
@@ -140,7 +140,7 @@ export function ApiTokens() {
                     administrator who created it, works only from its network until it expires and can only call the service endpoints.
                 </Typography.Paragraph>
                 <Spin spinning={loading}>
-                    <Table dataSource={tokens} columns={columns} rowKey="id" pagination={false} scroll={{x: "max-content"}} sticky={stickyTableHeader}/>
+                    <VempainTable dataSource={tokens} columns={columns} rowKey="id" pagination={false} sticky={stickyTableHeader}/>
                 </Spin>
 
                 <Modal open={creating} title="Create API token" onOk={() => form.submit()} onCancel={() => setCreating(false)}

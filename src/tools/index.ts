@@ -16,3 +16,6 @@ export {isModifiedAfterPublish} from './releaseTools';
 export {RESOURCE_TYPE_LABELS, resourceTypeLabel} from './statisticsTools';
 export {toInternalLinkTarget, WEBSITE_FILE_ROUTE_PREFIX, WEBSITE_PAGE_ROUTE_PREFIX} from './internalLinkTools';
 export type {InternalLinkTarget} from './internalLinkTools';
+export {MAP_TILE_URL, MAP_ATTRIBUTION} from './mapConfig';
+export {formatCoordinates} from './mapFileTools';
+export {reportAclBulkUpdate} from './aclBulkMessages';

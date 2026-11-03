@@ -8,10 +8,12 @@ export {layoutAPI} from './LayoutAPI';
 export {pageAPI} from './PageAPI';
 export {scheduleAPI} from './ScheduleAPI';
 export {statisticsAPI} from './StatisticsAPI';
+export {tagAPI} from './TagAPI';
 export {tagBlacklistAPI} from './TagBlacklistAPI';
 export {unitAPI} from './UnitAPI';
 export {userAPI} from './UserAPI';
 export {webSiteManagementAPI} from './WebSiteManagementAPI';
 export {taskAPI} from './TaskAPI';
+export {mapAPI} from './MapAPI';
 
 export * from './Files';

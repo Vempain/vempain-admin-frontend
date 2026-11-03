@@ -8,6 +8,7 @@ import {
     ClockCircleOutlined,
     ContainerOutlined,
     DatabaseOutlined,
+    EnvironmentOutlined,
     FieldTimeOutlined,
     FileImageOutlined,
     FileOutlined,
@@ -150,6 +151,11 @@ export function TopBar() {
                         label: (<Link to={"/videos"}>Video</Link>),
                         key: "video",
                         icon: <VideoCameraOutlined/>
+                    },
+                    {
+                        label: (<Link to={"/map"}>Map</Link>),
+                        key: "map",
+                        icon: <EnvironmentOutlined/>
                     },
                     {
                         label: (<Link to={"/galleries"}>Gallery</Link>),

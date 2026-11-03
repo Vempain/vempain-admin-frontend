@@ -8,6 +8,8 @@ import {acl, fileGroupListResponse, pagedResponse, SESSION_USER_ID} from "../hel
 const useSession = jest.fn();
 const galleryAPI = {findPageableList: jest.fn(), publishAll: jest.fn(), publishSelectedGalleries: jest.fn()};
 const fileSystemAPI = {refreshAllGalleryFiles: jest.fn()};
+const aclAPI = {bulkUpdate: jest.fn()};
+const lookupAPI = {findPageable: jest.fn()};
 const trackTask = jest.fn();
 
 jest.mock("@vempain/vempain-auth-frontend", () => ({
@@ -26,7 +28,10 @@ jest.mock("../../services", () => ({
         publishAll: (...a: unknown[]) => galleryAPI.publishAll(...a),
         publishSelectedGalleries: (...a: unknown[]) => galleryAPI.publishSelectedGalleries(...a)
     },
-    fileSystemAPI: {refreshAllGalleryFiles: (...a: unknown[]) => fileSystemAPI.refreshAllGalleryFiles(...a)}
+    fileSystemAPI: {refreshAllGalleryFiles: (...a: unknown[]) => fileSystemAPI.refreshAllGalleryFiles(...a)},
+    aclAPI: {bulkUpdate: (...a: unknown[]) => aclAPI.bulkUpdate(...a)},
+    userAPI: {findPageable: (...a: unknown[]) => lookupAPI.findPageable(...a)},
+    unitAPI: {findPageable: (...a: unknown[]) => lookupAPI.findPageable(...a)}
 }));
 
 const task = {task_id: "t3", type: "PUBLISH_GALLERY", title: "g", status: "QUEUED", total_steps: 3};
@@ -56,6 +61,8 @@ describe("GalleryList", () => {
                 published: dayjs("2026-01-05T08:00:00Z")
             })
         ]));
+        lookupAPI.findPageable.mockResolvedValue(pagedResponse([{id: SESSION_USER_ID, name: "Seven", nick: "seven", login_name: "seven"}]));
+        aclAPI.bulkUpdate.mockResolvedValue({updated_acl_ids: [100], skipped_acl_ids: []});
         galleryAPI.publishAll.mockResolvedValue({result: "OK", message: "", timestamp: "", task});
         galleryAPI.publishSelectedGalleries.mockResolvedValue({result: "OK", message: "", timestamp: "", task});
         fileSystemAPI.refreshAllGalleryFiles.mockResolvedValue({result: "OK", refreshed_items: 1, failed_items: 0, details: [], task});
@@ -157,6 +164,36 @@ describe("GalleryList", () => {
         expect(await screen.findByText("Publish selected galleries (0)")).toBeInTheDocument();
         (trackTask.mock.calls[0][1] as { onFinished: () => void }).onFinished();
         await waitFor(() => expect(galleryAPI.findPageableList).toHaveBeenCalledTimes(2));
+    });
+
+    it("sets the permissions of the selected galleries through the shared bulk dialog and reloads the list", async () => {
+        jest.spyOn(message, "warning").mockImplementation(() => ({}) as never);
+        aclAPI.bulkUpdate.mockResolvedValue({updated_acl_ids: [100], skipped_acl_ids: [101]});
+        renderList();
+        await screen.findByText("Summer");
+        expect(screen.getByRole("button", {name: "Permissions of selected (0)"})).toBeDisabled();
+
+        fireEvent.click(within(row("Summer")).getByRole("checkbox"));
+        fireEvent.click(within(row("Winter")).getByRole("checkbox"));
+        fireEvent.click(await screen.findByRole("button", {name: "Permissions of selected (2)"}));
+
+        const dialog = await screen.findByRole("dialog");
+        expect(within(dialog).getByText("Permissions of the selected resources (2)")).toBeInTheDocument();
+        await waitFor(() => expect(lookupAPI.findPageable).toHaveBeenCalledTimes(2));
+        fireEvent.click(within(dialog).getByLabelText("Replace with these"));
+        fireEvent.mouseDown(within(dialog).getAllByRole("combobox")[0]);
+        fireEvent.click(await screen.findByText("Seven (seven)", {selector: ".ant-select-item-option-content"}));
+        fireEvent.click(within(dialog).getByRole("button", {name: "Apply"}));
+
+        await waitFor(() => expect(aclAPI.bulkUpdate).toHaveBeenCalledWith({
+            acl_ids: [100, 100],
+            mode: "REPLACE",
+            entries: [{user: SESSION_USER_ID, unit: null, create_privilege: false, read_privilege: true, modify_privilege: false, delete_privilege: false}]
+        }));
+        expect(message.success).toHaveBeenCalledWith("Permissions of 1 galleries updated");
+        expect(message.warning).toHaveBeenCalledWith("1 galleries were skipped: the modify privilege on a resource is needed to change its permissions");
+        await waitFor(() => expect(galleryAPI.findPageableList).toHaveBeenCalledTimes(2));
+        expect(screen.getByRole("button", {name: "Permissions of selected (0)"})).toBeDisabled();
     });
 
     it("reports a failed selected publish and accepts a scheduled answer without a task", async () => {

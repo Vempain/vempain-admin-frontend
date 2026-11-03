@@ -6,6 +6,8 @@ import {FileTypeEnum} from "../../models";
 import {pagedResponse, siteFile} from "../helpers/testData";
 
 const siteFileAPI = {getPagedSiteFiles: jest.fn(), publishSelectedFiles: jest.fn(), delete: jest.fn()};
+const aclAPI = {bulkUpdate: jest.fn()};
+const lookupAPI = {findPageable: jest.fn()};
 const trackTask = jest.fn();
 
 jest.mock("@vempain/vempain-common-frontend", () => ({
@@ -18,7 +20,9 @@ jest.mock("../../services", () => ({
         publishSelectedFiles: (...a: unknown[]) => siteFileAPI.publishSelectedFiles(...a),
         delete: (...a: unknown[]) => siteFileAPI.delete(...a)
     },
-    userAPI: {findById: jest.fn().mockResolvedValue({id: 1, nick: "alice"})}
+    userAPI: {findById: jest.fn().mockResolvedValue({id: 1, nick: "alice"}), findPageable: (...a: unknown[]) => lookupAPI.findPageable(...a)},
+    unitAPI: {findPageable: (...a: unknown[]) => lookupAPI.findPageable(...a)},
+    aclAPI: {bulkUpdate: (...a: unknown[]) => aclAPI.bulkUpdate(...a)}
 }));
 
 const task = {task_id: "t7", type: "PUBLISH_SELECTED_FILES", title: "Publish 1 selected files", status: "QUEUED", total_steps: 1};
@@ -39,6 +43,8 @@ describe("SiteFileList", () => {
         ]));
         siteFileAPI.publishSelectedFiles.mockResolvedValue({result: "OK", message: "", timestamp: "", task});
         siteFileAPI.delete.mockResolvedValue(true);
+        lookupAPI.findPageable.mockResolvedValue(pagedResponse([{id: 1, name: "Alice", nick: "alice", login_name: "alice"}]));
+        aclAPI.bulkUpdate.mockResolvedValue({updated_acl_ids: [210, 220], skipped_acl_ids: []});
     });
 
     afterEach(() => jest.restoreAllMocks());
@@ -84,6 +90,33 @@ describe("SiteFileList", () => {
         await waitFor(() => expect(siteFileAPI.publishSelectedFiles).toHaveBeenCalledWith({file_ids: [21, 22]}));
         expect(message.success).toHaveBeenCalledWith("Publishing of the selected files started");
         await waitFor(() => expect(screen.getByRole("button", {name: "Publish selected files (0)"})).toBeDisabled());
+    });
+
+    it("sets the permissions of the selected files through the shared bulk dialog and reloads the list", async () => {
+        siteFileAPI.getPagedSiteFiles.mockResolvedValue(pagedResponse([siteFile(), siteFile({id: 22, acl_id: 220, file_name: "dawn.jpg"})]));
+        renderList();
+        await screen.findByText("sunset.jpg");
+        expect(screen.getByRole("button", {name: "Permissions of selected (0)"})).toBeDisabled();
+
+        fireEvent.click(within(row("sunset.jpg")).getByRole("checkbox"));
+        fireEvent.click(within(row("dawn.jpg")).getByRole("checkbox"));
+        fireEvent.click(await screen.findByRole("button", {name: "Permissions of selected (2)"}));
+
+        const dialog = await screen.findByRole("dialog");
+        await waitFor(() => expect(lookupAPI.findPageable).toHaveBeenCalledTimes(2));
+        fireEvent.mouseDown(within(dialog).getAllByRole("combobox")[0]);
+        fireEvent.click(await screen.findByText("Alice (alice)", {selector: ".ant-select-item-option-content"}));
+        fireEvent.click(within(dialog).getByRole("button", {name: "Grant all privileges"}));
+        fireEvent.click(within(dialog).getByRole("button", {name: "Apply"}));
+
+        await waitFor(() => expect(aclAPI.bulkUpdate).toHaveBeenCalledWith({
+            acl_ids: [210, 220],
+            mode: "ADD",
+            entries: [{user: 1, unit: null, create_privilege: true, read_privilege: true, modify_privilege: true, delete_privilege: true}]
+        }));
+        expect(message.success).toHaveBeenCalledWith("Permissions of 2 files updated");
+        await waitFor(() => expect(siteFileAPI.getPagedSiteFiles).toHaveBeenCalledTimes(2));
+        await waitFor(() => expect(screen.getByRole("button", {name: "Permissions of selected (0)"})).toBeDisabled());
     });
 
     it("reports a failed publish without reloading", async () => {

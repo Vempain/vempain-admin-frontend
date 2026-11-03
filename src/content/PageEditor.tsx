@@ -1,9 +1,10 @@
 import {useParams} from "react-router-dom";
 import {type UIEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {Button, Form, Input, Select, Spin, Switch, Tag, Typography} from "antd";
+import {Form, Input, Select, Spin, Switch, Tag, Typography} from "antd";
 import type {RuleObject} from "antd/es/form";
 import {AclEdit} from "./AclEdit";
 import {PagePathInput} from "./PagePathInput";
+import {PageTagsInput} from "./PageTagsInput";
 import {
     type DataSetQueryParams,
     type EmbedDataProviders,
@@ -15,15 +16,25 @@ import {
 import {MetadataForm, SubmitResultHandler} from "../main";
 import {dataAPI, formAPI, galleryAPI, pageAPI, siteFileAPI, webSiteManagementAPI} from "../services";
 import {aclTool, type AclVO, ActionResult, type SubmitResult, useSession, validateParamId} from "@vempain/vempain-auth-frontend";
-import {type FileTypeEnum, type FormVO, type PageRequest, type PageResponse, type SiteFilePagedRequest} from "../models";
+import {type SplitAction, SplitActionButton, useTaskProgress} from "@vempain/vempain-common-frontend";
+import {type FileTypeEnum, type FormVO, type PageRequest, type PageResponse, type PublishItemRequest, type SiteFilePagedRequest} from "../models";
 import dayjs from "dayjs";
 import {galleryIdsFromEmbeds, sameGalleryIds, sanitizeRichText, toInternalLinkTarget} from "../tools";
 
 // Define the loading messages
 const spinMessages: Record<string, string> = {
     loadingPageData: "Loading page data...",
-    savingPageData: "Saving page data..."
+    savingPageData: "Saving page data...",
+    publishingPageData: "Publishing the page",
 };
+
+/** The actions of the split save button; the selected one is kept in the editor's state and read when the form is submitted */
+const SAVE_ACTION = "save";
+const SAVE_AND_PUBLISH_ACTION = "save-and-publish";
+const SAVE_ACTIONS: SplitAction[] = [
+    {key: SAVE_ACTION, label: "Save page"},
+    {key: SAVE_AND_PUBLISH_ACTION, label: "Save and publish"},
+];
 const PAGE_OPTION_PAGE_SIZE = 50;
 
 function toSiteFilePagedRequest(params: SiteFileQueryParams): SiteFilePagedRequest {
@@ -72,6 +83,9 @@ export function PageEditor() {
 
     const [page, setPage] = useState<PageResponse | null>(null);
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
+    // What the split save button does: save only, or save and start the publishing of the saved page right away
+    const [saveAction, setSaveAction] = useState<string>(SAVE_ACTION);
+    const {trackTask} = useTaskProgress();
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
 
     const [formList, setFormList] = useState<FormVO[]>([]);
@@ -140,28 +154,36 @@ export function PageEditor() {
         setGalleryIds(current => sameGalleryIds(current, next) ? current : next);
     }, []);
 
+    // The galleries whose name was already asked for, so that every embedded gallery is looked up once per editor session: a lookup that
+    // yields no usable name (an unreadable or missing gallery answers an empty 200 or an error) must not be repeated, the id is shown instead
+    const requestedGalleryNamesRef = useRef<Set<number>>(new Set());
+    const mountedRef = useRef(true);
+
+    useEffect(() => {
+        mountedRef.current = true;
+        return () => {
+            mountedRef.current = false;
+        };
+    }, []);
+
     // Resolve the names of the embedded galleries for the summary; an unreadable or missing gallery is shown by its id
     useEffect(() => {
-        const missing = galleryIds.filter(id => galleryNames[id] === undefined);
+        const missing = galleryIds.filter(id => !requestedGalleryNamesRef.current.has(id));
 
         if (missing.length === 0) {
             return;
         }
 
-        let cancelled = false;
+        missing.forEach(id => requestedGalleryNamesRef.current.add(id));
         Promise.all(missing.map(id => galleryAPI.findById(id, null)
-                .then(gallery => [id, gallery.short_name] as const)
+                .then(gallery => [id, typeof gallery?.short_name === "string" && gallery.short_name !== "" ? gallery.short_name : `#${id}`] as const)
                 .catch(() => [id, `#${id}`] as const)))
                 .then(entries => {
-                    if (!cancelled) {
+                    if (mountedRef.current) {
                         setGalleryNames(current => ({...current, ...Object.fromEntries(entries)}));
                     }
                 });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [galleryIds, galleryNames]);
+    }, [galleryIds]);
 
     function handlePagePopupScroll(event: UIEvent<HTMLDivElement>): void {
         const target = event.currentTarget;
@@ -274,12 +296,14 @@ export function PageEditor() {
         setSpinTip(spinMessages.savingPageData);
         setLoading(true);
 
+        const publishAfterSave = saveAction === SAVE_AND_PUBLISH_ACTION;
         if (pageId > 0) {
             pageAPI.update(safeValues)
                     .then((response) => {
                         console.debug("Update response:", response);
-                        setSubmitResults({status: ActionResult.OK, message: "Page updated"});
+                        return publishAfterSave ? publishSavedPage(pageId, "Page updated") : "Page updated";
                     })
+                    .then((message) => setSubmitResults({status: ActionResult.OK, message}))
                     .catch((error) => {
                         console.error("Error updating:", error);
                         setSubmitResults({status: ActionResult.FAIL, message: "Failed to update the page, try again later"});
@@ -291,8 +315,9 @@ export function PageEditor() {
             pageAPI.create(safeValues)
                     .then((response) => {
                         console.debug("Create response:", response);
-                        setSubmitResults({status: ActionResult.OK, message: "Page created"});
+                        return publishAfterSave ? publishSavedPage(response.id, "Page created") : "Page created";
                     })
+                    .then((message) => setSubmitResults({status: ActionResult.OK, message}))
                     .catch((error) => {
                         console.error("Error creating:", error);
                         setSubmitResults({status: ActionResult.FAIL, message: "Failed to create the page, try again later"});
@@ -301,6 +326,26 @@ export function PageEditor() {
                         setLoading(false);
                     });
         }
+    }
+
+    /**
+     * The second step of "Save and publish": publishes the saved page right away (no schedule, no message) and follows the background
+     * task in the task tray. A failed publish does not undo the save, so the message says both.
+     */
+    function publishSavedPage(savedPageId: number, savedMessage: string): Promise<string> {
+        setSpinTip(spinMessages.publishingPageData);
+        const publishRequest: PublishItemRequest = {id: savedPageId, publish_message: "", publish_schedule: false, publish_date_time: null};
+        return pageAPI.publish(publishRequest)
+                .then((response) => {
+                    if (response.task) {
+                        trackTask(response.task);
+                    }
+                    return savedMessage + ", publishing started, follow it in the task tray";
+                })
+                .catch((error) => {
+                    console.error("Error publishing the saved page:", error);
+                    return savedMessage + ", but the publishing failed, publish it again from the page list";
+                });
     }
 
     function formValidation(_rule: RuleObject, value: number): Promise<void> {
@@ -372,9 +417,10 @@ export function PageEditor() {
                         <Form.Item name={"header"} label={"Header"}>
                             <Input/>
                         </Form.Item>
-                        <Form.Item name={"tags"} label={"Tags"} tooltip={"Published to the website with the page and shown next to its title"}>
-                            <Select mode={"tags"} tokenSeparators={[","]} placeholder={"Type a tag and press Enter"} aria-label={"Tags"}
-                                    open={false}/>
+                        <Form.Item name={"tags"} label={"Tags"}
+                                   tooltip={"Published to the website with the page and shown next to its title. Pick from the tags of the "
+                                           + "published files and pages, or type a new one and press Enter"}>
+                            <PageTagsInput placeholder={"Type to search the tags, Enter adds a new one"} aria-label={"Tags"}/>
                         </Form.Item>
                         <Form.Item name={"body"} label={"Body"}>
                             <RtEditor dataProviders={mergedDataProviders} onEmbedsChange={handleEmbedsChange} pageStyle={pageStyle}/>
@@ -406,7 +452,8 @@ export function PageEditor() {
                             <MetadataForm metadata={{creator: page.creator, created: page.created, modifier: page.modifier, modified: page.modified}}/>
                         </Form.Item>
                         <Form.Item wrapperCol={{offset: 8, span: 16,}} style={{textAlign: "center"}}>
-                            <Button type={"primary"} htmlType={"submit"}>Save page</Button>
+                            <SplitActionButton actions={SAVE_ACTIONS} selectedActionKey={saveAction} onActionSelect={setSaveAction}
+                                               htmlType={"submit"} menuLabel={"Choose how to save"} data-testid={"page-save"}/>
                         </Form.Item>
                     </Form>}
 

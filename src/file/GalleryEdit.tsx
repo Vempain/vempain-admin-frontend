@@ -2,14 +2,19 @@ import {useParams} from "react-router-dom";
 import {type ChangeEvent, type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {SubmitResultHandler} from "../main";
 import {Button, Form, Input, Select, Space, Spin, Switch, Transfer, Typography} from "antd";
+import {type SplitAction, SplitActionButton, useTaskProgress} from "@vempain/vempain-common-frontend";
 import type {TransferProps} from "antd/es/transfer";
 import VirtualList from "rc-virtual-list";
 import {galleryAPI, siteFileAPI} from "../services";
 import {AclEdit} from "../content";
 import type {SiteFileResponse} from "../models";
-import {FileTypeEnum, type GalleryRequest, type GalleryResponse} from "../models";
+import {FileTypeEnum, type GalleryRequest, type GalleryResponse, type PublishItemRequest} from "../models";
 import {aclTool, type AclVO, ActionResult, SortDirectionEnum, type SubmitResult, useSession, validateParamId} from "@vempain/vempain-auth-frontend";
 import dayjs from "dayjs";
+
+/** The actions of the split save button; the selected one is kept in the editor's state and read when the form is submitted */
+const SAVE_ACTION = "save";
+const SAVE_AND_PUBLISH_ACTION = "save-and-publish";
 
 const PAGE_SIZE = 50;
 
@@ -37,6 +42,14 @@ export function GalleryEdit() {
     const [loadResults, setLoadResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [submitResults, setSubmitResults] = useState<SubmitResult>({status: ActionResult.NO_CHANGE, message: ""});
     const [sendButtonText, setSendButtonText] = useState<string>("Update");
+    // What the split save button does: save only, or save and start the publishing of the saved gallery right away
+    const [saveAction, setSaveAction] = useState<string>(SAVE_ACTION);
+    const {trackTask} = useTaskProgress();
+    // "Create" or "Update" follows the page, the second action adds the publishing
+    const saveActions = useMemo<SplitAction[]>(() => [
+        {key: SAVE_ACTION, label: sendButtonText},
+        {key: SAVE_AND_PUBLISH_ACTION, label: sendButtonText + " and publish"},
+    ], [sendButtonText]);
     const [acls, setAcls] = useState<AclVO[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -274,15 +287,38 @@ export function GalleryEdit() {
 
         setLoading(true);
 
+        const savedMessage = galleryId > 0 ? "Gallery updated" : "Gallery created";
         const operation = galleryId > 0 ? galleryAPI.update(payload) : galleryAPI.create(payload);
-        operation.then(() => {
-            setSubmitResults({status: ActionResult.OK, message: galleryId > 0 ? "Gallery updated" : "Gallery created"});
+        operation.then((saved) => {
+            const savedId = galleryId > 0 ? galleryId : saved.id;
+            return saveAction === SAVE_AND_PUBLISH_ACTION ? publishSavedGallery(savedId, savedMessage) : savedMessage;
+        }).then((message) => {
+            setSubmitResults({status: ActionResult.OK, message});
         }).catch((error) => {
             console.error("Failed to save gallery:", error);
             setSubmitResults({status: ActionResult.FAIL, message: galleryId > 0 ? "Failed to update gallery" : "Failed to create gallery"});
         }).finally(() => {
             setLoading(false);
         });
+    }
+
+    /**
+     * The second step of "... and publish": publishes the saved gallery right away (no schedule, no message) and follows the background task in the
+     * task tray. A failed publish does not undo the save, so the message says both.
+     */
+    function publishSavedGallery(savedGalleryId: number, savedMessage: string): Promise<string> {
+        const publishRequest: PublishItemRequest = {id: savedGalleryId, publish_message: "", publish_schedule: false, publish_date_time: null};
+        return galleryAPI.publish(publishRequest)
+                .then((response) => {
+                    if (response.task) {
+                        trackTask(response.task);
+                    }
+                    return savedMessage + ", publishing started, follow it in the task tray";
+                })
+                .catch((error) => {
+                    console.error("Error publishing the saved gallery:", error);
+                    return savedMessage + ", but the publishing failed, publish it again from the gallery list";
+                });
     }
 
     if (loadResults.status !== ActionResult.NO_CHANGE) {
@@ -447,9 +483,8 @@ export function GalleryEdit() {
                             <AclEdit acls={acls} parentForm={galleryForm}/>
                         </Form.Item>
                         <Space size={12} style={{width: "100%", justifyContent: "center"}}>
-                            <Button type="primary" htmlType="submit" disabled={loading}>
-                                {sendButtonText}
-                            </Button>
+                            <SplitActionButton actions={saveActions} selectedActionKey={saveAction} onActionSelect={setSaveAction}
+                                               htmlType="submit" disabled={loading} menuLabel="Choose how to save" data-testid="gallery-save"/>
                             <Button type="default" htmlType="reset" disabled={loading} onClick={() => {
                                 if (gallery) {
                                     galleryForm.setFieldsValue(gallery);
