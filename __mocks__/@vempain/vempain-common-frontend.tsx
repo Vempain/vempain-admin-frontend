@@ -5,6 +5,9 @@
  * Tests that need to assert on task tracking spy on `trackTaskMock` or provide their own jest.mock factory.
  */
 import {type ReactNode, useState} from "react";
+import axios from "axios";
+import {message} from "antd";
+import {ReturnType} from "node:ffi";
 
 export const TaskStatusEnum = {
     QUEUED: 'QUEUED' as const,
@@ -67,6 +70,195 @@ export class TaskAPI {
     getTask = jest.fn();
     cancelTask = jest.fn();
     dismissTask = jest.fn();
+}
+
+export const ApiTokenScope = {
+    FILE_SERVICE: "FILE_SERVICE",
+    MCP_READ: "MCP_READ"
+} as const;
+
+export const ApiTokenNetworkSource = {
+    CONFIGURED: "CONFIGURED",
+    PRIVATE_NETWORK: "PRIVATE_NETWORK",
+    NONE: "NONE"
+} as const;
+
+export class ApiTokenAPI {
+    readonly baseURL: string;
+    readonly member: string;
+    private readonly axiosInstance: ReturnType<typeof axios.create>;
+
+    constructor(baseURL: string, member: string) {
+        this.baseURL = baseURL;
+        this.member = member;
+        this.axiosInstance = axios.create({baseURL: `${baseURL}${member}`});
+    }
+
+    async list() {
+        return (await this.axiosInstance.get("", {params: undefined})).data;
+    }
+
+    async defaultNetwork() {
+        return (await this.axiosInstance.get("/default-network")).data;
+    }
+
+    async createToken(request: unknown) {
+        return (await this.axiosInstance.post("", request)).data;
+    }
+
+    async deleteToken(id: number) {
+        await this.axiosInstance.delete(`/${id}`);
+    }
+}
+
+export function isValidNetwork(value: string | undefined): boolean {
+    if (!value) return false;
+    const text = value.trim();
+    return /^(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}(\/([0-9]|[12]\d|3[0-2]))?$/.test(text)
+            || /^[0-9A-Fa-f:.]*:[0-9A-Fa-f:.]*(\/(\d|[1-9]\d|1[01]\d|12[0-8]))?$/.test(text);
+}
+
+interface MockToken {
+    id: number;
+    token_prefix: string;
+    description: string;
+    scope: MockTokenScope;
+    network: string;
+    expires_at: string;
+    owner_user_id: number;
+    created: string;
+    last_used: string | null;
+    expired: boolean;
+}
+
+interface MockNetworkResponse {
+    network: string | null;
+    source: typeof ApiTokenNetworkSource[keyof typeof ApiTokenNetworkSource];
+    candidates: { network: string; interface_name: string; address: string }[];
+}
+
+interface MockCreatedResponse {
+    token: string;
+    api_token: MockToken;
+}
+
+type MockTokenScope = typeof ApiTokenScope[keyof typeof ApiTokenScope];
+
+interface MockTokenAPI {
+    list: () => Promise<MockToken[]>;
+    defaultNetwork: () => Promise<MockNetworkResponse>;
+    createToken: (request: { description: string; network: string; expires_at: string; scope?: MockTokenScope }) => Promise<MockCreatedResponse>;
+    deleteToken: (id: number) => Promise<void>;
+}
+
+export function ApiTokenManagement(props: {
+    api: MockTokenAPI;
+    scopeOptions: { value: MockTokenScope; label: string }[];
+    defaultScope?: MockTokenScope;
+    descriptionPlaceholder: string;
+    creationTitle: string;
+    description: string;
+    networkHint: (suggestion: MockNetworkResponse | null) => string;
+    createdTokenDescription: (token: MockToken) => string;
+}) {
+    const [tokens, setTokens] = useState<MockToken[]>([]);
+    const [creating, setCreating] = useState(false);
+    const [suggestion, setSuggestion] = useState<MockNetworkResponse | null>(null);
+    const [created, setCreated] = useState<MockCreatedResponse | null>(null);
+    const [description, setDescription] = useState("");
+    const [network, setNetwork] = useState("");
+    const [scope, setScope] = useState(props.defaultScope ?? props.scopeOptions[0]?.value);
+    const [networkError, setNetworkError] = useState(false);
+
+    const load = () => props.api.list()
+            .then(setTokens)
+            .catch(() => message.error("Failed to load the API tokens"));
+
+    useState(() => {
+        void load();
+        return undefined;
+    });
+
+    const openCreate = () => {
+        setCreating(true);
+        props.api.defaultNetwork()
+                .then(value => {
+                    setSuggestion(value);
+                    setNetwork(value.network ?? "");
+                })
+                .catch(() => setSuggestion(null));
+    };
+
+    const submit = () => {
+        if (!isValidNetwork(network)) {
+            setNetworkError(true);
+            return;
+        }
+        setNetworkError(false);
+        props.api.createToken({
+            description: description.trim(),
+            network: network.trim(),
+            expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+            scope
+        }).then(value => {
+            setCreated(value);
+            setCreating(false);
+            void load();
+        }).catch(() => message.error("Failed to create the API token"));
+    };
+
+    const remove = (token: MockToken) => props.api.deleteToken(token.id)
+            .then(() => {
+                message.success(`API token ${token.token_prefix} deleted`);
+                void load();
+            })
+            .catch(() => message.error("Failed to delete the API token"));
+
+    return <div className="DarkDiv">
+        <h1>API tokens</h1>
+        <button onClick={openCreate}>Create token</button>
+        <p>{props.description}</p>
+        <div className="ant-table-sticky-holder" style={{top: "60px"}}>
+            {tokens.map(token => <div key={token.id}>
+                <code>{token.token_prefix}…</code>
+                <span>{token.description}</span>
+                <span>{token.scope}</span>
+                <code>{token.network}</code>
+                <span>{token.last_used ? token.last_used : "never"}</span>
+                <button aria-label={`Delete token ${token.token_prefix}`} onClick={() => {
+                    const confirmation = document.createElement("button");
+                    confirmation.textContent = "Delete";
+                    confirmation.onclick = () => {
+                        confirmation.remove();
+                        void remove(token);
+                    };
+                    document.body.appendChild(confirmation);
+                }}/>
+            </div>)}
+        </div>
+        {creating && <div role="dialog">
+            <h2>{props.creationTitle}</h2>
+            <input placeholder={props.descriptionPlaceholder} value={description} onChange={event => setDescription(event.target.value)}/>
+            <input aria-label="Allowed network (IPv4 or IPv6, CIDR or single address)" role="combobox" value={network}
+                   onChange={event => {
+                       setNetwork(event.target.value);
+                       setNetworkError(false);
+                   }}/>
+            <p>{props.networkHint(suggestion)}</p>
+            {networkError && <p>Enter an IPv4/IPv6 address or CIDR network</p>}
+            {props.scopeOptions.map(option => <label key={option.value}>
+                <input type="radio" name="scope" aria-label={option.label} checked={scope === option.value} onChange={() => setScope(option.value)}/>
+                {option.label}
+            </label>)}
+            <button onClick={submit}>Create</button>
+            <button onClick={() => setCreating(false)}>Cancel</button>
+        </div>}
+        {created && <div role="dialog">
+            <p data-testid="created-token">{created.token}</p>
+            <p>{props.createdTokenDescription(created.api_token)}</p>
+            <button aria-label="Close" onClick={() => setCreated(null)}>I have stored the token</button>
+        </div>}
+    </div>;
 }
 
 export const trackTaskMock = jest.fn();

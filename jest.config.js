@@ -17,6 +17,7 @@ export default {
         // Deep antd imports (antd/es/...) are ESM and pull ESM @babel/runtime helpers; the CommonJS build is equivalent
         '^antd/es/(.*)$': '<rootDir>/node_modules/antd/lib/$1',
         '^@vempain/vempain-auth-frontend$': '<rootDir>/node_modules/@vempain/vempain-auth-frontend/dist/index.js',
+        '^@vempain/vempain-common-frontend$': '<rootDir>/__mocks__/@vempain/vempain-common-frontend.tsx',
         // The rich-text editor ships an ESM-only build; the stub keeps the props contract (value/onChange/onEmbedsChange/dataProviders)
         '^@vempain/vempain-rt-editor$': '<rootDir>/__mocks__/@vempain/vempain-rt-editor.tsx',
         '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/__mocks__/fileMock.js',
