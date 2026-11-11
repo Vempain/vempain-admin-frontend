@@ -21,7 +21,7 @@ jest.mock("../services", () => ({
 }));
 
 const stored = {
-    id: 3, token_prefix: "vat_k3Jd9Qx2", description: "file backend", network: "10.0.0.0/24", expires_at: "2027-01-01T00:00:00Z",
+    id: 3, token_prefix: "vat_k3Jd9Qx2", description: "file backend", scope: "FILE_SERVICE", network: "10.0.0.0/24", expires_at: "2027-01-01T00:00:00Z",
     owner_user_id: 1, created: "2026-10-09T10:00:00Z", last_used: null, expired: false
 };
 
@@ -53,6 +53,7 @@ describe("ApiTokens", () => {
         render(<ApiTokens/>);
         await waitFor(() => expect(screen.getByText("vat_k3Jd9Qx2…")).toBeTruthy());
         expect(screen.getByText("file backend")).toBeTruthy();
+        expect(screen.getByText("FILE_SERVICE")).toBeTruthy();
         expect(screen.getByText("10.0.0.0/24")).toBeTruthy();
         expect(screen.getByText("never")).toBeTruthy();
         // The unpaged token list keeps its header visible below the 60px top bar while scrolling
@@ -78,9 +79,25 @@ describe("ApiTokens", () => {
         const request = createToken.mock.calls[0][0];
         expect(request.description).toBe("file backend");
         expect(request.network).toBe("10.0.0.0/24");
+        expect(request.scope).toBe("FILE_SERVICE");
         expect(new Date(request.expires_at).getTime()).toBeGreaterThan(Date.now());
         await waitFor(() => expect(screen.getByTestId("created-token").textContent).toContain("vat_k3Jd9Qx2SECRET"));
         expect(list).toHaveBeenCalledTimes(2);
+    });
+
+    it("creates an MCP_READ token when that scope is selected", async () => {
+        createToken.mockResolvedValue({token: "vat_mcpSECRET", api_token: {...stored, scope: "MCP_READ"}});
+        render(<ApiTokens/>);
+        await waitFor(() => expect(list).toHaveBeenCalledTimes(1));
+
+        fireEvent.click(screen.getByText("Create token"));
+        fireEvent.change(await screen.findByPlaceholderText("vempain-file-backend production"), {target: {value: "vempain-mcp"}});
+        fireEvent.change(screen.getByRole("combobox"), {target: {value: "10.0.0.0/24"}});
+        fireEvent.click(screen.getByLabelText("MCP_READ (GET /mcp/** only)"));
+        fireEvent.click(screen.getByText("Create"));
+
+        await waitFor(() => expect(createToken).toHaveBeenCalledTimes(1));
+        expect(createToken.mock.calls[0][0].scope).toBe("MCP_READ");
     });
 
     it("pre-fills the network detected from the private network and offers the alternatives", async () => {

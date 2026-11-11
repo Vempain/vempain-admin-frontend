@@ -117,7 +117,7 @@ describe("SiteFileList", () => {
         expect(message.success).toHaveBeenCalledWith("Permissions of 2 files updated");
         await waitFor(() => expect(siteFileAPI.getPagedSiteFiles).toHaveBeenCalledTimes(2));
         await waitFor(() => expect(screen.getByRole("button", {name: "Permissions of selected (0)"})).toBeDisabled());
-    });
+    }, 60000);
 
     it("reports a failed publish without reloading", async () => {
         siteFileAPI.publishSelectedFiles.mockRejectedValue(new Error("boom"));

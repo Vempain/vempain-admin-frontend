@@ -24,4 +24,4 @@ export type {WebSiteConfigurationResponse} from './WebSiteConfigurationResponse'
 export * from './Files';
 export type {PagePathSuggestionResponse} from "./PagePathSuggestionResponse";
 export type {ApiTokenResponse, ApiTokenCreatedResponse, ApiTokenNetworkResponse, ApiTokenNetworkCandidate} from "./ApiTokenResponse";
-export {ApiTokenNetworkSource} from "./ApiTokenResponse";
+export {ApiTokenNetworkSource, ApiTokenScope} from "./ApiTokenResponse";
