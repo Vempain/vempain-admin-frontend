@@ -3612,7 +3612,7 @@ __metadata:
     "@typescript/native": "npm:typescript@^7.0.2"
     "@vempain/vempain-auth-frontend": "npm:^2.4.0"
     "@vempain/vempain-common-frontend": "npm:^1.1.0"
-    "@vempain/vempain-rt-editor": "npm:1.0.31"
+    "@vempain/vempain-rt-editor": "npm:1.1.0"
     "@vitejs/plugin-react": "npm:^6.3.0"
     "@vitejs/plugin-react-swc": "npm:^4.3.3"
     antd: "npm:^6.7.0"
@@ -3680,9 +3680,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vempain/vempain-rt-editor@npm:1.0.31":
-  version: 1.0.31
-  resolution: "@vempain/vempain-rt-editor@npm:1.0.31::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-rt-editor%2F1.0.31%2Fbdb995c8cdee38fe6098153903b73b85d5077a4a"
+"@vempain/vempain-rt-editor@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@vempain/vempain-rt-editor@npm:1.1.0::__archiveUrl=https%3A%2F%2Fnpm.pkg.github.com%2Fdownload%2F%40vempain%2Fvempain-rt-editor%2F1.1.0%2Fd6278b3f431ff8efd0a9a8ab0be7fa2471b27911"
   peerDependencies:
     "@ant-design/icons": ^6.2.3
     antd: ^6.4.3
@@ -3690,7 +3690,7 @@ __metadata:
     rc-virtual-list: ^3.19.2
     react: ^19.2.0
     react-dom: ^19.2.0
-  checksum: 10c0/1264b538dc4f50095aa052ff07806b04e83ee5a7de96cd52e0f8bfd3c6455ffb5bd6ee058a214a028449db46143ad2156781e9d223fb7d23877e927c1da2d7d8
+  checksum: 10c0/f1152284e1f5d97fa42e8ce33c9b8442fc7b0f2587928e2271231ad28fcb7442c97a86d77ea72df0b46e69d61499bb098cfc0f552a2cc7764735c18dd372e545
   languageName: node
   linkType: hard
 

@@ -27,7 +27,7 @@
     "@ant-design/icons": "^6.3.4",
     "@vempain/vempain-auth-frontend" : "^2.4.0",
     "@vempain/vempain-common-frontend" : "^1.1.0",
-    "@vempain/vempain-rt-editor": "1.0.31",
+    "@vempain/vempain-rt-editor" : "1.1.0",
     "antd" : "^6.7.0",
     "axios" : "^1.21.1",
     "dayjs": "^1.11.23",
