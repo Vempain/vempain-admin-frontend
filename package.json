@@ -25,14 +25,14 @@
   "dependencies": {
     "@ant-design/charts": "^2.6.7",
     "@ant-design/icons": "^6.3.4",
-    "@vempain/vempain-auth-frontend": "^2.3.5",
-    "@vempain/vempain-common-frontend" : "^1.0.10",
+    "@vempain/vempain-auth-frontend" : "^2.4.0",
+    "@vempain/vempain-common-frontend" : "^1.1.0",
     "@vempain/vempain-rt-editor": "1.0.31",
     "antd" : "^6.7.0",
     "axios" : "^1.21.1",
     "dayjs": "^1.11.23",
     "dompurify": "^3.4.17",
-    "i18next" : "^27.1.0",
+    "i18next" : "^27.1.1",
     "leaflet": "^1.9.4",
     "rc-virtual-list": "^3.19.2",
     "react": "^19.3.1",
@@ -69,7 +69,7 @@
     "ts-jest": "^29.4.15",
     "typescript": "^6.0.3",
     "typescript-eslint" : "^8.72.2",
-    "vite" : "^8.3.7"
+    "vite" : "^8.3.8"
   },
   "browserslist": {
     "production": [
